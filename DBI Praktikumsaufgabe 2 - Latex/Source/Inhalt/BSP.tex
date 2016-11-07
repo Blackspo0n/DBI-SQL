@@ -1,0 +1,150 @@
+\section{Analysephase}
+\label{sec:Analysephase}
+
+\subsection{SQL Test}
+\label{sec:SQL Test}
+\lstset{language=SQL,numbers=none}
+Das ist ein PostgreSQL Test: \\
+\begin{lstlisting}
+SELECT p.pid FROM orders AS o 
+INNER JOIN products AS p ON (o.pid = p.pid)
+INNER JOIN agents AS a ON (o.aid = a.aid)
+INNER JOIN costumers AS c ON (o.cid = c.cid)
+WHERE a.city = 'Tokio' AND c.city = 'Dallas'
+\end{lstlisting}
+
+\subsection{IST-Analyse}
+\label{sec:IstAnalyse}
+
+Fast jedes von der \acl{mention} geschriebene .NET-Programm besitzt ein eigenes
+Rechtesystem, welches bestimmte Programmfunktionen in der Benutzung einschränkt.
+
+Die Zugriffsrechte der meisten .NET-Programme werden unabhängig von der
+\acs{WAWI}, meist in verschlüsselten \gqq{.dat} Dateien, gespeichert. Diese
+Rechte sind nur im Programm selber gültig und haben keinerlei Einfluss auf
+andere Anwendungen, da diese im Programmverzeichnis abgelegt werden.
+
+In der Tabelle \Reference{tab:verschiedeneRechteverwaltungen} ist eine
+Übersicht über aktuell gewartete Programme und deren eigenständigen
+Rechtesysteme gegeben.\\
+
+\tabelle{verschiedene
+Rechteverwaltungen}{tab:verschiedeneRechteverwaltungen}{ZeitplanungKomplett.tex}
+
+\subsection{Wirtschaftlichkeitsanalyse}
+\label{sec:Wirtschaftlichkeitsanalyse}
+Durch die vielen einzelnen Implementationen sind in den letzten Monaten
+immer wieder Schwierigkeiten bei der Rechtevergabe aufgetreten. Um dieses
+Problem zu lösen wurde unter Umständen bis zu ein Entwicklertag
+investiert.
+
+Durch die Entwicklung einer zentralen Rechteverwaltung für die .NET
+Programme für \ac{mention} soll dieses immer wiederkehrende Problem
+gelöst werden.
+Durch diese Lösung sollen dem Unternehmen \ac{mention}
+keine unnötigen Kosten mehr entstehen und die Kosten für künftige Projekte
+gering gehalten werden.\\
+
+\subsubsection{\gqq{Make or Buy}-Entscheidung}
+\label{sec:MakeOrBuyEntscheidung}
+Um zu ermitteln wie das Problem mit der Rechteverwaltung zu lösen ist wurde,
+bevor die Entwurfsphase begonnen wurde, nach einer bereits fertigen und kostengünstigen Lösung gesucht.
+
+Eine fertige Lösung zur Verwaltung der Benutzerrechte müsste die folgenden
+Kriterien besitzen damit sie für die Zwecke des Betriebs \ac{mention} in Frage
+kommt:
+\begin{itemize}
+	\item Kompatibilität zur \ac{MSSQL} Datenbank der \ac{mention} \ac{WAWI}
+	\item gegliedert in Nutzer, Rollen, Berechtigungen
+	\item Backend zur Administration der Nutzerrechte
+	\item integrierbar als Programmbibliothek in aktuelle .NET-Programme
+\end{itemize}
+
+Durch den wichtigsten Punkt, die Datenbank des \acs{WAWI}, ist eine eigene
+Implementation die beste Alternative, denn für etwaige Lösungen müsste die
+\ac{WAWI} angepasst werden, was wiederum einen nicht schätzbaren Aufwand
+darstellen würde, da jedes Programm, einschließlich der FoxPro Programme,
+dahingehend geändert werden müsste.
+
+Recherchiert wurde die im Zend
+Framework\footnote{\url{http://framework.zend.com/}} befindliche ACL
+Technologie. Das Akronym ACL steht für Access Control List. Würde diese Lösung
+verwendet werden, ständen Nutzerrollen und Zugriffsregeln zur Verfügung. Das
+Framework basiert jedoch auf der Programmiersprache
+PHP\footnote{\url{http:///www.php.net/}}. Diese Sprache ist mit Standardmitteln
+nicht als eine \ac{DLL} kompilierbar.
+
+Für die Programmiersprache C\# existiert keine eigenständige Lösung zum
+Administrieren der Rechte von Benutzern.\\
+
+\subsubsection{Projektkosten}
+\label{sec:Projektkosten}
+
+Die Entwicklungskosten für das Projekt die durch die Durchführung des
+Projektes entstehen setzen sich sowohl aus Personal-, als auch aus
+Ressourcenkosten zusammen.
+
+Der gemittelte Stundensatz der festangestellten Entwickler beläuft sich auf
+\eur{50}.\newline Der monatliche Bruttolohn in dem dritten Lehrjahr von dem
+Autor und Auszubildenden \autor{}, liegt bei \eur{750}.
+Der Stundensatz von Autor \autor{} ist allerdings nicht
+festgelegt. Um aber dennoch die Kosten korrekt darzulegen hat der Autor \autor{}
+den Stundensatz mittels nachstehender Berechnung errechnet:
+
+\begin{eqnarray}
+8 \mbox{ h/Tag} \cdot 220 \mbox{ Tage/Jahr} = 1760 \mbox{ h/Jahr}\\
+\eur{750}\mbox{/Monat} \cdot 12 \mbox{ Monate/Jahr} = \eur{9000}
+\mbox{/Jahr}\\
+\frac{\eur{9000} \mbox{/Jahr}}{1760 \mbox{ h/Jahr}} \approx \eur{5.12}\mbox{/h}
+\end{eqnarray}
+\setcounter{equation}{0}
+
+Es ergibt sich ein Stundenlohn von \eur{5.12}. 
+
+Die Durchführungszeit des Projektes beträgt 70 Stunden. Für die Nutzung von
+Ressourcen\footnote{Räumlichkeiten, Arbeitsplatzrechner etc.} wird ein
+pauschaler Stundensatz von \eur{15} angenommen.
+Eine Aufstellung der Kosten befindet sich in
+der Tabelle. 
+
+Insgesamt wurden, unter der Berücksichtigung der genannten
+Wertestellungen, Kosten in Höhe von \eur{1723,40} errechnet.
+
+\subsubsection{Amortisationsdauer / Gewinnbringende Nutzung}
+\label{sec:Amortisationsdauer}
+
+Durch die Entwicklung dieser Bibliothek fallen Kosten an. Durch
+nachstehende Rechnung soll die Amortisationsdauer\footnote{Zeit für die
+Zurückgewinnung der Projektkosten} berechnet werden und mit dem IST-Zustand,
+der im Abschnitt \Reference{sec:IstAnalyse} erläutert wird, verglichen werden.
+
+\begin{itemize}
+	\item Geschätzter Aufwand für die Entwicklung eigener Systeme: 4
+	Entwicklerstunden (\eur{50}/h)
+	\item Geschätzter Aufwand für die Implementation der Bibliothek: 30 Minuten
+	(\eur{50}/h)
+\end{itemize}
+
+Die gesparten Kosten pro Projekt ergeben sich anschließend wie
+folgt:\begin{eqnarray} (4\mbox{h} - 0.5\mbox{h}) \cdot \eur{50} = \eur{175}
+\end{eqnarray}
+\setcounter{equation}{0}
+
+Für die Amortisationsdauer ergibt sich folgende Rechnung:\begin{eqnarray}
+\eur{175} = \mbox{gesparte Kosten/Projekt}\\
+\frac{\mbox{Projektkosten}}{\mbox{gesparte Kosten}} = 
+\frac{\eur{1723,40}}{\eur{175}}
+= 9,848\mbox{ Projekte} \approx 10\mbox{ Projekte}
+\end{eqnarray}
+\setcounter{equation}{0}
+
+Die Amortisationsdauer des Projektes liegt also bei 9
+Projektimplementierungen.\\
+
+\subsection{Lastenheft}
+\label{sec:Lastenheft}
+Um die konkreten Anforderungen, die an das Projekt gestellt werden, festzuhalten
+wurde ein Lastenheft von dem Ausbilder und Auftraggeber \ac{mention} erstellt.
+
+In diesem wurden die Projektanforderungen aus der Sicht des Auftragsgebers
+definiert. Das gekürzte Lastenheft befindet sich im \Anhang{app:Lastenheft}.

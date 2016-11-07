@@ -1,0 +1,233 @@
+\addsec{Praktikumsaufgabe 2)}
+\label{sec:Praktikumsaufgabe 2}
+\lstset{language=SQL,numbers=none}
+
+\subsection{Teilaufgabe a)}
+\label{sec:Teilaufgabe a}
+Bestimme alle Paare aus ORDNO und PID für Bestellungen mit einer QTY größer oder
+gleich 1000.
+\begin{lstlisting}
+SELECT ordno, 
+       pid 
+FROM   orders 
+WHERE  qty >= 1000
+\end{lstlisting}
+Anzahl der Ergebnistupel: 7
+
+\subsection{Teilaufgabe b)}
+\label{sec:Teilaufgabe b}
+Bestimme alle Produktnamen für Produkte mit einem Preis zwischen 0.50 und 1.00
+Dollar inklusive beider Grenzen.
+
+\begin{lstlisting}
+SELECT pname 
+FROM   products 
+WHERE  price >= 0.5 
+       AND price <= 1
+\end{lstlisting}
+Anzahl der Ergebnismenge: 6
+
+
+\subsection{Teilaufgabe c)}
+\label{sec:Teilaufgabe c}
+Bestimme alle Paare aus ORDNO und CNAME für Bestellungen mit einem Wert unter 500 Dollar.
+
+\begin{lstlisting}
+SELECT ordno, 
+       cname 
+FROM   orders AS o 
+       INNER JOIN customers 
+               ON o.cid = customers.cid 
+WHERE  dollars < 500 
+\end{lstlisting}
+Anzahl der Ergebnistupel: 6
+
+
+\subsection{Teilaufgabe d)}
+\label{sec:Teilaufgabe d}
+Bestimme alle Trippel aus ORDNO, CNAME und ANAME für Bestellungen im März.
+
+\begin{lstlisting}
+SELECT o.cid, 
+       o.aid, 
+       o.month 
+FROM   orders AS o 
+       INNER JOIN customers 
+               ON ( o.cid = customers.cid ) 
+       INNER JOIN agents 
+               ON ( o.aid = agents.aid ) 
+WHERE  o.month = 'mar'
+
+\end{lstlisting}
+Anzahl der Ergebnistripel: 3
+
+
+\subsection{Teilaufgabe e)}
+\label{sec:Teilaufgabe e}
+Bestimme die Produktnamen der Produkte, die in Duluth gelagert werden und für die im März Bestellungen vorlagen.
+
+\begin{lstlisting}
+SELECT pname, 
+       p.pid, 
+       city 
+FROM   products AS p 
+       LEFT JOIN orders AS o 
+              ON ( p.pid = o.pid ) 
+WHERE  p.city = 'Duluth' 
+       AND o.month = 'mar' 
+
+\end{lstlisting}
+Anzahl der Ergebnistripel: 0
+
+
+\subsection{Teilaufgabe f)}
+\label{sec:Teilaufgabe f}
+Bestimme alle möglichen Trippel aus CID, AID und PID, so dass alle dieselbe Adresse besitzen. 
+
+\begin{lstlisting}
+SELECT c.cid, 
+       a.aid, 
+       p.pid 
+FROM   customers AS c 
+       INNER JOIN agents AS a 
+               ON ( c.city = a.city ) 
+       INNER JOIN products AS p 
+               ON( a.city = p.city ) 
+\end{lstlisting}
+Anzahl der Ergebnistripel: 10
+
+
+\subsection{Teilaufgabe g)}
+\label{sec:Teilaufgabe g}
+Bestimme alle möglichen Trippel aus CID, AID und PID, so dass nicht alle dieselbe Adresse besitzen (jeweils zwei Adressen dürfen aber übereinstimmen). 
+
+\begin{lstlisting}
+SELECT c.cid, 
+       a.aid, 
+       p.pid 
+FROM   products AS p, 
+       customers AS c, 
+       agents AS a 
+WHERE  ( p.city ! = c.city 
+          OR c.city != a.city 
+          OR a.city	 != p.city )  
+
+\end{lstlisting}
+Anzahl der Ergebnistripel: 200
+
+
+\subsection{Teilaufgabe h)}
+\label{sec:Teilaufgabe h}
+Bestimme nochmals alle möglichen Trippel aus CID, AID und PID, so dass keine zwei Adressen übereinstimmen. 
+
+\begin{lstlisting}
+SELECT c.cid, 
+       a.aid, 
+       p.pid 
+FROM   products AS p, 
+       customers AS c, 
+       agents AS a 
+WHERE  ( p.city != c.city 
+         AND c.city != a.city 
+         AND a.city != p.city )
+
+\end{lstlisting}
+Anzahl der Ergebnistripel: 107
+
+\subsection{Teilaufgabe i)}
+\label{sec:Teilaufgabe i}
+Bestimme die Produktnamen der Produkte, die von mindestens einem Kunden aus Dallas durch einen Vertriebsagenten in Tokyo bestellt wurden.
+
+\begin{lstlisting} 
+SELECT p.pname 
+FROM   orders AS o 
+       INNER JOIN agents AS a 
+               ON o.aid = a.aid 
+       INNER JOIN products AS p 
+               ON p.pid = o.pid 
+       INNER JOIN customers AS c 
+               ON o.cid = c.cid 
+WHERE  a.city = 'Tokyo' 
+       AND c.city = 'Dallas'
+
+\end{lstlisting}
+Anzahl der Ergebnismenge: 3
+
+
+\subsection{Teilaufgabe j)}
+\label{sec:Teilaufgabe j}
+Bestimme die PIDs der Produkte, die durch Vertriebsagenten bestellt wurden, die mindestens eine Bestellung für einen Kunden aus Kyoto durchgeführt haben. 
+
+\begin{lstlisting}
+SELECT p.pid 
+FROM   orders AS o 
+       INNER JOIN agents AS a 
+               ON o.aid = a.aid 
+       INNER JOIN products AS p 
+               ON p.pid = o.pid 
+       INNER JOIN customers AS c 
+               ON o.cid = c.cid 
+WHERE  a.city = 'Kyoto' 
+\end{lstlisting}
+Anzahl der Ergebnismenge: 3
+
+
+\subsection{Teilaufgabe k)}
+\label{sec:Teilaufgabe k}
+Bestimme AID-Paare, so dass die beiden unterschiedlichen(!) Agenten in derselben CITY beheimatet sind.
+
+\begin{lstlisting}
+SELECT a1.aid, 
+       a2.aid 
+FROM   agents AS a1 
+       INNER JOIN agents AS a2 
+               ON ( a1.aid != a2.aid 
+                    AND a1.city = a2.city )  
+
+\end{lstlisting}
+Anzahl der Ergebnistupel: 2
+
+
+\subsection{Teilaufgabe l)}
+\label{sec:Teilaufgabe l}
+Bestimme die Kundennummern der Kunden, die keine Bestellung über den Vertriebsagenten „a03“ getätigt haben. 
+
+\begin{lstlisting}
+SELECT DISTINCT cid 
+FROM   orders 
+       INNER JOIN agents 
+               ON ( orders.aid = agents.aid ) 
+WHERE  agents.aid != 'a03'  
+\end{lstlisting}
+Anzahl der Ergebnistmenge: 4
+
+
+\subsection{Teilaufgabe m)}
+\label{sec:Teilaufgabe m}
+Bestimme die Kundennummern der Kunden, die sowohl das Produkt „p01“ als auch das Produkt „p07“ bestellt haben. 
+
+\begin{lstlisting}
+SELECT DISTINCT cid 
+FROM   orders 
+WHERE  cid IN (SELECT cid 
+               FROM   orders 
+               WHERE  pid = 'p07' 
+                       OR pid = 'p01')  
+
+\end{lstlisting}
+Anzahl der Ergebnistripel: 3
+
+\subsection{Teilaufgabe n)}
+\label{sec:Teilaufgabe n}
+Bestimme die Kundennummern der Kunden, die bereits alle Produkte bestellt haben. 
+
+\begin{lstlisting}
+SELECT cid 
+FROM   customers 
+WHERE  (SELECT Count(DISTINCT pid) 
+        FROM   orders 
+        WHERE  customers.cid = orders.cid) = (SELECT Count(pid) 
+                                              FROM   products)  
+
+\end{lstlisting}
+Anzahl der Ergebnismenge: 1

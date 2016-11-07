@@ -1,0 +1,40 @@
+\documentclass[
+	toc=listof, 
+	toc=bibliography, % Literaturverzeichnis in das Inhaltsverzeichnis aufnehmen
+	footnotes=multiple, % Trennen von direkt aufeinander folgenden Fußnoten
+	parskip=half, % vertikalen Abstand zwischen Absätzen verwenden anstatt
+	% horizontale Einrückung von Folgeabsätzen
+	headlines=2.1
+]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[scaled]{uarial}
+
+
+\newcommand{\titel}{Datenbank- und Informationssysteme}
+\newcommand{\untertitel}{Praktikumsaufgabe 6 - Einbindung von jdbc}
+ 
+\newcommand{\abgabedatum}{9. November 2016}
+\newcommand{\keywords}{DBI, JDBC, SQL, Query, postgresql, Java}
+\newcommand{\datum}{\today}
+ 
+ 
+\newcommand{\autoren}{
+	Jonas Stadtler//jonas.stadler@studmail.w-hs.de,
+	Mario Kellner//mario.kellner@studmail.w-hs.de,
+	Markus Hausmann//markus.hausmann@studmail.w-hs.de
+}
+
+\input{Meta.tex}
+\input{Allgemein/Packages.tex} 
+\input{Allgemein/Seitenstil.tex}
+\input{Allgemein/Befehle.tex}
+
+\begin{document}
+\input{Deckblatt.tex}
+\clearpage
+
+\pagenumbering{arabic}
+\input{Inhalt.tex}
+
+\end{document}
