@@ -170,6 +170,7 @@ pythontex-files-*/
 
 # xypic precompiled matrices
 *.xyc
+*.xmpi
 
 # endfloat
 *.ttt
@@ -185,7 +186,7 @@ TSWLatexianTemp*
 
 # Texpad
 .texpadtmp
-
+.
 # Kile
 *.backup
 
