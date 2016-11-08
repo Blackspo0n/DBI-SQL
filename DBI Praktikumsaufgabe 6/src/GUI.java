@@ -69,6 +69,7 @@ public class GUI extends JFrame implements ActionListener
 		this.ausgabeFenster=new JFrame();
 		ausgabeFenster.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		ausgabeFenster.setLocationRelativeTo(null);
+		ausgabe.setSize(200, 300);
 		ausgabe= new JTextArea();
 		
 		
@@ -77,6 +78,7 @@ public class GUI extends JFrame implements ActionListener
 		for (Agent row: list)
 		{
 			ausgabe.setText(ausgabe.getText()+"\n"+ row.getAgent()+"          "+row.getUmsatz());
+			
 		}
 		
 		//hinzufügen einer Scrollbar
@@ -102,11 +104,7 @@ public class GUI extends JFrame implements ActionListener
 			}
 			try
 			{
-				erstellenAusgabe(Datenbankanbindung.abfrage(Integer.parseInt(eingabe.getText())));
-			}
-			catch(NumberFormatException e)
-			{
-				JOptionPane.showMessageDialog(frame, "Bitte nur Zahlen eingeben!","Fehler!", JOptionPane.ERROR_MESSAGE);
+				erstellenAusgabe(Datenbankanbindung.abfrage(eingabe.getText()));
 			}
 			catch(NullPointerException e)
 			{
