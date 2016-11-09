@@ -13,6 +13,10 @@ import javax.swing.JTextField;
 
 public class GUI extends JFrame implements ActionListener
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public JFrame frame;
 	public JTextField eingabe;
 	public JLabel schrift;
@@ -68,9 +72,10 @@ public class GUI extends JFrame implements ActionListener
 		//erstelen eines neuen Frames
 		this.ausgabeFenster=new JFrame();
 		ausgabeFenster.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		ausgabeFenster.setSize(200,300);
 		ausgabeFenster.setLocationRelativeTo(null);
-		ausgabe.setSize(200, 300);
 		ausgabe= new JTextArea();
+		ausgabe.setSize(200, 300);
 		
 		
 		//einfügen in die Liste

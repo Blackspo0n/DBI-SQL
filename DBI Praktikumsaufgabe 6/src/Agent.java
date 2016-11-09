@@ -1,4 +1,12 @@
 
+/**
+ * Erstellen des Objekts Agent, welches bei der Übergabe vom Daten hilft.
+ * 
+ * @author Markus Hausmann
+ * @author Mario Kellner
+ * @author Jonas Stadtler
+ *
+ */
 public class Agent
 {
 	double umsatz;
