@@ -39,9 +39,15 @@ public class Datenbankanbindung
 			return "Fehler bei der Verbindung zur Datenbank!";
 		} 
 	}
-	/*
+	
+	/**
 	 * Abfrage an die Datenbank und verarbeiten der Informationen. 
-	 * Danach ausgeben der Informationen.
+	 * 
+	 * @author Markus Hausmann
+	 * @author Mario Kellner
+	 * @author Jonas Stadtler
+	 * @param produktID ProduktID spezifiziert die Abfrage. 
+	 * @return Rückgabe der Agent Liste, welche aus den dem ResultSet kommt.
 	 */
 	public static List<Agent> abfrage(String produktID)
 	{

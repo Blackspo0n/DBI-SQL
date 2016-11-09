@@ -13,9 +13,7 @@ import javax.swing.JTextField;
 
 public class GUI extends JFrame implements ActionListener
 {
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	public JFrame frame;
 	public JTextField eingabe;
@@ -24,6 +22,14 @@ public class GUI extends JFrame implements ActionListener
 	public JFrame ausgabeFenster;
 	public JTextArea ausgabe;
 	
+	/**
+	 * Dies ist der Konstrukter der GUI.
+	 * 
+	 * @author Markus Hausmann
+	 * @author Mario Kellner
+	 * @author Jonas Stadtler
+	 * 
+	 */
 	public GUI()
 	{
 		/*
@@ -41,10 +47,18 @@ public class GUI extends JFrame implements ActionListener
 		erstellenEingabe();
 		
 		
-		//ans Ende
+		
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Erstellen des Eingabebereichs, wird vom Konstruktor der GUI aufgerufen.
+	 * 
+	 * @author Markus Hausmann
+	 * @author Mario Kellner
+	 * @author Jonas Stadtler
+	 * 
+	 */
 	private void erstellenEingabe()
 	{
 		eingabe=new JTextField();
@@ -67,8 +81,18 @@ public class GUI extends JFrame implements ActionListener
 		
 		
 	}
+	/**
+	 * Erstellt ein Ausgabefenste, in welchem alle Ergebnisse aufgelistet sind.
+	 * 
+	 * @author Markus Hausmann
+	 * @author Mario Kellner
+	 * @author Jonas Stadtler
+	 * 
+	 * @param list Es wird eine Liste aller Agents übergeben, die im ResultSet enthalten waren.
+	 */
 	private void erstellenAusgabe(List<Agent> list)
 	{
+		
 		//erstelen eines neuen Frames
 		this.ausgabeFenster=new JFrame();
 		ausgabeFenster.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -88,14 +112,23 @@ public class GUI extends JFrame implements ActionListener
 		
 		//hinzufügen einer Scrollbar
 			JScrollPane scrollpane = new JScrollPane(ausgabe);     
-		//ans Ende
+		
 		ausgabeFenster.add(scrollpane);
 		ausgabeFenster.setVisible(true);
 	}
 	
 	
 	
-	@Override
+	
+	/** 
+	 * ActionListener, welcher von GUI implementiert wird. Dieser wurde dem Button "bestätigen" zugewiesen.
+	 * 
+	 * @author Markus Hausmann
+	 * @author Mario Kellner
+	 * @author Jonas Stadtler
+	 * 
+	 * @param a Übergaben des Actionevents, welches aufgerufen wird.
+	 */
 	public void actionPerformed(ActionEvent a) 
 	{
 		// TODO Auto-generated method stub
