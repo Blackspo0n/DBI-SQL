@@ -1,0 +1,516 @@
+\subsection{Programm (unoptimiert)}
+\label{app:programmv1}
+
+\begin{lstlisting}[caption={DatabaseConnection}, label={lst:dbv1}]
+package de.whs.dbi.pa7.database;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+/**
+ * Unsere Datebankklasse ermöglicht die Kommunikation
+ * mit der Datenbank. 
+ * 
+ * 
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ *
+ */
+public class DatabaseConnection 
+{
+	//benennen einer Verbindungsvariablen
+	public Connection databaseLink;
+	private ConnectionInformation ci;
+	
+	
+	public DatabaseConnection(ConnectionInformation cInfo) throws Exception {
+		if(cInfo == null) {
+			throw new Exception("ConnectionInfo Oject cannot be null");
+		}
+		
+		ci = cInfo;
+	}
+	
+	/**
+	 * 
+	 * List die Informatioen aus dem Objekt ci (ConnectionInformation) und versucht eine Verbindung 
+	 * zur Datenbank auf zu bauen.
+	 * 
+	 * @throws SQLException Wird geworfen, wenn der DriverManager keine Verbndung
+	 zur Datenbank aufbauen kann */
+	public void connect() throws SQLException
+	{
+		/*
+		 * Der Compiler übersetzt " + var + " automatisch in ein StringBuilder Objekt
+		 */
+		databaseLink = DriverManager.getConnection(
+				"jdbc:postgresql://" + ci.getHost() +"/" + ci.getDatabase(),
+				ci.getUser(), 
+				ci.getPassword()
+		);
+		
+	}
+}
+
+\end{lstlisting}
+
+\begin{lstlisting}[caption={tpsCreator}, label={lst:tpsv1}]
+package de.whs.dbi.pa7.database;
+
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.concurrent.ThreadLocalRandom;
+
+/**
+ * Die tpsCreator Klasse enthält alle nötigen Befehle um eine initial n-tps-Datenbank
+ * erstellen zu können. Hier kann auserdem ein instanziiertes Verbindungsobjekt übergeben werden,
+ * um auf unterschiedliche Datenbanken gleichzeitig arbeiten zu können.
+ * 
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ */
+public class tpsCreator {
+	/**
+	 * Das Verbindungsobjekt
+	 */
+	private DatabaseConnection connection;
+	
+	/**
+	 * Tabellen die in dem Shema enthalten sind, momentan nur nötig zum "droppen" der Datenbank
+	 */
+	public String[] tables = { "branches", "accounts", "tellers", "history"};
+	
+	/**
+	 * Die Create-Statements für das Schema
+	 */
+	public String[] schema ={
+			"CREATE TABLE branches (branchid INT NOT NULL, branchname CHAR(20) NOT NULL, balance INT NOT NULL, address CHAR(72) NOT NULL, PRIMARY KEY (branchid))",
+			"CREATE TABLE accounts ( accid INT NOT NULL, NAME CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL, PRIMARY KEY (accid), FOREIGN KEY (branchid) REFERENCES branches )",
+			"CREATE TABLE tellers ( tellerid INT NOT NULL, tellername CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL, PRIMARY KEY (tellerid), FOREIGN KEY (branchid) REFERENCES branches)",
+			"CREATE TABLE history ( accid INT NOT NULL, tellerid INT NOT NULL, delta INT NOT NULL, branchid INT NOT NULL, accbalance INT NOT NULL, cmmnt CHAR(30) NOT NULL, FOREIGN KEY (accid) REFERENCES accounts, FOREIGN KEY (tellerid) REFERENCES tellers, FOREIGN KEY (branchid) REFERENCES branches )",
+	};
+	
+	
+	/**
+	 * Unser Konstruktor. Er Überprüft, ob ein nicht leeres DatabaseConnection Objekt übergeben worden ist.
+	 * 
+	 * 
+	 * @param connection Das Verbindungsobjekt
+	 * @throws NullPointerException Das Verbindungsobjekt ist leer 
+	 */
+	public tpsCreator(DatabaseConnection connection) throws Exception {
+		
+		if(connection == null ) {
+			throw new NullPointerException("connection object cannot be null");
+		}
+		
+		try {
+			connection.databaseLink.isValid(0);
+			//connection.databaseLink.setAutoCommit(false);
+		}
+		catch(Exception err) {
+			throw err;
+		}
+		
+		this.connection = connection;
+		
+	}
+
+	
+	/**
+	 * Löscht die Tabellen aus der Datenbank
+	 * 
+	 * @return Gibt an, ob ein Fehler vorhanden ist.
+	 */
+	public boolean dropSchema() {
+		try {
+			Statement statement = connection.databaseLink.createStatement();
+
+			for (String table : this.tables) {
+				statement.executeUpdate("DROP TABLE IF EXISTS " + table + " CASCADE");
+			}
+
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
+	
+	/**
+	 * Erstellt die Tabellen
+	 * 
+	 * @return Gibt an, ob win Fehler vorhanden ist.
+	 */
+	public boolean createSchema() {
+	
+		try {
+			Statement statement = connection.databaseLink.createStatement();
+
+			for (String table : this.schema) {
+				statement.executeUpdate(table);
+			}
+
+			return true;
+		} catch (SQLException e) {
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Erstellt die Tupel in der Tabelle Branch
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden
+	 * @return Gibt an, ob ein Fehler vorhanden ist
+	 */
+	public boolean createBranchTupel(int n) {
+		
+		try {
+			Statement statement = connection.databaseLink.createStatement();
+
+			for (int i = 1; i <= n; i++) {
+				statement.executeUpdate("INSERT INTO branches (branchid, branchname, balance, address) VALUES("
+					+ i + ", 'branch', 0, 'branch')");
+				System.out.println("INSERT INTO branches (branchid, branchname, balance, address) VALUES("
+					+ i + ", 'branch', 0, 'branch')");
+			}
+
+			return true;
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	
+	/**
+	 * Erstellt die Tupel in der Tabelle Accounts
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden mal 10000
+	 * @return Gibt an, ob ein Fehler vorhanden ist
+	 */
+	public boolean createAccountTupel(int n) {
+		int localConst = n*10000;
+		int localRandom;
+		
+		try {
+			
+			Statement statement = connection.databaseLink.createStatement();
+
+			for (int i = 1; i <= localConst; i++) {
+				
+				// Generiert eine zufällige ID zwischen 1 und n
+				localRandom = ThreadLocalRandom.current().nextInt(1, n + 1);
+								
+				statement.executeUpdate("INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES("
+					+ i + ", 'account', 0,'test', " + localRandom + ")");
+				System.out.println("INSERT INTO accounts (accid, NAME, balance, address, branchid) "
+						+ "VALUES(" + i + ", 'account', 0,'test', " + localRandom + ")");
+			}
+
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Erstellt die Tupel in der Tabelle Teller
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden mal 10
+	 * @return Gibt an, ob ein Fehler vorhanden ist
+	 */
+	public boolean createTellerTupel(int n) {
+		int localConst = n*10;
+		int localRandom;
+		
+		try {
+			
+			Statement statement = connection.databaseLink.createStatement();
+
+			for (int i = 1; i <= localConst; i++) {
+				
+				// Generiert eine zufällige ID zwischen 1 und n
+				localRandom = ThreadLocalRandom.current().nextInt(1, n + 1);
+								
+				statement.executeUpdate("INSERT INTO tellers (tellerid, tellername, balance, address, branchid) "
+						+ "VALUES(" + i + ", 'teller', 0,'adress', " + localRandom + ")");
+
+				System.out.println("INSERT INTO tellers (tellerid, tellername, balance, address, branchid) "
+						+ "VALUES(" + i + ", 'teller', 0,'adress', " + localRandom + ")");
+			}
+
+			return true;
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	
+	/**
+	 * Bündelt die Funktionen des tpsCreators und führt diese nach ein ander aus.
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden
+	 */
+	public void autoSetup(int n) {
+		System.out.println("Starte automatisches Setup...");
+		System.out.println("Erzeuge eine " + n + "-tps-Datenbank");
+		
+		if(!dropSchema()) {
+			System.out.println("Warnung: Datenbank konnte nicht geleert werden!");
+			return;
+		}
+		if(!createSchema()) {
+			System.out.println("Tabellen konnten nicht erzeugt werden. Stoppe Setup ...");
+			return;
+		}
+		
+		/**
+		 * Jetzt kommen die Datensätze in die Datenbank yay \o/
+		 */
+		
+		
+		if(!createBranchTupel(n)) {
+			System.out.println("Branches konnten nicht angelegt werden. Stoppe Setup ...");
+			return;
+		}
+		if(!createAccountTupel(n)) {
+			System.out.println("Accounts konnten nicht angelegt werden. Stoppe Setup ...");
+			return;
+		}
+		if(!createTellerTupel(n)) {
+			System.out.println("Teller konnten nicht angelegt werden. Stoppe Setup ...");
+			return;
+		}
+		
+
+		System.out.println("Erstellen der " + n + "-tps-Datenbak erfolgreich");
+	}	
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Main}, label={lst:mainv1}]
+/**
+ * 
+ */
+package de.whs.dbi.pa7;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+import de.whs.dbi.pa7.database.ConnectionInformation;
+import de.whs.dbi.pa7.database.DatabaseConnection;
+import de.whs.dbi.pa7.database.tpsCreator;
+
+/**
+ * Unsere Hauptklasse. Hauptsächlich dient Sie als Einsteigspunkt unserer Applikation
+ * und bietet gleichzeitig dem Benutzer eine Interaktionsmöglichkeit
+ * über die Konsole an.
+ * 
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ *
+ */
+public class Main {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		boolean useLocal = false;
+		
+		System.out.println("Lokale Datenbank verwenden? [J/n]:");
+		useLocal = ConsoleReader.readJn();
+		
+		ConnectionInformation infos = new ConnectionInformation();
+		
+		if(useLocal) {
+			infos.setHost("127.0.0.1");
+			infos.setDatabase("benchmark");
+			infos.setUser("postgres");
+			infos.setPassword("DBIPr");
+		}
+		else {
+			System.out.println("Verbindungsinformationen eingeben!");
+			
+			System.out.println("Host:");
+			infos.setHost(ConsoleReader.readString());
+
+			System.out.println("Datenbank:");
+			infos.setDatabase(ConsoleReader.readString());
+			
+			System.out.println("Benutzer:");
+			infos.setUser(ConsoleReader.readString());
+			
+			System.out.println("Password:");
+			infos.setPassword(ConsoleReader.readString());
+		}
+		
+		DatabaseConnection con;
+		
+		try {
+			con = new DatabaseConnection(infos);
+			con.connect();
+			
+		}
+		catch ( Exception err){
+			System.err.println("Konnte keine Verbindung zur Datenbank aufbauen!");
+			System.err.println(err.getMessage());
+			err.printStackTrace();
+			
+			return;
+		}
+		
+		try {
+			tpsCreator tpsDBCreator = new tpsCreator(con);
+		
+			System.out.println("Gebe bitte die Größe (n) der Datenbank ein:");
+			
+			int sizeN = ConsoleReader.readInt();
+			
+			tpsDBCreator.autoSetup(sizeN);
+			
+		} catch (Exception e) {}
+		
+		System.out.println("Beende Anwendung...");		
+	}
+}
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={ConnectionInformation}, label={lst:civ1}]
+package de.whs.dbi.pa7.database;
+
+
+/**
+ * Dieses Model beinhaltet alle nötigen Informationen 
+ * um sich zu einer Postgre Datenbank zu verbinden
+ * 
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ *
+ */
+public class ConnectionInformation {
+	public String host = null;
+	public String database = null;
+	public String user = null;
+	public String password = null;
+	
+	
+	// Getter & Setter
+	
+	public String getHost() {
+		return host;
+	}
+	public void setHost(String host) {
+		this.host = host;
+	}
+	public String getDatabase() {
+		return database;
+	}
+	public void setDatabase(String database) {
+		this.database = database;
+	}
+	public String getUser() {
+		return user;
+	}
+	public void setUser(String user) {
+		this.user = user;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+}
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={ConsoleReader}, label={lst:crv1}]
+package de.whs.dbi.pa7;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+/**
+ * Einige Konsolen Helfer. Die Klasse ist con der BasicIO.java aus dem GDI1 Kurs adaptiert
+ * 
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ */
+public class ConsoleReader {
+	
+	/**
+	 * Liest ein j/J oder ein n/N aus der Konsole
+	 * 
+	 * @return j = true und n = false
+	 */
+	public static boolean readJn() {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+		try {
+			String strTmp = br.readLine();
+			if(strTmp.length() != 0 && (strTmp.charAt(0) == 'j' || strTmp.charAt(0) == 'J')) {
+				return true;
+			}
+		}
+		catch(Exception err) {}
+		
+		return false;
+	}
+	/**
+	 * Liest einen String aus der Konsole aus
+	 * 
+	 * @return ausgelesener String
+	 */
+	public static String readString() {
+		BufferedReader din = new BufferedReader(new InputStreamReader(System.in)); 
+		
+		try {	
+			return din.readLine();
+		}
+		catch(IOException e) {				  
+			return "Ein-/Ausgabe-Fehler";
+		}
+
+	}
+	/**
+	 * Liest einen Integer aus der Konsole aus
+	 * 
+	 * @return ausgelesener String
+	 */
+	public static int readInt()
+	{
+		try 
+		{
+			BufferedReader din = new BufferedReader(new InputStreamReader(System.in));
+			return Integer.parseInt(din.readLine());
+		}
+		catch (NumberFormatException e)
+		{
+			System.out.println("Bitte gebe eine gültige Zahl ein.");
+			return readInt();
+		}
+		catch (IOException e)
+		{
+			return -1;
+		}
+	}
+}
+\end{lstlisting}

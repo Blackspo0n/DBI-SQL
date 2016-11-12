@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>DBI Praktikumsaufgabe 6 - Latex</name>
+	<name>DBI Praktikumsaufgabe 7 - Latex</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -14,4 +14,11 @@
 	<natures>
 		<nature>net.sourceforge.texlipse.builder.TexlipseNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Source/.tex</name>
+			<type>1</type>
+			<location>/usr/share/texlive/texmf-dist/tex/latex/tools/.tex</location>
+		</link>
+	</linkedResources>
 </projectDescription>
