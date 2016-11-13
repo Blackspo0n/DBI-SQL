@@ -161,6 +161,27 @@ Diese Optimierung  hat uns bei einer \textbf{10-tps-Datenbank} nochmal \ca
 als mit dem Benchmark-Tool, welhes wir als erstes entwickelt hatten.
 
 
+\subsection{Ändern der Servereinstellungen}
+
+Um ein noch besseres Eregbnis zu erzielen kann man in PostgreSQL die
+\textit{asyncronen Commits} aktivieren. Diese sind Stanardmäßig dieaktiviert und
+müssen in der Konfigurationsdatei von PostgreSQL ersteinmal aktiviert werden\footnote{https://www.postgresql.org/docs/current/static/wal-async-commit.html}.
+
+Unter Unix-Systemen liegt die Konfigurationsdatei meistens unter \newline
+\gqq{\textit{/etc/postgresql/\{versionsnummer\}/main/postgresql.conf}}
+
+Aktivierte \& geänderte Serverkonfiguration:
+\begin{lstlisting}
+shared_buffers		= 1GB
+synchronous_commit	= off
+wal_writer_delay	= 5000ms
+commit_delay		= 50000
+wal_buffers			= 128MB
+\end{lstlisting}
+
+Der Performanceschub fällt je nach System unterschiedlich aus. So hat diese
+Konfiguration auf den Laptop eines Kommilitonen ein 100 Millisekunden bei einer
+\textbf{10-tps-Datenbank} ausgemacht.
 
 \subsection{Adressauflösung von Domainnamen}
 Um das Ergebnis noch mehr zu verbessern kam jetzt das Feintuning. Dazu
