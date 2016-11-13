@@ -9,8 +9,13 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[scaled]{uarial}
-\usepackage{etoolbox}
+\usepackage{accsupp}    
 
+\newcommand{\noncopynumber}[1]{
+    \BeginAccSupp{method=escape,ActualText={}}
+    #1
+    \EndAccSupp{}
+}
 
 \newcommand{\titel}{Datenbank- und Informationssysteme}
 \newcommand{\untertitel}{Praktikumsaufgabe 7 - Benchmarking}
@@ -32,8 +37,6 @@
 \input{Allgemein/Befehle.tex}
 
 \begin{document}
-\BeforeBeginEnvironment{listings}{\par\noindent\begin{minipage}{\linewidth}}
-\AfterEndEnvironment{listings}{\end{minipage}\par\addvspace{\topskip}}
 
 \input{Deckblatt.tex}
 \clearpage
