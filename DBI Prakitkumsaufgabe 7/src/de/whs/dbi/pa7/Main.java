@@ -3,9 +3,6 @@
  */
 package de.whs.dbi.pa7;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 import de.whs.dbi.pa7.database.ConnectionInformation;
 import de.whs.dbi.pa7.database.DatabaseConnection;
 import de.whs.dbi.pa7.database.tpsCreator;

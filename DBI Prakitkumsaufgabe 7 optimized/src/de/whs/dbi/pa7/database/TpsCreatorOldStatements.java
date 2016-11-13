@@ -1,9 +1,7 @@
 package de.whs.dbi.pa7.database;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.IllformedLocaleException;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -15,10 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author Markus Hausmann
  * @author Jonas Stadtler
  */
-public class tpsCreator {
-
-    
-	
+public class TpsCreatorOldStatements  implements TpsCreatorInterface {
 	private boolean isDebug = false;
 	
 	/**
@@ -41,6 +36,7 @@ public class tpsCreator {
 			"CREATE TABLE history ( accid INT NOT NULL, tellerid INT NOT NULL, delta INT NOT NULL, branchid INT NOT NULL, accbalance INT NOT NULL, cmmnt CHAR(30) NOT NULL, FOREIGN KEY (accid) REFERENCES accounts, FOREIGN KEY (tellerid) REFERENCES tellers, FOREIGN KEY (branchid) REFERENCES branches )",
 	};
 	
+	
 	/**
 	 * Unser Konstruktor. Er Überprüft, ob ein nicht leeres DatabaseConnection Objekt übergeben worden ist.
 	 * 
@@ -48,7 +44,7 @@ public class tpsCreator {
 	 * @param connection Das Verbindungsobjekt
 	 * @throws NullPointerException Das Verbindungsobjekt ist leer 
 	 */
-	public tpsCreator(DatabaseConnection connection) throws Exception {
+	public TpsCreatorOldStatements(DatabaseConnection connection) throws Exception {
 		
 		if(connection == null ) {
 			throw new NullPointerException("connection object cannot be null");
@@ -98,11 +94,9 @@ public class tpsCreator {
 			Statement statement = connection.databaseLink.createStatement();
 
 			for (String table : this.tables) {
-				StringBuilder strBuilder = new StringBuilder("DROP TABLE IF EXISTS ").append(table).append(" CASCADE");
-				statement.executeUpdate(strBuilder.toString());
-				
+				statement.executeUpdate("DROP TABLE IF EXISTS " + table + " CASCADE");
 				if(isDebug) {
-					System.out.println(strBuilder.toString());
+					System.out.println("DROP TABLE IF EXISTS " + table + " CASCADE");
 				}
 			}
 
@@ -145,27 +139,19 @@ public class tpsCreator {
 	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
 	public boolean createBranchTupel(int n) {
-		
 		try {
-			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
-					"INSERT INTO branches (branchid, branchname, balance, address) VALUES (? , 'branch', 0, 'branch')"
-			);
-			
+			Statement statement = connection.databaseLink.createStatement();
+
 			for (int i = 1; i <= n; i++) {
-				insertBranches.setInt(1, i);
-				insertBranches.addBatch();
+				statement.executeUpdate("INSERT INTO branches (branchid, branchname, balance, address) VALUES(" + i + ", 'branch', 0, 'branch')");
 				
 				if(isDebug) {
-					System.out.println("INSERT INTO branches (branchid, branchname, balance, address) VALUES("
-							+ i + ", 'branch', 0, 'branch')");
+					System.out.println("INSERT INTO branches (branchid, branchname, balance, address) VALUES(" + i + ", 'branch', 0, 'branch')");
 				}
 			}
 
-			insertBranches.executeBatch();
-			
 			return true;
 		} catch (SQLException e) {
-
 			e.printStackTrace();
 		}
 		
@@ -184,26 +170,23 @@ public class tpsCreator {
 		int localRandom;
 		
 		try {
-			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
-					"INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'account', 0,'test', ?)"
-			);
 			
+			Statement statement = connection.databaseLink.createStatement();
+
 			for (int i = 1; i <= localConst; i++) {
-
-				localRandom = ThreadLocalRandom.current().nextInt(1, n + 1);
-
-				insertBranches.setInt(1, i);
-				insertBranches.setInt(2, localRandom);
-				insertBranches.addBatch();
 				
+				// Generiert eine zufällige ID zwischen 1 und n
+				localRandom = ThreadLocalRandom.current().nextInt(1, n + 1);
+								
+				statement.executeUpdate("INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES("
+					+ i + ", 'account', 0,'test', " + localRandom + ")");
+		
 				if(isDebug) {
-					System.out.println("INSERT INTO branches (branchid, branchname, balance, address) VALUES("
-							+ i + ", 'branch', 0, 'branch')");
+					System.out.println("INSERT INTO accounts (accid, NAME, balance, address, branchid) "
+							+ "VALUES(" + i + ", 'account', 0,'test', " + localRandom + ")");	
 				}
 			}
 
-			insertBranches.executeBatch();
-			
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -223,26 +206,22 @@ public class tpsCreator {
 		int localRandom;
 		
 		try {
-			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
-					"INSERT INTO tellers (tellerid, tellername, balance, address, branchid) VALUES(?, 'teller', 0, 'adress', ?)"
-			);
 			
+			Statement statement = connection.databaseLink.createStatement();
+
 			for (int i = 1; i <= localConst; i++) {
-
-				localRandom = ThreadLocalRandom.current().nextInt(1, n + 1);
-
-				insertBranches.setInt(1, i);
-				insertBranches.setInt(2, localRandom);
-				insertBranches.addBatch();
 				
+				// Generiert eine zufällige ID zwischen 1 und n
+				localRandom = ThreadLocalRandom.current().nextInt(1, n + 1);
+								
+				statement.executeUpdate("INSERT INTO tellers (tellerid, tellername, balance, address, branchid) "
+						+ "VALUES(" + i + ", 'teller', 0,'adress', " + localRandom + ")");
 				if(isDebug) {
-					System.out.println("INSERT INTO branches (branchid, branchname, balance, address) VALUES("
-							+ i + ", 'branch', 0, 'branch')");
+					System.out.println("INSERT INTO tellers (tellerid, tellername, balance, address, branchid) "
+							+ "VALUES(" + i + ", 'teller', 0,'adress', " + localRandom + ")");					
 				}
 			}
 
-			insertBranches.executeBatch();
-			
 			return true;
 		} catch (SQLException e) {
 

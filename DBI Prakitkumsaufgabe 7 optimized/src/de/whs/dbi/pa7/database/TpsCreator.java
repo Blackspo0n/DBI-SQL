@@ -1,8 +1,8 @@
 package de.whs.dbi.pa7.database;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Die tpsCreator Klasse enthält alle nötigen Befehle um eine initial n-tps-Datenbank
@@ -13,7 +13,10 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author Markus Hausmann
  * @author Jonas Stadtler
  */
-public class tpsCreatorOldStatements {
+public class TpsCreator implements TpsCreatorInterface {
+
+    
+	
 	private boolean isDebug = false;
 	
 	/**
@@ -36,7 +39,6 @@ public class tpsCreatorOldStatements {
 			"CREATE TABLE history ( accid INT NOT NULL, tellerid INT NOT NULL, delta INT NOT NULL, branchid INT NOT NULL, accbalance INT NOT NULL, cmmnt CHAR(30) NOT NULL, FOREIGN KEY (accid) REFERENCES accounts, FOREIGN KEY (tellerid) REFERENCES tellers, FOREIGN KEY (branchid) REFERENCES branches )",
 	};
 	
-	
 	/**
 	 * Unser Konstruktor. Er Überprüft, ob ein nicht leeres DatabaseConnection Objekt übergeben worden ist.
 	 * 
@@ -44,7 +46,7 @@ public class tpsCreatorOldStatements {
 	 * @param connection Das Verbindungsobjekt
 	 * @throws NullPointerException Das Verbindungsobjekt ist leer 
 	 */
-	public tpsCreatorOldStatements(DatabaseConnection connection) throws Exception {
+	public TpsCreator(DatabaseConnection connection) throws Exception {
 		
 		if(connection == null ) {
 			throw new NullPointerException("connection object cannot be null");
@@ -63,6 +65,10 @@ public class tpsCreatorOldStatements {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#beginTransaktion()
+	 */
+	@Override
 	public void beginTransaktion() {
 		try {
 			connection.databaseLink.setAutoCommit(false);
@@ -73,6 +79,10 @@ public class tpsCreatorOldStatements {
 	}
 	
 
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#endAndCommitTransaction()
+	 */
+	@Override
 	public void endAndCommitTransaction() {
 		try {
 			connection.databaseLink.commit();
@@ -84,19 +94,20 @@ public class tpsCreatorOldStatements {
 		}
 	}
 	
-	/**
-	 * Löscht die Tabellen aus der Datenbank
-	 * 
-	 * @return Gibt an, ob ein Fehler vorhanden ist.
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#dropSchema()
 	 */
+	@Override
 	public boolean dropSchema() {
 		try {
 			Statement statement = connection.databaseLink.createStatement();
 
 			for (String table : this.tables) {
-				statement.executeUpdate("DROP TABLE IF EXISTS " + table + " CASCADE");
+				StringBuilder strBuilder = new StringBuilder("DROP TABLE IF EXISTS ").append(table).append(" CASCADE");
+				statement.executeUpdate(strBuilder.toString());
+				
 				if(isDebug) {
-					System.out.println("DROP TABLE IF EXISTS " + table + " CASCADE");
+					System.out.println(strBuilder.toString());
 				}
 			}
 
@@ -108,11 +119,10 @@ public class tpsCreatorOldStatements {
 		
 	}
 	
-	/**
-	 * Erstellt die Tabellen
-	 * 
-	 * @return Gibt an, ob win Fehler vorhanden ist.
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#createSchema()
 	 */
+	@Override
 	public boolean createSchema() {
 	
 		try {
@@ -132,20 +142,20 @@ public class tpsCreatorOldStatements {
 	}
 	
 	
-	/**
-	 * Erstellt die Tupel in der Tabelle Branch
-	 * 
-	 * @param n Anzahl der Tupel, die erstellt werden
-	 * @return Gibt an, ob ein Fehler vorhanden ist
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#createBranchTupel(int)
 	 */
+	@Override
 	public boolean createBranchTupel(int n) {
 		
 		try {
-			Statement statement = connection.databaseLink.createStatement();
-
+			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
+					"INSERT INTO branches (branchid, branchname, balance, address) VALUES (? , 'branch', 0, 'branch')"
+			);
+			
 			for (int i = 1; i <= n; i++) {
-				statement.executeUpdate("INSERT INTO branches (branchid, branchname, balance, address) VALUES("
-					+ i + ", 'branch', 0, 'branch')");
+				insertBranches.setInt(1, i);
+				insertBranches.addBatch();
 				
 				if(isDebug) {
 					System.out.println("INSERT INTO branches (branchid, branchname, balance, address) VALUES("
@@ -153,6 +163,8 @@ public class tpsCreatorOldStatements {
 				}
 			}
 
+			insertBranches.executeBatch();
+			
 			return true;
 		} catch (SQLException e) {
 
@@ -163,34 +175,29 @@ public class tpsCreatorOldStatements {
 	}
 	
 	
-	/**
-	 * Erstellt die Tupel in der Tabelle Accounts
-	 * 
-	 * @param n Anzahl der Tupel, die erstellt werden mal 10000
-	 * @return Gibt an, ob ein Fehler vorhanden ist
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#createAccountTupel(int)
 	 */
+	@Override
 	public boolean createAccountTupel(int n) {
 		int localConst = n*10000;
-		int localRandom;
 		
 		try {
+			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
+					"INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'account', 0,'test', trunc(random() * " + n + " + 1))"
+			);
 			
-			Statement statement = connection.databaseLink.createStatement();
-
 			for (int i = 1; i <= localConst; i++) {
+				insertBranches.setInt(1, i);
+				insertBranches.addBatch();
 				
-				// Generiert eine zufällige ID zwischen 1 und n
-				localRandom = ThreadLocalRandom.current().nextInt(1, n + 1);
-								
-				statement.executeUpdate("INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES("
-					+ i + ", 'account', 0,'test', " + localRandom + ")");
-		
 				if(isDebug) {
-					System.out.println("INSERT INTO accounts (accid, NAME, balance, address, branchid) "
-							+ "VALUES(" + i + ", 'account', 0,'test', " + localRandom + ")");	
+					System.out.println("INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES( " + i + " , 'account', 0,'test', trunc(random() * " + n + " + 1))");
 				}
 			}
 
+			insertBranches.executeBatch();
+			
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -199,33 +206,31 @@ public class tpsCreatorOldStatements {
 		return false;
 	}
 	
-	/**
-	 * Erstellt die Tupel in der Tabelle Teller
-	 * 
-	 * @param n Anzahl der Tupel, die erstellt werden mal 10
-	 * @return Gibt an, ob ein Fehler vorhanden ist
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#createTellerTupel(int)
 	 */
+	@Override
 	public boolean createTellerTupel(int n) {
 		int localConst = n*10;
-		int localRandom;
 		
 		try {
+			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
+					"INSERT INTO tellers (tellerid, tellername, balance, address, branchid) VALUES(?, 'teller', 0, 'adress', trunc(random() * " + n + " + 1))"
+			);
 			
-			Statement statement = connection.databaseLink.createStatement();
-
 			for (int i = 1; i <= localConst; i++) {
+
+
+				insertBranches.setInt(1, i);
+				insertBranches.addBatch();
 				
-				// Generiert eine zufällige ID zwischen 1 und n
-				localRandom = ThreadLocalRandom.current().nextInt(1, n + 1);
-								
-				statement.executeUpdate("INSERT INTO tellers (tellerid, tellername, balance, address, branchid) "
-						+ "VALUES(" + i + ", 'teller', 0,'adress', " + localRandom + ")");
 				if(isDebug) {
-					System.out.println("INSERT INTO tellers (tellerid, tellername, balance, address, branchid) "
-							+ "VALUES(" + i + ", 'teller', 0,'adress', " + localRandom + ")");					
+					System.out.println("INSERT INTO tellers (tellerid, tellername, balance, address, branchid) VALUES(" + i + ", 'teller', 0, 'adress', trunc(random() * " + n + " + 1))");
 				}
 			}
 
+			insertBranches.executeBatch();
+			
 			return true;
 		} catch (SQLException e) {
 
@@ -236,11 +241,10 @@ public class tpsCreatorOldStatements {
 	}
 	
 	
-	/**
-	 * Bündelt die Funktionen des tpsCreators und führt diese nach ein ander aus.
-	 * 
-	 * @param n Anzahl der Tupel, die erstellt werden
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#autoSetup(int)
 	 */
+	@Override
 	public void autoSetup(int n) {
 		System.out.println("Starte automatisches Setup...");
 		System.out.println("Erzeuge eine " + n + "-tps-Datenbank");
@@ -277,11 +281,19 @@ public class tpsCreatorOldStatements {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#isDebug()
+	 */
+	@Override
 	public boolean isDebug() {
 		return isDebug;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#setDebug(boolean)
+	 */
+	@Override
 	public void setDebug(boolean isDebug) {
 		this.isDebug = isDebug;
 	}

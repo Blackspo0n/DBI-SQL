@@ -1,11 +1,11 @@
 package de.whs.dbi.pa7;
 
-import de.whs.dbi.pa7.database.tpsCreator;
+import de.whs.dbi.pa7.database.TpsCreatorInterface;
 
 public class Benchmark {
 	private static long startTime;
 	
-	public static void BenchmarkTask(int size, tpsCreator tpsDBCreator, boolean debugLog, boolean useTransaction, boolean usePreamble) {
+	public static void BenchmarkTask(int size, TpsCreatorInterface tpsDBCreator, boolean debugLog, boolean useTransaction, boolean usePreamble) {
 		System.out.println("Brenchmarking gestartet");
 		System.out.println("Parameter: debugLog = " + debugLog + ", useTransaction = " + useTransaction + ", usePreamble = " + usePreamble);
 		
@@ -28,16 +28,23 @@ public class Benchmark {
 			}
 		}
 		
-		
+		long localTime  = System.currentTimeMillis();
 		tpsDBCreator.createBranchTupel(size);
+		System.out.println("Branches angelegt! Dauer " + (System.currentTimeMillis() - localTime) + " Millisekunden.");
+		
+		localTime  = System.currentTimeMillis();
 		tpsDBCreator.createAccountTupel(size);
+		System.out.println("Accounts angelegt! Dauer " + (System.currentTimeMillis() - localTime) + " Millisekunden.");
+		
+		localTime  = System.currentTimeMillis();
 		tpsDBCreator.createTellerTupel(size);
+		System.out.println("Teller angelegt! Dauer " + (System.currentTimeMillis() - localTime) + " Millisekunden.");
 		
 		if(useTransaction) {
 			tpsDBCreator.endAndCommitTransaction();
 		}
 		
-		System.out.println("Benchmark abgeschlossen. Dauer " + getCurrentMilliseconds() + " Millisekunden");
+		System.out.println("Benchmark abgeschlossen. Gesamtdauer " + getCurrentMilliseconds() + " Millisekunden.");
 	}
 	
 	public static void startTimer() {
@@ -47,4 +54,5 @@ public class Benchmark {
 	public static long getCurrentMilliseconds() {
 		return System.currentTimeMillis() - startTime;
 	}
+
 }

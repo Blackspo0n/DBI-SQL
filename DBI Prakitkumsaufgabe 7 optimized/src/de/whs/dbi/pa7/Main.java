@@ -3,13 +3,10 @@
  */
 package de.whs.dbi.pa7;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import de.whs.dbi.pa7.database.ConnectionInformation;
 import de.whs.dbi.pa7.database.DatabaseConnection;
-import de.whs.dbi.pa7.database.tpsCreator;
+import de.whs.dbi.pa7.database.TpsCreator;
+import de.whs.dbi.pa7.database.TpsCreatorInterface;
 
 /**
  * Unsere Hauptklasse. Hauptsächlich dient Sie als Einsteigspunkt unserer Applikation
@@ -24,7 +21,7 @@ import de.whs.dbi.pa7.database.tpsCreator;
 public class Main {
 
 	static DatabaseConnection con;
-	static tpsCreator tpsDBCreator;
+	static TpsCreatorInterface tpsDBCreator;
 	static int sizeN;
 	static boolean useLocal = false;
 	/**
@@ -63,7 +60,7 @@ public class Main {
 		try {
 			con = new DatabaseConnection(infos);
 			con.connect();
-			tpsDBCreator = new tpsCreator(con);
+			tpsDBCreator = new TpsCreator(con);
 		}
 		catch ( Exception err){
 			System.err.println("Konnte keine Verbindung zur Datenbank aufbauen!");

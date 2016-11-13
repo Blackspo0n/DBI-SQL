@@ -1,109 +1,9 @@
-\section{Praktkumsaufgabe 7)}
-\subsection{Teilaufgabe A)}
-\textbf{Entwickeln Sie ein Programm, das einen Aufrufparameter n erwartet und eine initiale n-
-tps-Datenbank auf dem gewählten Datenbankmanagementsystem erzeugt.}
-
-Um überhaupt mit der Datenbank zu interagieren mussten wir uns erstmal den
-JDBC-Treiber für unser DBMS Postgresql besorgen.
-
-Diesen haben wir anschließend in das Projekt eingebunden und haben mit der
-Klasse \gqq{DatabaseConnection} diesen Treiber in der
-\gqq{getConnection}-Methode laden lassen.
-
-
-\lstset{language=Java, backgroundcolor=\color{editorGray},
-  basicstyle={\linespread{0.82}\footnotesize\ttfamily},   
-  frame=b, xleftmargin={0.75cm},literate=
-    {Ö}{{\"O}}1
-  {Ä}{{\"A}}1
-  {Ü}{{\"U}}1
-  {ß}{{\ss}}2
-  {ü}{{\"u}}1
-  {ä}{{\"a}}1
-  {ö}{{\"o}}1,
-    numberstyle=\tiny\noncopynumber,
-      columns=flexible,
-      }
-\begin{lstlisting}
-	/**
-	 * List die Informatioen aus dem Objekt ci (ConnectionInformation) und versucht eine Verbindung 
-	 * zur Datenbank auf zu bauen.
-	 * 
-	 * @throws SQLException Wird geworfen, wenn der DriverManager keine Verbndung zur Datenbank aufbauen kann
-	 */
-	public void connect() throws SQLException
-	{
-		/*
-		 * Der Compiler uebersetzt " + var + " automatisch in ein StringBuilder Objekt
-		 */
-		databaseLink = DriverManager.getConnection(
-				"jdbc:postgresql://" + ci.getHost() +"/" + ci.getDatabase(),
-				ci.getUser(), 
-				ci.getPassword()
-		);
-	}
-\end{lstlisting}
-
-
-Anschließend haben wir eine Klasse \gqq{tpsCreator} implementiert, welche die
-gesamte Funktionalität zum Erstellen der \textbf{n-tps-Datenbank} beinhaltet.
-Diese Klasse kann man wiederum ein \textit{DatabaseConnection}-Objekt übergeben.
-So ist es Möglich in einem Programm mehrere die Datenbank auf verschiedene
-Servern anzulegen. Die Verbindungsinformationen übergeben wir mit der Klasse
-\nameref{lst:civ1}.
-
-Der Quelltext von tpsCreator befindet sich im Anhang~\nameref{lst:tpsv1}
-
-Als nächstes haben wir uns um die Benutzerinteraktion gekümmert. Wir waren uns
-einig, dass wir anstatt auf eine komplexe GUI Darstellung auf eine simple
-Konsolen-Anwendung beschränken wollen. Außerdem hat das große Vorteile gegenüer
-der Performance.
-
-Um die Interaktion mit der Konsole so einfach wie Möglich zu gestalten haben wir
-uns eine Helfer Klasse ~\nameref{lst:crv1} geschrieben und diese anschließend
-in unserer \nameref{lst:mainv1} benutzt.
-\clearpage
-
-\begin{lstlisting}
-			System.out.println("Verbindungsinformationen eingeben!");
-			
-			System.out.println("Host:");
-			infos.setHost(ConsoleReader.readString());
-
-			System.out.println("Datenbank:");
-			infos.setDatabase(ConsoleReader.readString());
-			
-			System.out.println("Benutzer:");
-			infos.setUser(ConsoleReader.readString());
-			
-			System.out.println("Password:");
-			infos.setPassword(ConsoleReader.readString());
-\end{lstlisting}
-
-Am Ende unserer Main rufen wir die Funkion autoSetup auf. Diese erstellt uns
-anschliessend die Datenbank.
-
-\subsection{Teilaufgabe B)}
-\textbf{Welche Mindestgrößen schätzen Sie für eine 1-tps-Datenbank bzw. allgemein für eine n-
-tps-Datenbank? Wie viel Plattenplatz wird auf dem Datenbank-Server tatsächlich für die
-erstellten Datenbanken benötigt?}
-
-Die reine Spaltenanzahl lässt sich folgendermaßen ausrechnen:
-\begin{eqnarray}
-n + n \cdot 10 + n \cdot 10000
-\end{eqnarray}
-
-Also sind bei einer 1-tps-Datenbank 10011 Datensätze enthalten.
-
-Die physikalische Beträgt dabei: 17932460 Bytes. \newline
-Umgerechnet ist die Datenbank dementsprechend 17 MB groß.
-
-\subsection{Teilaufgabe C)}
+\section{Teilaufgabe C)}
 \textbf{Versuchen Sie, die Laufzeit Ihres Programms zu beschleunigen! Dokumentieren Sie
 einzelne Verbesserungsideen und die jeweiligen Laufzeitveränderungen für eine lokale
 Ausführung Ihres Programms bei der Erzeugung einer 10-tps-Datenbank!}
 
-\subsubsection{Transaction}
+\subsection{Transaction}
 Um den Durchsatz der Daten zu erhöhen lassen sich die Queries in einer
 Transaction zusammenfassen.  
 
@@ -112,8 +12,6 @@ mit einem manuellen \textit{commit} zum Server geschickt werden. Wir müssen als
 unseren \nameref{lst:tpsv1} erweitern. Dafür legen wir 2 neue Funktionen an und
 erweitern nebenbei die anderen Funktionen um ein zuschaltbares Debug-Logging.
 
-
-\clearpage
 \begin{lstlisting}
 	public void beginTransaktion() {
 		try {
@@ -172,9 +70,9 @@ zum Server geschcikt worden sind.
 \end{figure} 
 
 
-\subsubsection{Prepared Statements}
+\subsection{Prepared Statements}
 Selbst in einer Transaktion wird jeder einzelne Query validiert. Wir besitzen
-aber eine Maße von gleich strukturierten Statements,  Jeden einzelnen zu
+nun aber eine Masse von gleich strukturierten Statements. Jeden einzelnen zu
 validieren kostet den Server Zeit und Ressourcen.
  
  Wir suchen also eine Möglichkeit eine vorher definierte und validierte Struktur
@@ -199,7 +97,8 @@ Die umgeschriebene Funktion für Accounts sieht nun folgendermaßen aus:
 				insertBranches.addBatch();
 				
 				if(isDebug) {
-					System.out.println("INSERT INTO branches (branchid, branchname, balance,address) VALUES(" + i + ", 'branch', 0, 'branch')"); }
+					System.out.println("INSERT INTO branches (branchid, branchname, balance,address) VALUES(" + i + ", 'branch', 0, 'branch')");
+				}
 			}
 
 			insertBranches.executeBatch();
@@ -222,13 +121,47 @@ hinderlich, Wir möchten ja die Queries auch ohne Transaktion ausführen können
 deshalb müssen wir uns eine alte Kopie der Klasse behalten und bei Bedarf
 instanziieren.
 \begin{center}
-\includegraphics{Bilder/Auswahl_016.png}
+\includegraphics[scale=0.8]{Bilder/Auswahl_016.png}
 \end{center}
 Mit den Prepared Statement ist unser Benchmark jetzt \textbf{36fach} schneller
 als unser ursprüngliches Benchmark Tool.
 
-\subsubsection{Adressauflösung von Domainnamen}
-Um das Ergebniss noch mehr zu verbessern kommt jetzt das Feintuning. Dazu
+\subsection{IDs vom Server generieren lassen}
+Momentan benutzen wir die Ressourcen von unserem Javaprogramm. Da wir aber so
+viel wie Möglich vom Server verarbeiten lassen wollen, lagern wir das Generieren
+der Branchen-IDs auf unseren Server aus, denn dieser hat mit Sicherheit die
+Möglichkeit aus unserem SQL-Query etwas Effizentes zu generieren.
+
+Wir müssen uns also den Zufallszahlengenerator von PostgreSQL benutzen um uns
+eine ID zu genrieren.
+
+\begin{lstlisting}[language=sql]
+SELECT rand();
+\end{lstlisting}
+
+Diese Funktion liefert uns eine Gleitkommazahl zwischen 0 und 1. Diese Zahl
+müssen wir anschließend nur noch $ \cdot  n + 1 $ rechnen um eine zufällige ID
+zwischen 1 und $n$ zu erzeugen. Das am Ende stehende $ + 1$ soll dafür sorgen,
+dass $n$ auch generiert werden kann. Anschließend schneiden wir mittels \textit{trunc} noch
+die Kommastellen ab.
+
+Unser Query, der uns die IDs generiert, sieht dann folgendermaßen aus:
+\begin{lstlisting}[language=sql]
+SELECT trunc(random() *  n  + 1);
+\end{lstlisting}
+
+Diesen Query können wir jetzt auf unser Prepared Statement anwenden:
+\begin{lstlisting}[language=sql]
+INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'account', 0,'test', trunc(random() * n + 1))
+\end{lstlisting}
+
+Diese Optimierung spart uns bei einer  \textbf{10-tps-Datenbank} nochmal \ca
+500 Millisekunden. Jedoch ist es jetzt nicht mehr Möglich im DebugLog die
+generierte ID zu überprüfen.
+
+
+\subsection{Adressauflösung von Domainnamen}
+Um das Ergebnis noch mehr zu verbessern kommt jetzt das Feintuning. Dazu
 schauen wir uns jetzt nicht das DBMS an, sondern DNS-Server.
 
 Hier besteht ein massiver Nachteil gegenüber der herkömmlicher IP. Jeder
@@ -241,14 +174,9 @@ umgehen, brauchen wir einfach nur die IP-Adresse statt des Domainnamens
 einzugeben. Dies wäre für \textbf{localhost} entweder \gqq{127.0.0.1} als
 IPv4-Schreibweiße oder \gqq{[::1]} als IPv6 Schreibweise.
 
-\subsubsection{IDs vom Server generieren lassen}
 -- bis hierher bin ich gekommen .- lg mario
 ps: habe nicht auf rächtschreibung geachtet, habe einfach mal drauf los getippz,
-vieles ist noch überarbeitungswürdig
-
-\subsection{Teilaufgabe D)}
-\textbf{Messen und protokollieren Sie die Laufzeit ihres optimierten Programms für n=10, n=20
-und n=50 sowohl lokal auf dem Datenbank-Server als auch von einem "remote" Client!
-(Gemessen werden soll nur die Laufzeit zum Einfügen ohne evtl. notwendige vorherige
-DROP-TABLE- oder CREATE-TABLE-Anweisungen!)}
-
+vieles ist noch überarbeitungswürdig. Es muss noch das Optimierte Programm in
+den Anhang. An einigen Stellen mittels nameref darauf verwiesen werden und
+eindeutig sollte der gesamte Text mal durch word geschickt werden.
+\clearpage

@@ -1,0 +1,107 @@
+\section{Teilaufgabe A)}
+\textbf{Entwickeln Sie ein Programm, das einen Aufrufparameter n erwartet und eine initiale n-
+tps-Datenbank auf dem gewählten Datenbankmanagementsystem erzeugt.}
+
+Um überhaupt mit der Datenbank zu interagieren mussten wir uns erstmal den
+JDBC-Treiber für unser DBMS Postgresql besorgen.
+
+Diesen haben wir anschließend in das Projekt eingebunden und haben mit der
+Klasse \gqq{DatabaseConnection} diesen Treiber in der
+\gqq{getConnection}-Methode laden lassen.
+
+\lstset{language=Java, backgroundcolor=\color{editorGray},
+  basicstyle={\linespread{0.82}\footnotesize\ttfamily},   
+  frame=b, xleftmargin={0.75cm},literate=
+    {Ö}{{\"O}}1
+  {Ä}{{\"A}}1
+  {Ü}{{\"U}}1
+  {ß}{{\ss}}2
+  {ü}{{\"u}}1
+  {ä}{{\"a}}1
+  {ö}{{\"o}}1,
+    numberstyle=\tiny\noncopynumber,
+      columns=flexible,
+      }
+\begin{lstlisting}
+	/**
+	 * List die Informatioen aus dem Objekt ci (ConnectionInformation) und versucht eine Verbindung 
+	 * zur Datenbank auf zu bauen.
+	 * 
+	 * @throws SQLException Wird geworfen, wenn der DriverManager keine Verbndung zur Datenbank aufbauen kann
+	 */
+	public void connect() throws SQLException
+	{
+		/*
+		 * Der Compiler uebersetzt " + var + " automatisch in ein StringBuilder Objekt
+		 */
+		databaseLink = DriverManager.getConnection(
+				"jdbc:postgresql://" + ci.getHost() +"/" + ci.getDatabase(),
+				ci.getUser(), 
+				ci.getPassword()
+		);
+	}
+\end{lstlisting}
+
+Die Verbindungsinformationen übergeben wir mittels der Klasse
+\nameref{lst:civ1}. Diese implementiert ein einfaches Model, welches nur die
+Parameter für die Datenbankverbindung beinhaltet.
+
+Anschließend haben wir eine Klasse \nameref{lst:tpsv1} implementiert, welche die
+gesamte Funktionalität zum Erstellen der \textbf{n-tps-Datenbank} beinhaltet.
+Dieser Klasse kann man wiederum ein \textit{DatabaseConnection}-Objekt
+übergeben. So ist es Möglich in einem Programm mehrere die Datenbank auf
+verschiedene Servern anzulegen. 
+
+Die Queries der Klasse \nameref{lst:tpsv1}
+führen wir mit anschließend normalen Statements aus. 
+
+\begin{lstlisting}
+	/**
+	 * Erstellt die Tupel in der Tabelle Branch
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden
+	 * @return Gibt an, ob ein Fehler vorhanden ist
+	 */
+	public boolean createBranchTupel(int n) {
+		try {
+			Statement statement = connection.databaseLink.createStatement();
+
+			for (int i = 1; i <= n; i++) {
+				statement.executeUpdate("INSERT INTO branches (branchid, branchname, balance, address) VALUES(" + i + ", 'branch', 0, 'branch')");
+			}
+			return true;
+		} catch (SQLException e) {}		
+		return false;
+	}
+\end{lstlisting}
+
+Als nächstes haben wir uns um die Benutzerinteraktion gekümmert. Wir waren uns
+einig, dass wir anstatt auf eine komplexe GUI Darstellung auf eine simple
+Konsolen-Anwendung beschränken wollen. Außerdem hat das große Vorteile gegenüer
+der Performance.
+
+Um die Interaktion mit der Konsole so einfach wie Möglich zu gestalten haben wir
+uns eine Helfer Klasse ~\nameref{lst:crv1} geschrieben und diese anschließend
+in unserer \nameref{lst:mainv1} benutzt.
+
+\begin{lstlisting}
+			System.out.println("Verbindungsinformationen eingeben!");
+			
+			System.out.println("Host:");
+			infos.setHost(ConsoleReader.readString());
+
+			System.out.println("Datenbank:");
+			infos.setDatabase(ConsoleReader.readString());
+			
+			System.out.println("Benutzer:");
+			infos.setUser(ConsoleReader.readString());
+			
+			System.out.println("Password:");
+			infos.setPassword(ConsoleReader.readString());
+\end{lstlisting}
+
+Am Ende unserer Main rufen wir die Funkion autoSetup auf. Diese Funktion 
+erstellt uns anschliessend die Datenbank. Ein Durchlauf mit einer
+\textbf{10-tps-Datenbank} dauert \ca 4 Minuten und ist alles andere als
+Performant.
+\clearpage
