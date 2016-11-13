@@ -2,8 +2,10 @@
 \textbf{Entwickeln Sie ein Programm, das einen Aufrufparameter n erwartet und eine initiale n-
 tps-Datenbank auf dem gewählten Datenbankmanagementsystem erzeugt.}
 
-Um überhaupt mit der Datenbank zu interagieren mussten wir uns erstmal den
-JDBC-Treiber für unser DBMS Postgresql besorgen.
+Um überhaupt mit unserer PostgreSQL Datenbank zu können interagieren mussten wir
+uns erstmal den JDBC-Treiber für unser DBMS Postgresql besorgen. Den
+JDBC-Treiber befindet sich au der Webseite von
+PostgreSQL\footnote{\url{https://jdbc.postgresql.org/download.html}}.
 
 Diesen haben wir anschließend in das Projekt eingebunden und haben mit der
 Klasse \gqq{DatabaseConnection} diesen Treiber in der
@@ -20,7 +22,6 @@ Klasse \gqq{DatabaseConnection} diesen Treiber in der
   {ä}{{\"a}}1
   {ö}{{\"o}}1,
     numberstyle=\tiny\noncopynumber,
-      columns=flexible,
       }
 \begin{lstlisting}
 	/**
@@ -48,8 +49,8 @@ Parameter für die Datenbankverbindung beinhaltet.
 
 Anschließend haben wir eine Klasse \nameref{lst:tpsv1} implementiert, welche die
 gesamte Funktionalität zum Erstellen der \textbf{n-tps-Datenbank} beinhaltet.
-Dieser Klasse kann man wiederum ein \textit{DatabaseConnection}-Objekt
-übergeben. So ist es Möglich in einem Programm mehrere die Datenbank auf
+Dieser Klasse kann man wiederum ein \nameref{lst:dbv1}-Objekt
+übergeben. So ist es möglich in einem Programm die Datenbank auf
 verschiedene Servern anzulegen. 
 
 Die Queries der Klasse \nameref{lst:tpsv1}
@@ -76,11 +77,12 @@ führen wir mit anschließend normalen Statements aus.
 \end{lstlisting}
 
 Als nächstes haben wir uns um die Benutzerinteraktion gekümmert. Wir waren uns
-einig, dass wir anstatt auf eine komplexe GUI Darstellung auf eine simple
-Konsolen-Anwendung beschränken wollen. Außerdem hat das große Vorteile gegenüer
-der Performance.
+einig, dass wir uns anstelle einer komplexen GUI Darstellung auf eine simple
+Konsolen-Anwendung beschränken wollen. Außerdem hat das große Vorteile gegenüber
+der Performance, da wir das Swing-Framework nicht laden initialisieren
+brauchen.
 
-Um die Interaktion mit der Konsole so einfach wie Möglich zu gestalten haben wir
+Um die Interaktion mit der Konsole so einfach wie möglich zu gestalten haben wir
 uns eine Helfer Klasse ~\nameref{lst:crv1} geschrieben und diese anschließend
 in unserer \nameref{lst:mainv1} benutzt.
 
@@ -100,8 +102,8 @@ in unserer \nameref{lst:mainv1} benutzt.
 			infos.setPassword(ConsoleReader.readString());
 \end{lstlisting}
 
-Am Ende unserer Main rufen wir die Funkion autoSetup auf. Diese Funktion 
-erstellt uns anschliessend die Datenbank. Ein Durchlauf mit einer
-\textbf{10-tps-Datenbank} dauert \ca 4 Minuten und ist alles andere als
-Performant.
+Am Ende unserer \nameref{lst:mainv1}-Klasse rufen wir die Funkion
+\textit{autoSetup} in dem instanziierten \nameref{lst:tpsv1}-Objekt auf. Diese Funktion erstellt uns
+anschliessend die Datenbank. Ein Durchlauf mit einer \textbf{10-tps-Datenbank}
+dauert \ca 4 Minuten und ist alles andere als performant.
 \clearpage

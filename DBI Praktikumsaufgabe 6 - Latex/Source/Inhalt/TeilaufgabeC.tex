@@ -3,14 +3,14 @@
 einzelne Verbesserungsideen und die jeweiligen Laufzeitveränderungen für eine lokale
 Ausführung Ihres Programms bei der Erzeugung einer 10-tps-Datenbank!}
 
-\subsection{Transaction}
+\subsection{Transaktion}
 Um den Durchsatz der Daten zu erhöhen lassen sich die Queries in einer
-Transaction zusammenfassen.  
+\textbf{Transaktion}\footnote{\url{https://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html}} zusammenfassen.  
 
 Dazu muss die Option \textit{autoCommit} abgeschaltet werden und die Transaktion
-mit einem manuellen \textit{commit} zum Server geschickt werden. Wir müssen also
-unseren \nameref{lst:tpsv1} erweitern. Dafür legen wir 2 neue Funktionen an und
-erweitern nebenbei die anderen Funktionen um ein zuschaltbares Debug-Logging.
+mit einem manuellen \textit{commit} zum Server geschickt werden. Wir mussten
+also unseren \nameref{lst:tpsv1} erweitern. Dafür haben wir 2 neue
+Funktionen angelegt.
 
 \begin{lstlisting}
 	public void beginTransaktion() {
@@ -33,9 +33,9 @@ erweitern nebenbei die anderen Funktionen um ein zuschaltbares Debug-Logging.
 
 
 Jetzt brauchen wir noch die funktionalität, um die Funktionen zu benutzen. Damit
-wir recht flexibel sind implentieren wir hierfür ein Konsolen-Menü. Dieses
-erstellt uns dann eine Benchmark Klasse die die tpsCreator-Klasse alle nötigen
-Parameter übergibt und das Benchmarking ausführt.\\
+wir recht flexibel sind haben wir hierfür ein Konsolen-Menü implementiert.
+Dieses erstellt uns dann eine Benchmark Klasse, die der tpsCreator-Klasse alle
+nötigen Parameter übergibt und das Benchmarking ausführt.\\
 
 \begin{lstlisting}
 
@@ -59,8 +59,8 @@ Parameter übergibt und das Benchmarking ausführt.\\
 
  
 Die Queries, die mittels einer Transaktion übertragen worden sind, sind bei
-einer 1-tps-Datenbank um \ca das 11fache schneller als die Queries die einzelnt
-zum Server geschcikt worden sind.
+einer \textbf{10-tps-Datenbank} um \ca das \textbf{11fache} schneller als die
+Queries die einzelnd zum Server geschickt werden.
 
 \begin{figure}[!htbp] 
     \subfigure[mit
@@ -75,11 +75,13 @@ Selbst in einer Transaktion wird jeder einzelne Query validiert. Wir besitzen
 nun aber eine Masse von gleich strukturierten Statements. Jeden einzelnen zu
 validieren kostet den Server Zeit und Ressourcen.
  
- Wir suchen also eine Möglichkeit eine vorher definierte und validierte Struktur
- eines Queries zu bekommen. Dazu bietet sich das \textbf{Prepared Statement} an.
- Wie der Name schon sagt, wird dieser Query einmal zum Server geschickt und
- validiert. Anschließend kann man mit der Reference des Prepared Statements
- schnell und sicher die Daten dem Server übergeben.
+Wir haben also eine Möglichkeit gesucht eine vorher definierte und validierte
+Struktur eines Queries zu bekommen. Dazu hat sich das Konstrukt 
+\textbf{Prepared Statement}\footnote{\url{https://docs.oracle.com/javase/tutorial/jdbc/basics/prepared.html}} angeboten.
+ 
+Wie der Name schon sagt, wird der Query im Prepared Stament einmal zum Server
+geschickt und validiert. Anschließend kann man mit der Referenz
+schnell und sicher die Daten dem Server übergeben.
  
 Die umgeschriebene Funktion für Accounts sieht nun folgendermaßen aus:
  \begin{lstlisting}
@@ -132,47 +134,51 @@ viel wie Möglich vom Server verarbeiten lassen wollen, lagern wir das Generiere
 der Branchen-IDs auf unseren Server aus, denn dieser hat mit Sicherheit die
 Möglichkeit aus unserem SQL-Query etwas Effizentes zu generieren.
 
-Wir müssen uns also den Zufallszahlengenerator von PostgreSQL benutzen um uns
+Wir haben uns also den Zufallszahlengenerator von PostgreSQL bedient um uns
 eine ID zu genrieren.
-
 \begin{lstlisting}[language=sql]
 SELECT rand();
 \end{lstlisting}
 
 Diese Funktion liefert uns eine Gleitkommazahl zwischen 0 und 1. Diese Zahl
-müssen wir anschließend nur noch $ \cdot  n + 1 $ rechnen um eine zufällige ID
+müssten wir anschließend nur noch $ \cdot  n + 1 $ rechnen um eine zufällige ID
 zwischen 1 und $n$ zu erzeugen. Das am Ende stehende $ + 1$ soll dafür sorgen,
-dass $n$ auch generiert werden kann. Anschließend schneiden wir mittels \textit{trunc} noch
-die Kommastellen ab.
+dass $n$ auch generiert werden kann. Anschließend haben wir mittels \textit{trunc} noch
+die Kommastellen abgeschnitten.
 
 Unser Query, der uns die IDs generiert, sieht dann folgendermaßen aus:
 \begin{lstlisting}[language=sql]
 SELECT trunc(random() *  n  + 1);
 \end{lstlisting}
 
-Diesen Query können wir jetzt auf unser Prepared Statement anwenden:
+Diesen Query konnten wir jetzt auf unser Prepared Statement anwenden:
 \begin{lstlisting}[language=sql]
 INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'account', 0,'test', trunc(random() * n + 1))
 \end{lstlisting}
 
-Diese Optimierung spart uns bei einer  \textbf{10-tps-Datenbank} nochmal \ca
-500 Millisekunden. Jedoch ist es jetzt nicht mehr Möglich im DebugLog die
-generierte ID zu überprüfen.
+Diese Optimierung  hat uns bei einer \textbf{10-tps-Datenbank} nochmal \ca
+500 Millisekunden gespart. Somit sind wir jetzt \textbf{38fach} schneller 
+als mit dem Benchmark-Tool, welhes wir als erstes entwickelt hatten.
+
 
 
 \subsection{Adressauflösung von Domainnamen}
-Um das Ergebnis noch mehr zu verbessern kommt jetzt das Feintuning. Dazu
-schauen wir uns jetzt nicht das DBMS an, sondern DNS-Server.
+Um das Ergebnis noch mehr zu verbessern kam jetzt das Feintuning. Dazu
+haebn wir uns jetzt nicht das DBMS zugewendet, sondern haben uns auf die Netzwerkebene begeben.
 
-Hier besteht ein massiver Nachteil gegenüber der herkömmlicher IP. Jeder
+Eine Datenbank spricht man normalerweiße mit einer Domain an. 
+Eine Domain muss aber erst einmal aufgelöst werden.
+Das ist ein massiver Nachteil gegenüber der herkömmlicher IP. Jeder
 DNS-Server \bzw DNS-Cache muss in irgendeiner Tabelle nachschauen, welche Domain
-zu welcher IP gehört. 
+zu welcher IP gehört. Das kostet beim Verbindungsaufbau wertvolle Zeit.
 
 Selbst der lokale DNS-Cache muss dies \zB für \textbf{localhost} machen.
-Zugriffe bedeuten bekanntlich Zeit. Möchten wir also diese Zugriffszeiten
-umgehen, brauchen wir einfach nur die IP-Adresse statt des Domainnamens
-einzugeben. Dies wäre für \textbf{localhost} entweder \gqq{127.0.0.1} als
+Möchten wir also die Zugriffszeiten umgehen, brauchen wir einfach nur die IP-Adresse
+statt des Domainnamens einzugeben. Dies wäre für \textbf{localhost} entweder \gqq{127.0.0.1} als
 IPv4-Schreibweiße oder \gqq{[::1]} als IPv6 Schreibweise.
+
+Wir haben in unser Programm deswegen nur IP-Adressen verwendet um sicher zu gehen, dass wir 
+die Zugriffszeiten umgegehen.
 
 -- bis hierher bin ich gekommen .- lg mario
 ps: habe nicht auf rächtschreibung geachtet, habe einfach mal drauf los getippz,
