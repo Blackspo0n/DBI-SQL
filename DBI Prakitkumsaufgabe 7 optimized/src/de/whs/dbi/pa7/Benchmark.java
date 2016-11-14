@@ -3,8 +3,21 @@ package de.whs.dbi.pa7;
 import de.whs.dbi.pa7.database.TpsCreatorInterface;
 
 public class Benchmark {
+	
+	/**
+	 * Globale Startzeit des Benchmarks
+	 */
 	private static long startTime;
 	
+	/**
+	 * Führt den Benchmark mit den Übergebenen Parametern durch.
+	 * 
+	 * @param size Die geplante Größe der n-tps-Datenbank
+	 * @param tpsDBCreator Das Objekt, welches die Datenbank erzeugen kann
+	 * @param debugLog Aktiviert das Debug Logging (SQL-Queries)
+	 * @param useTransaction Gibt an, ob SQL-Transaktionen für die Datenbank ausgeführt werden sollen
+	 * @param usePreamble Gibt an, ob die drop- und createstatements mit ins Benchmark mit einfließen sollen
+	 */
 	public static void BenchmarkTask(int size, TpsCreatorInterface tpsDBCreator, boolean debugLog, boolean useTransaction, boolean usePreamble) {
 		System.out.println("Brenchmarking gestartet");
 		System.out.println("Parameter: debugLog = " + debugLog + ", useTransaction = " + useTransaction + ", usePreamble = " + usePreamble);
@@ -47,12 +60,19 @@ public class Benchmark {
 		System.out.println("Benchmark abgeschlossen. Gesamtdauer " + getCurrentMilliseconds() + " Millisekunden.");
 	}
 	
+	/**
+	 * Setzt die Startzeit auf die jetzige Zeit
+	 */
 	public static void startTimer() {
 		startTime  = System.currentTimeMillis();
 	}
 	
+	/**
+	 * Gibt die Differenz aus der Startzeit und der jetzigen Zeit aus
+	 * 
+	 * @return Differenz der Subtraktion
+	 */
 	public static long getCurrentMilliseconds() {
 		return System.currentTimeMillis() - startTime;
 	}
-
 }

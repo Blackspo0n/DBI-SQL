@@ -1,6 +1,5 @@
 package de.whs.dbi.pa7.database;
 
-
 /**
  * Dieses Model beinhaltet alle nötigen Informationen 
  * um sich zu einer Postgre Datenbank zu verbinden
@@ -11,6 +10,8 @@ package de.whs.dbi.pa7.database;
  *
  */
 public class ConnectionInformation {
+	
+	// Eigenschaften
 	public String host = null;
 	public String database = null;
 	public String user = null;
@@ -18,7 +19,6 @@ public class ConnectionInformation {
 	
 	
 	// Getter & Setter
-	
 	public String getHost() {
 		return host;
 	}

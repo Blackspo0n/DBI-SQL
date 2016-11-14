@@ -7,6 +7,7 @@ import de.whs.dbi.pa7.database.ConnectionInformation;
 import de.whs.dbi.pa7.database.DatabaseConnection;
 import de.whs.dbi.pa7.database.TpsCreator;
 import de.whs.dbi.pa7.database.TpsCreatorInterface;
+import de.whs.dbi.pa7.database.TpsCreatorOldStatements;
 
 /**
  * Unsere Hauptklasse. Hauptsächlich dient Sie als Einsteigspunkt unserer Applikation
@@ -19,14 +20,35 @@ import de.whs.dbi.pa7.database.TpsCreatorInterface;
  *
  */
 public class Main {
-
-	static DatabaseConnection con;
-	static TpsCreatorInterface tpsDBCreator;
-	static int sizeN;
-	static boolean useLocal = false;
 	/**
-	 * @param args
+	 * Datenbank Verbindungsobjekt
 	 */
+	static DatabaseConnection con;
+	
+	/**
+	 * Ersteller der Datenbank
+	 */
+	static TpsCreatorInterface tpsDBCreator;
+	
+	/**
+	 * Vom Benutzer angegebene Größe der tps-Datenbank
+	 */
+	static int sizeN;
+	
+	/**
+	 * Gibt an, ob die heardcodierten Verbindungsinformationen benutzt werden.
+	 */
+	static boolean useLocal = false;
+	
+	/**
+	 * Unserer Einstiegspunkt füt unsere Anwendung.
+	 * Hier werden die nötigen Informationen von dem Benutzer abgefragt
+	 * und der Benchmark Klasse übergeben.
+	 * 
+	 * 
+	 * @param args Wird irgoriert
+	 */
+	
 	public static void main(String[] args) {
 		
 		System.out.println("Lokale Datenbank verwenden? [J/n]:");
@@ -35,12 +57,16 @@ public class Main {
 		ConnectionInformation infos = new ConnectionInformation();
 		
 		if(useLocal) {
+			// Lokale Informationen unserer Gruppe.
+			// Diese Zugangsdaten werden nicht bei einer anderen Gruppe funktionieren.
 			infos.setHost("127.0.0.1");
 			infos.setDatabase("benchmark");
 			infos.setUser("postgres");
 			infos.setPassword("DBIPr");
 		}
 		else {
+			
+			//Verbindungnsinformationen werden vom User angegeben.
 			System.out.println("Verbindungsinformationen eingeben!");
 			
 			System.out.println("Host:");
@@ -58,11 +84,26 @@ public class Main {
 		
 
 		try {
+			// erstelle die Datenbankverbindung und verbinde
 			con = new DatabaseConnection(infos);
 			con.connect();
-			tpsDBCreator = new TpsCreator(con);
+			
+			
+			// Nutzer fragen, ob er die unoptimierte Programmversion nutzen möchte
+			System.out.println("Unoptimierte Programmversion benutzen?? [j/N]:");
+			
+			// erstellen des jeweiligen TpsCreatorObjekts
+			if(ConsoleReader.readJn()) {
+				tpsDBCreator = new TpsCreatorOldStatements(con);
+			}
+			else {
+
+				tpsDBCreator = new TpsCreator(con);
+			}
 		}
 		catch ( Exception err){
+			
+			//Fehlerfall
 			System.err.println("Konnte keine Verbindung zur Datenbank aufbauen!");
 			System.err.println(err.getMessage());
 			err.printStackTrace();
@@ -70,21 +111,25 @@ public class Main {
 			return;
 		}
 		
-		try {
-			System.out.println("Gebe bitte die Größe (n) der Datenbank ein:");
-			
-			sizeN = ConsoleReader.readInt();			
-		} catch (Exception e) {}
 		
+		// Nutzer die größe der Datenbank angeben lassen
+		System.out.println("Gebe bitte die Größe (n) der Datenbank ein:");	
+		sizeN = ConsoleReader.readInt();			
 		
+		// Zeige das Benchmarkmenü
 		benchmarkMenu();
 		
 		System.out.println("Beende Anwendung...");		
 	}
-		
+	
+	/**
+	 * Zeigt das Benchmarkmenü und wertet die Nutzereingaben
+	 * aus.
+	 */
 	public static void benchmarkMenu() {
 		int menureturn = renderMenu();
 		
+		// Übergabe der Benchmarkparameter
 		switch(menureturn) {
 		case 1:
 			Benchmark.BenchmarkTask(sizeN, tpsDBCreator, true, false, true);
@@ -115,6 +160,12 @@ public class Main {
 		}
 	}
 	
+	
+	/**
+	 * Rendert das Benchmarkmenü.
+	 * 
+	 * @return Nutzereingabe
+	 */
 	public static int renderMenu() {
 		System.out.println("======================- Benchmark Menu -===========================");
 		System.out.println("= Wähle bitte eine der folgende Optionen:                         =");

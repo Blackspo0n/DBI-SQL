@@ -14,9 +14,10 @@ import java.sql.Statement;
  * @author Jonas Stadtler
  */
 public class TpsCreator implements TpsCreatorInterface {
-
-    
 	
+	/**
+	 * Debug Variable
+	 */
 	private boolean isDebug = false;
 	
 	/**
@@ -64,40 +65,36 @@ public class TpsCreator implements TpsCreatorInterface {
 		
 	}
 
-
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#beginTransaktion()
+	/**
+	 * Aktiviert das Transaktion-System.
 	 */
-	@Override
 	public void beginTransaktion() {
 		try {
 			connection.databaseLink.setAutoCommit(false);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#endAndCommitTransaction()
+	/**
+	 * Comitted die Queries zur DAtenbank und beendet das Transaktion-System
+	 * 
+	 * @return Gibt an, ob win Fehler vorhanden ist.
 	 */
-	@Override
 	public void endAndCommitTransaction() {
 		try {
 			connection.databaseLink.commit();
-			
 			connection.databaseLink.setAutoCommit(true);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#dropSchema()
+	/**
+	 * Löscht die Tabellen aus der Datenbank
+	 * 
+	 * @return Gibt an, ob win Fehler vorhanden ist.
 	 */
-	@Override
 	public boolean dropSchema() {
 		try {
 			Statement statement = connection.databaseLink.createStatement();
@@ -119,10 +116,11 @@ public class TpsCreator implements TpsCreatorInterface {
 		
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#createSchema()
+	/**
+	 * Erstellt die Tabellen
+	 * 
+	 * @return Gibt an, ob win Fehler vorhanden ist.
 	 */
-	@Override
 	public boolean createSchema() {
 	
 		try {
@@ -141,11 +139,12 @@ public class TpsCreator implements TpsCreatorInterface {
 		}
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#createBranchTupel(int)
+	/**
+	 * Erstellt die Tupel in der Tabelle Branch.
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden
+	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
-	@Override
 	public boolean createBranchTupel(int n) {
 		
 		try {
@@ -174,11 +173,12 @@ public class TpsCreator implements TpsCreatorInterface {
 		return false;
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#createAccountTupel(int)
+	/**
+	 * Erstellt die Tupel in der Tabelle Accounts
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden mal 10000
+	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
-	@Override
 	public boolean createAccountTupel(int n) {
 		int localConst = n*10000;
 		
@@ -206,10 +206,12 @@ public class TpsCreator implements TpsCreatorInterface {
 		return false;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#createTellerTupel(int)
+	/**
+	 * Erstellt die Tupel in der Tabelle Teller
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden mal 10
+	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
-	@Override
 	public boolean createTellerTupel(int n) {
 		int localConst = n*10;
 		
@@ -240,11 +242,11 @@ public class TpsCreator implements TpsCreatorInterface {
 		return false;
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#autoSetup(int)
+	/**
+	 * Bündelt die Funktionen des tpsCreators und führt diese nach ein ander aus.
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden
 	 */
-	@Override
 	public void autoSetup(int n) {
 		System.out.println("Starte automatisches Setup...");
 		System.out.println("Erzeuge eine " + n + "-tps-Datenbank");
@@ -280,22 +282,17 @@ public class TpsCreator implements TpsCreatorInterface {
 		System.out.println("Erstellen der " + n + "-tps-Datenbak erfolgreich");
 	}
 
-
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#isDebug()
+	/**
+	 * Gibt an, ob das DebugLogging aktiviert ist.
 	 */
-	@Override
 	public boolean isDebug() {
 		return isDebug;
 	}
-
-
-	/* (non-Javadoc)
-	 * @see de.whs.dbi.pa7.database.TpsCreatorInterface#setDebug(boolean)
+	
+	/**
+	 * Aktivert bzw deaktiviert den Debug Modus
 	 */
-	@Override
 	public void setDebug(boolean isDebug) {
 		this.isDebug = isDebug;
 	}
-	
 }

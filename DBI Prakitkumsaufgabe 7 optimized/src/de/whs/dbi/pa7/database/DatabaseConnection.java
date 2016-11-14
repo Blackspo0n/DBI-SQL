@@ -1,29 +1,39 @@
 package de.whs.dbi.pa7.database;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-
 /**
  * Unsere Datebankklasse ermöglicht die Kommunikation
- * mit der Datenbank. 
- * 
+ * mit der Datenbank. Es ist ein Wrapper für das
+ * Connection-Objekt der JDBC Connection
  * 
  * @author Mario Kellner
  * @author Markus Hausmann
  * @author Jonas Stadtler
- *
  */
 public class DatabaseConnection 
 {
-	//benennen einer Verbindungsvariablen
+	/**
+	 * Das eigentliche Connection Objekt
+	 */
 	public Connection databaseLink;
+	
+	/**
+	 *  Unser Verbindungs-Model
+	 */
 	private ConnectionInformation ci;
 	
-	
+	/**
+	 * Der Konstruktur der Klasse.  Überprüft ob das Objekt im C
+	 * 
+	 * @param cInfo Das Connection Objekt
+	 * @throws Exception Wird geworfen, wenn das Objekt was übergeben wird null ist.
+	 */
 	public DatabaseConnection(ConnectionInformation cInfo) throws Exception {
 		if(cInfo == null) {
-			throw new Exception("ConnectionInfo Oject cannot be null");
+			throw new Exception("ConnectionInfo Object cannot be null");
 		}
 		
 		ci = cInfo;
@@ -45,7 +55,6 @@ public class DatabaseConnection
 				"jdbc:postgresql://" + ci.getHost() +"/" + ci.getDatabase(),
 				ci.getUser(), 
 				ci.getPassword()
-		);
-		
+		);		
 	}
 }

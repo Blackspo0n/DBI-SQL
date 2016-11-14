@@ -31,6 +31,7 @@ public class ConsoleReader {
 		
 		return false;
 	}
+	
 	/**
 	 * Liest einen String aus der Konsole aus
 	 * 
@@ -45,8 +46,8 @@ public class ConsoleReader {
 		catch(IOException e) {				  
 			return "Ein-/Ausgabe-Fehler";
 		}
-
 	}
+	
 	/**
 	 * Liest einen Integer aus der Konsole aus
 	 * 

@@ -62,24 +62,27 @@ public class TpsCreatorOldStatements  implements TpsCreatorInterface {
 		
 	}
 
-
+	/**
+	 * Aktiviert das Transaktion-System.
+	 */
 	public void beginTransaktion() {
 		try {
 			connection.databaseLink.setAutoCommit(false);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-
+	/**
+	 * Comitted die Queries zur DAtenbank und beendet das Transaktion-System
+	 * 
+	 * @return Gibt an, ob win Fehler vorhanden ist.
+	 */
 	public void endAndCommitTransaction() {
 		try {
 			connection.databaseLink.commit();
-			
 			connection.databaseLink.setAutoCommit(true);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -254,7 +257,6 @@ public class TpsCreatorOldStatements  implements TpsCreatorInterface {
 		 * Jetzt kommen die Datensätze in die Datenbank yay \o/
 		 */
 		
-		
 		if(!createBranchTupel(n)) {
 			System.out.println("Branches konnten nicht angelegt werden. Stoppe Setup ...");
 			return;
@@ -268,18 +270,14 @@ public class TpsCreatorOldStatements  implements TpsCreatorInterface {
 			return;
 		}
 		
-
 		System.out.println("Erstellen der " + n + "-tps-Datenbak erfolgreich");
 	}
-
 
 	public boolean isDebug() {
 		return isDebug;
 	}
 
-
 	public void setDebug(boolean isDebug) {
 		this.isDebug = isDebug;
 	}
-	
 }

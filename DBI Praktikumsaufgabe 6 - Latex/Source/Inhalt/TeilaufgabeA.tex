@@ -4,7 +4,7 @@ tps-Datenbank auf dem gewählten Datenbankmanagementsystem erzeugt.}
 
 Um überhaupt mit unserer PostgreSQL Datenbank zu können interagieren mussten wir
 uns erstmal den JDBC-Treiber für unser DBMS Postgresql besorgen. Den
-JDBC-Treiber befindet sich au der Webseite von
+JDBC-Treiber befindet sich auf der Webseite von
 PostgreSQL\footnote{\url{https://jdbc.postgresql.org/download.html}}.
 
 Diesen haben wir anschließend in das Projekt eingebunden und haben mit der
@@ -43,9 +43,9 @@ Klasse \gqq{DatabaseConnection} diesen Treiber in der
 	}
 \end{lstlisting}
 
-Die Verbindungsinformationen übergeben wir mittels der Klasse
-\nameref{lst:civ1}. Diese implementiert ein einfaches Model, welches nur die
-Parameter für die Datenbankverbindung beinhaltet.
+Die Verbindungsinformationen haben wir mittels der Klasse
+\nameref{lst:civ1} übergeben. Diese implementiert ein einfaches Model, welches
+nur die Parameter für die Datenbankverbindung beinhaltet.
 
 Anschließend haben wir eine Klasse \nameref{lst:tpsv1} implementiert, welche die
 gesamte Funktionalität zum Erstellen der \textbf{n-tps-Datenbank} beinhaltet.
