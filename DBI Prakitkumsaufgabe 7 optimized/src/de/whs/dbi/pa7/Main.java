@@ -85,9 +85,12 @@ public class Main {
 
 		try {
 			// erstelle die Datenbankverbindung und verbinde
+			System.out.print("Verbinde zur Datenbank ... ");
+			
 			con = new DatabaseConnection(infos);
 			con.connect();
 			
+			System.out.println("[OK]");
 			
 			// Nutzer fragen, ob er die unoptimierte Programmversion nutzen möchte
 			System.out.println("Unoptimierte Programmversion benutzen?? [j/N]:");
@@ -104,9 +107,10 @@ public class Main {
 		catch ( Exception err){
 			
 			//Fehlerfall
-			System.err.println("Konnte keine Verbindung zur Datenbank aufbauen!");
-			System.err.println(err.getMessage());
+
 			err.printStackTrace();
+			System.err.println(err.getMessage());
+			System.err.println("Konnte keine Verbindung zur Datenbank aufbauen!");
 			
 			return;
 		}
