@@ -8,11 +8,12 @@ Die reine Spaltenanzahl lässt sich folgendermaßen ausrechnen:
 n + n \cdot 10 + n \cdot 10000 = \mbox{Spaltenanzahl}
 \end{eqnarray}
 
-Also sind bei einer 1-tps-Datenbank 10011 Datensätze enthalten.
+Also sind bei einer 1-tps-Datenbank 10011 Datensätze enthalten. Plus den 4
+Tabellen sind wir dann bei einer Anzahl von 10015 Statements.
 
-
-Folgender SQL-Query liefert uns die physikalische Größe jeder einzelner Tabelle:
-\begin{lstlisting}[language=sql]
+Folgender SQL-Query liefert uns die Größe jeder einzelner Tabelle:
+\begin{lstlisting}[language=sql, caption={Größe der Tabelle und Datensätze
+ermitteln}]
   SELECT nspname || '.' || relname AS relation,
     pg_total_relation_size(C.oid) AS total_size
   FROM pg_class C
@@ -22,24 +23,22 @@ Folgender SQL-Query liefert uns die physikalische Größe jeder einzelner Tabell
     AND nspname !~ '^pg_toast'
   ORDER BY pg_total_relation_size(C.oid) DESC
 \end{lstlisting}
+
 Wenn wir diesen Query ausführen erhalten wir folgende Ausgabe:
 \tabelle{Ausgabe des Query}{tab:databaseSize}{databaseSize.tex}
 
 Die so errechnete Größe liegt bei 1736704 bytes. Umgerechnet ergibt das: 
 1,65 MB.
 
-Die tatsächliche physikalische Größe der gesammten Datenbank lässt sich mit
+Die tatsächliche physikalische Größe der gesamten Datenbank lässt sich mit
 folgendem Query bestimmen:
-\begin{lstlisting}[language=sql]
-SELECT d.datname AS Name,  pg_catalog.pg_get_userbyid(d.datdba) AS Owner,
-    pg_catalog.pg_database_size(d.datname) AS SIZE
-FROM pg_catalog.pg_database d
+\begin{lstlisting}[language=sql, caption={Physikalische Größe der Datenbank
+ermitteln}]
+SELECT d.datname AS Name,  pg_catalog.pg_get_userbyid(d.datdba) AS Owner, pg_catalog.pg_database_size(d.datname) AS SIZE FROM pg_catalog.pg_database d
     ORDER BY pg_catalog.pg_database_size(d.datname) DESC
 \end{lstlisting}
 
-Die tatsäcliche Größe der Datenban beträgt dabei: 17932460 Bytes. Umgerechnet
+Die tatsächliche Größe der Datenbank beträgt dabei: 17932460 Bytes. Umgerechnet
 ist die Datenbank dementsprechend 17,1 MB groß.
 
-Die Differenz beträgt also 15,45 MB.
-
---- hier noch eine begründung warum das so ist.
+Die Differenz beider Größen beträgt also 15,45 MB.

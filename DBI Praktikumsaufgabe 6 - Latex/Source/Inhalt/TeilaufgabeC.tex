@@ -4,15 +4,15 @@ einzelne Verbesserungsideen und die jeweiligen Laufzeitveränderungen für eine 
 Ausführung Ihres Programms bei der Erzeugung einer 10-tps-Datenbank!}
 
 \subsection{Transaktion}
-Um den Durchsatz der Daten zu erhöhen lassen sich die Queries in einer
+Um den Durchsatz der Daten zu erhöhen, lassen sich die Queries in einer
 \textbf{Transaktion}\footnote{\url{https://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html}} zusammenfassen.  
 
 Dazu muss die Option \textit{autoCommit} abgeschaltet werden und die Transaktion
 mit einem manuellen \textit{commit} zum Server geschickt werden. Wir mussten
-also unseren \nameref{lst:tpsv1} erweitern. Dafür haben wir 2 neue
-Funktionen angelegt.
+also unseren \hyperref[lst:tpsv2]{TpsCreator} erweitern. In
+dieser legen wir dazu 2 neue Funktionen an:
 
-\begin{lstlisting}
+\begin{lstlisting}[caption={Erweiterung der TpsCreator-Klasse}]
 	public void beginTransaktion() {
 		try {
 			connection.databaseLink.setAutoCommit(false);
@@ -31,14 +31,12 @@ Funktionen angelegt.
 	}
 \end{lstlisting}
 
-
-Jetzt brauchen wir noch die funktionalität, um die Funktionen zu benutzen. Damit
+Jetzt brauchen wir noch die Funktionalität, um die Funktionen aufzurufen. Damit
 wir recht flexibel sind haben wir hierfür ein Konsolen-Menü implementiert.
-Dieses erstellt uns dann eine Benchmark Klasse, die der tpsCreator-Klasse alle
-nötigen Parameter übergibt und das Benchmarking ausführt.\\
+Dieses erstellt uns dann eine  \hyperref[lst:bmv2]{Benchmark}-Klasse, die der
+\hyperref[lst:tpsv2]{TpsCreator}-Klasse alle nötigen Parameter übergibt und das Benchmarking ausführt.\\
 
-\begin{lstlisting}
-
+\begin{lstlisting}[caption={Renderer für das Konsolen Menü}]
 	public static int renderMenu() {
 		System.out.println("======================- Benchmark Menu -===========================");
 		System.out.println("= Wähle bitte eine der folgende Optionen:                         =");
@@ -64,9 +62,9 @@ Queries die einzelnd zum Server geschickt werden.
 
 \begin{figure}[!htbp] 
     \subfigure[mit
-    Transactions]{\includegraphics[width=0.49\textwidth]{Bilder/Auswahl_014.png}}
+    Transactions]{\includegraphics[width=0.49\textwidth]{Bilder/Auswahl_015.png}}
     \subfigure[ohne
-    Transaction]{\includegraphics[width=0.49\textwidth]{Bilder/Auswahl_015.png}}
+    Transaction]{\includegraphics[width=0.49\textwidth]{Bilder/Auswahl_014.png}}
 \end{figure} 
 
 
@@ -83,8 +81,9 @@ Wie der Name schon sagt, wird der Query im Prepared Stament einmal zum Server
 geschickt und validiert. Anschließend kann man mit der Referenz
 schnell und sicher die Daten dem Server übergeben.
  
-Die umgeschriebene Funktion für Accounts sieht nun folgendermaßen aus:
- \begin{lstlisting}
+Die umgeschriebene Funktion in der \hyperref[lst:tpsv2]{TpsCreator}-Klasse für
+Accounts sieht nun folgendermaßen aus:
+ \begin{lstlisting}[caption={Einbinden von Prepared Statements}]
 
 	public boolean createAccountTupel(int n) {
 		int localConst = n*10000;
@@ -113,28 +112,36 @@ Die umgeschriebene Funktion für Accounts sieht nun folgendermaßen aus:
  \end{lstlisting}
 
 Eine gute Eigenschaft von den Prepared Statements ist, dass sie die
-Transaktionsverwaltung schon intregriert haben und damit bei gleichen Queries
+Transaktionsverwaltung schon besitzen und damit bei gleichen Queries
 deutlich schneller sind als ein normales Statement, welches ein und den selben
 Query immer und immer wieder ausführt. Diese Eigenschaft besitzt ein
 Prepared Statement auch, wenn das Feature \textit{autoCommit} aktiviert ist.
 
 Um aber aussagekräftige Benchmarks zu erhalten, ist gerade das Feature
 hinderlich, Wir möchten ja die Queries auch ohne Transaktion ausführen können,
-deshalb müssen wir uns eine alte Kopie der Klasse behalten und bei Bedarf
-instanziieren.
+deshalb müssen wir uns eine alte \gqq{Kopie} der Klasse behalten und bei Bedarf
+instanziieren. Dafür legen wir ein Interface an, welches von der neuen Klasse
+\hyperref[lst:tpsv2]{TpsCreator} und der alten Klasse
+\hyperref[lst:tpsoldv2]{TpsCreatorOldStatements} implementiert wird.
+Anschließend fragen wir in der \hyperref[lst:mainv2]{Main}-Klasse den
+Nutzer, welche Version er verwenden möchte.
+
+
 \begin{center}
 \includegraphics[scale=0.8]{Bilder/Auswahl_016.png}
 \end{center}
 Mit den Prepared Statement ist unser Benchmark jetzt \textbf{36fach} schneller
-als unser ursprüngliches Benchmark Tool.
+als mit unserem ursprüngliches Benchmark-Tool, welches nur mit normalen
+Statements lief.
 
 \subsection{IDs vom Server generieren lassen}
-Momentan benutzen wir die Ressourcen von unserem Javaprogramm. Da wir aber so
-viel wie Möglich vom Server verarbeiten lassen wollen, lagern wir das Generieren
-der Branchen-IDs auf unseren Server aus, denn dieser hat mit Sicherheit die
-Möglichkeit aus unserem SQL-Query etwas Effizentes zu generieren.
+Momentan benutzen wir die Ressourcen von unserem Javaprogramm um uns eine
+zufällige ID zu generieren. Da wir aber so viel wie möglich vom Server
+verarbeiten lassen wollen, lagern wir das Generieren der IDs auf unseren Server
+aus, denn dieser hat mit Sicherheit die Möglichkeit aus unserem SQL-Query etwas
+Effizentes zu generieren.
 
-Wir haben uns also den Zufallszahlengenerator von PostgreSQL bedient um uns
+Wir bedienen uns also den Zufallszahlengenerator von PostgreSQL um uns
 eine ID zu genrieren.
 \begin{lstlisting}[language=sql]
 SELECT rand();
@@ -143,23 +150,25 @@ SELECT rand();
 Diese Funktion liefert uns eine Gleitkommazahl zwischen 0 und 1. Diese Zahl
 müssten wir anschließend nur noch $ \cdot  n + 1 $ rechnen um eine zufällige ID
 zwischen 1 und $n$ zu erzeugen. Das am Ende stehende $ + 1$ soll dafür sorgen,
-dass $n$ auch generiert werden kann. Anschließend haben wir mittels \textit{trunc} noch
-die Kommastellen abgeschnitten.
+dass $n$ auch generiert werden kann. Diese Zahl muss anschließend mittels der
+Funktion \textit{trunc} in ein Integer gecastet werden.
 
 Unser Query, der uns die IDs generiert, sieht dann folgendermaßen aus:
 \begin{lstlisting}[language=sql]
 SELECT trunc(random() *  n  + 1);
 \end{lstlisting}
 
-Diesen Query konnten wir jetzt auf unser Prepared Statement anwenden:
-\begin{lstlisting}[language=sql]
+Diesen Query können wir jetzt auf unser Prepared Statement anwenden:
+\begin{lstlisting}[language=sql, caption={INSERT-Query mit vom Server
+generierten ID}]
 INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'account', 0,'test', trunc(random() * n + 1))
 \end{lstlisting}
 
-Diese Optimierung  hat uns bei einer \textbf{10-tps-Datenbank} nochmal \ca
+Diese Optimierung hat uns bei einer \textbf{10-tps-Datenbank} nochmal \ca
 500 Millisekunden gespart. Somit sind wir jetzt \textbf{38fach} schneller 
-als mit dem Benchmark-Tool, welhes wir als erstes entwickelt hatten.
+als mit dem Benchmark-Tool, welches wir als erstes entwickelt hatten.
 
+--- vergleich rein machen
 
 \subsection{Ändern der Servereinstellungen}
 
@@ -171,7 +180,7 @@ Unter Unix-Systemen liegt die Konfigurationsdatei meistens unter \newline
 \gqq{\textit{/etc/postgresql/\{versionsnummer\}/main/postgresql.conf}}
 
 Aktivierte \& geänderte Serverkonfiguration:
-\begin{lstlisting}
+\begin{lstlisting}[title={Veränderte Serverkonfiguration}]
 shared_buffers		= 1GB
 synchronous_commit	= off
 wal_writer_delay	= 5000ms
@@ -184,7 +193,7 @@ Konfiguration auf den Laptop eines Kommilitonen ein 100 Millisekunden bei einer
 \textbf{10-tps-Datenbank} ausgemacht.
 
 \subsection{Adressauflösung von Domainnamen}
-Um das Ergebnis noch mehr zu verbessern kam jetzt das Feintuning. Dazu
+Um das Ergebnis noch mehr zu verbessern kommt nun das Feintuning. Dazu
 haben wir uns jetzt nicht das DBMS zugewendet, sondern haben uns auf die
 Netzwerkebene begeben.
 
@@ -201,10 +210,4 @@ IPv4-Schreibweiße oder \gqq{[::1]} als IPv6 Schreibweise.
 
 Wir haben in unser Programm deswegen nur IP-Adressen verwendet um sicher zu gehen, dass wir 
 die Zugriffszeiten umgegehen.
-
--- bis hierher bin ich gekommen .- lg mario
-ps: habe nicht auf rächtschreibung geachtet, habe einfach mal drauf los getippz,
-vieles ist noch überarbeitungswürdig. Es muss noch das Optimierte Programm in
-den Anhang. An einigen Stellen mittels nameref darauf verwiesen werden und
-eindeutig sollte der gesamte Text mal durch word geschickt werden.
 \clearpage

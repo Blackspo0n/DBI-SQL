@@ -36,12 +36,22 @@
 \input{Allgemein/Befehle.tex}
 
 \begin{document}
-
 \input{Deckblatt.tex}
+\clearpage
+
+\pdfbookmark[1]{Inhaltsverzeichnis}{toc}
+\pagenumbering{Roman}
+\tableofcontents 
 \clearpage
 
 \pagenumbering{arabic}
 \input{Inhalt.tex}
+ 
+\lstlistoflistings
+\clearpage
+
+\listoftables
+\clearpage
 
 \appendix
 \pagenumbering{roman}

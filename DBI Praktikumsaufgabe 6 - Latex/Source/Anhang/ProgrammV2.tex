@@ -1,7 +1,7 @@
 \subsection{Programm (optimiert)}
 \label{app:programmv2}
 
-\begin{lstlisting}[caption={Main}, label={lst:mainv2}]
+\begin{lstlisting}[caption={Main (optimiert)}, label={lst:mainv2}]
 /**
  * 
  */
@@ -189,7 +189,7 @@ public class Main {
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption={ConsoleReader}, label={lst:crv2}]
+\begin{lstlisting}[caption={ConsoleReader (optimiert)}, label={lst:crv2}]
 package de.whs.dbi.pa7;
 
 import java.io.BufferedReader;
@@ -265,7 +265,7 @@ public class ConsoleReader {
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Benchmark}, label={lst:bmv2}]
+\begin{lstlisting}[caption={Benchmark (optimiert)}, label={lst:bmv2}]
 package de.whs.dbi.pa7;
 
 import de.whs.dbi.pa7.database.TpsCreatorInterface;
@@ -346,7 +346,7 @@ public class Benchmark {
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption={ConnectionInformation}, label={lst:civ2}]
+\begin{lstlisting}[caption={ConnectionInformation (optimiert)}, label={lst:civ2}]
 package de.whs.dbi.pa7.database;
 
 /**
@@ -395,7 +395,7 @@ public class ConnectionInformation {
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption={DatabaseConnection}, label={lst:dbv2}]
+\begin{lstlisting}[caption={DatabaseConnection (optimiert)}, label={lst:dbv2}]
 package de.whs.dbi.pa7.database;
 
 import java.sql.Connection;
@@ -441,7 +441,7 @@ public class DatabaseConnection
 	 * 
 	 * List die Informatioen aus dem Objekt ci (ConnectionInformation) und versucht eine Verbindung 
 	 * zur Datenbank auf zu bauen.
-	 * 
+	 *  
 	 * @throws SQLException Wird geworfen, wenn der DriverManager keine Verbndung
 	 zur Datenbank aufbauen kann */
 	public void connect() throws SQLException
@@ -458,7 +458,7 @@ public class DatabaseConnection
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption={TpsCreatorInterface}, label={lst:tpsiv2}]
+\begin{lstlisting}[caption={TpsCreatorInterface (optimiert)}, label={lst:tpsiv2}]
 package de.whs.dbi.pa7.database;
 
 public interface TpsCreatorInterface {
@@ -475,7 +475,7 @@ public interface TpsCreatorInterface {
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption={TpsCreator}, label={lst:tpsv2}]
+\begin{lstlisting}[caption={TpsCreator (optimiert)}, label={lst:tpsv2}]
 package de.whs.dbi.pa7.database;
 
 import java.sql.PreparedStatement;
@@ -775,7 +775,7 @@ public class TpsCreator implements TpsCreatorInterface {
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption={TpsCreatorOldStatements}, label={lst:tpsoldv2}]
+\begin{lstlisting}[caption={TpsCreatorOldStatements (optimiert)}, label={lst:tpsoldv2}]
 package de.whs.dbi.pa7.database;
 
 import java.sql.SQLException;
