@@ -58,6 +58,8 @@ public class Benchmark {
 		}
 		
 		System.out.println("Benchmark abgeschlossen. Gesamtdauer " + getCurrentMilliseconds() + " Millisekunden.");
+
+		tpsDBCreator.finishUp();
 	}
 	
 	/**

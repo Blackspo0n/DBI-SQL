@@ -3,6 +3,13 @@ package de.whs.dbi.pa7.database;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.postgresql.copy.CopyIn;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.core.BaseConnection;
 
 /**
  * Die tpsCreator Klasse enthält alle nötigen Befehle um eine initial n-tps-Datenbank
@@ -34,11 +41,27 @@ public class TpsCreator implements TpsCreatorInterface {
 	 * Die Create-Statements für das Schema
 	 */
 	public String[] schema ={
-			"CREATE TABLE branches (branchid INT NOT NULL, branchname CHAR(20) NOT NULL, balance INT NOT NULL, address CHAR(72) NOT NULL, PRIMARY KEY (branchid))",
-			"CREATE TABLE accounts ( accid INT NOT NULL, NAME CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL, PRIMARY KEY (accid), FOREIGN KEY (branchid) REFERENCES branches )",
-			"CREATE TABLE tellers ( tellerid INT NOT NULL, tellername CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL, PRIMARY KEY (tellerid), FOREIGN KEY (branchid) REFERENCES branches)",
-			"CREATE TABLE history ( accid INT NOT NULL, tellerid INT NOT NULL, delta INT NOT NULL, branchid INT NOT NULL, accbalance INT NOT NULL, cmmnt CHAR(30) NOT NULL, FOREIGN KEY (accid) REFERENCES accounts, FOREIGN KEY (tellerid) REFERENCES tellers, FOREIGN KEY (branchid) REFERENCES branches )",
+			"CREATE TABLE branches (branchid INT NOT NULL, branchname CHAR(20) NOT NULL, balance INT NOT NULL, address CHAR(72) NOT NULL)",
+			"CREATE TABLE accounts ( accid INT NOT NULL, NAME CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL)",
+			"CREATE TABLE tellers ( tellerid INT NOT NULL, tellername CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL)",
+			"CREATE TABLE history ( accid INT NOT NULL, tellerid INT NOT NULL, delta INT NOT NULL, branchid INT NOT NULL, accbalance INT NOT NULL, cmmnt CHAR(30) NOT NULL)",
 	};
+	
+	/**
+	 * Alter Statements zum setzen der Keys
+	 */
+	
+	public String[] AlterStatements = {
+			"ALTER TABLE branches ADD PRIMARY KEY(branchid)",
+			"ALTER TABLE accounts ADD PRIMARY KEY(accid)",
+			"ALTER TABLE tellers ADD PRIMARY KEY(tellerid)",
+			"ALTER TABLE accounts ADD  FOREIGN KEY(branchid) REFERENCES PARENT(bracnhes)",
+			"ALTER TABLE tellers ADD  FOREIGN KEY(branchid) REFERENCES PARENT(bracnhes)",
+			"ALTER TABLE history ADD  FOREIGN KEY(branchid) REFERENCES PARENT(bracnhes)",
+			"ALTER TABLE history ADD  FOREIGN KEY(tellerid) REFERENCES PARENT(tellers)",
+			"ALTER TABLE history ADD  FOREIGN KEY(accid) REFERENCES PARENT(accounts)"
+	};
+
 	
 	/**
 	 * Unser Konstruktor. Er Überprüft, ob ein nicht leeres DatabaseConnection Objekt übergeben worden ist.
@@ -139,6 +162,31 @@ public class TpsCreator implements TpsCreatorInterface {
 		}
 	}
 	
+	
+	
+	/**
+	 * Erstellt die Tabellen
+	 * 
+	 * @return Gibt an, ob win Fehler vorhanden ist.
+	 */
+	public boolean createKeys() {
+	
+		try {
+			Statement statement = connection.databaseLink.createStatement();
+
+			for (String table : this.AlterStatements) {
+				statement.executeUpdate(table);
+				if(isDebug) {
+					System.out.println(table);
+				}
+			}
+
+			return true;
+		} catch (SQLException e) {
+			return false;
+		}
+	}
+	
 	/**
 	 * Erstellt die Tupel in der Tabelle Branch.
 	 * 
@@ -146,27 +194,23 @@ public class TpsCreator implements TpsCreatorInterface {
 	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
 	public boolean createBranchTupel(int n) {
-		
 		try {
-			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
-					"INSERT INTO branches (branchid, branchname, balance, address) VALUES (? , 'aaaaaaaaaaaaaaaaaaaa', 0, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')"
-			);
 			
+			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
+			CopyIn ci = cpm.copyIn("COPY branches (branchid, branchname, balance, address) FROM STDIN WITH DELIMITER '|'");
+
 			for (int i = 1; i <= n; i++) {
-				insertBranches.setInt(1, i);
-				insertBranches.addBatch();
+				// Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
+				StringBuilder sb = new StringBuilder().append(i).append("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
 				
 				if(isDebug) {
-					System.out.println("INSERT INTO branches (branchid, branchname, balance, address) VALUES("
-							+ i + ", 'branch', 0, 'branch')");
+					System.out.println(sb.toString());
 				}
 			}
-
-			insertBranches.executeBatch();
-			
+	        ci.endCopy();			
 			return true;
 		} catch (SQLException e) {
-
 			e.printStackTrace();
 		}
 		
@@ -181,23 +225,24 @@ public class TpsCreator implements TpsCreatorInterface {
 	 */
 	public boolean createAccountTupel(int n) {
 		int localConst = n*10000;
-		
+		int randomNumber;
 		try {
-			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
-					"INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'aaaaaaaaaaaaaaaaaaaa', 0,'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', trunc(random() * " + n + " + 1))"
-			);
+			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
 			
+			CopyIn ci = cpm.copyIn("COPY accounts(accid, NAME, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
+
 			for (int i = 1; i <= localConst; i++) {
-				insertBranches.setInt(1, i);
-				insertBranches.addBatch();
+				randomNumber = ThreadLocalRandom.current().nextInt(1, n + 1);
+
+				// Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
+				StringBuilder sb = new StringBuilder().append(i).append("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(randomNumber).append("\n");
+				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
 				
 				if(isDebug) {
-					System.out.println("INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES( " + i + " , 'account', 0,'test', trunc(random() * " + n + " + 1))");
+					System.out.println(sb.toString());
 				}
 			}
-
-			insertBranches.executeBatch();
-			
+	        ci.endCopy();			
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -215,27 +260,25 @@ public class TpsCreator implements TpsCreatorInterface {
 	public boolean createTellerTupel(int n) {
 		int localConst = n*10;
 		
+		int randomNumber;
 		try {
-			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
-					"INSERT INTO tellers (tellerid, tellername, balance, address, branchid) VALUES(?, 'aaaaaaaaaaaaaaaaaaaa', 0, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', trunc(random() * " + n + " + 1))"
-			);
+			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
+			CopyIn ci = cpm.copyIn("COPY tellers (tellerid, tellername, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
 			
 			for (int i = 1; i <= localConst; i++) {
-
-
-				insertBranches.setInt(1, i);
-				insertBranches.addBatch();
+				randomNumber = ThreadLocalRandom.current().nextInt(1, n + 1);
+				
+				// Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
+				StringBuilder sb = new StringBuilder().append(i).append("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(randomNumber).append("\n");
+				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
 				
 				if(isDebug) {
-					System.out.println("INSERT INTO tellers (tellerid, tellername, balance, address, branchid) VALUES(" + i + ", 'teller', 0, 'adress', trunc(random() * " + n + " + 1))");
+					System.out.println(sb.toString());
 				}
 			}
-
-			insertBranches.executeBatch();
-			
+	        ci.endCopy();
 			return true;
 		} catch (SQLException e) {
-
 			e.printStackTrace();
 		}
 		
@@ -294,5 +337,10 @@ public class TpsCreator implements TpsCreatorInterface {
 	 */
 	public void setDebug(boolean isDebug) {
 		this.isDebug = isDebug;
+	}
+
+	@Override
+	public void finishUp() {
+		this.createKeys();
 	}
 }

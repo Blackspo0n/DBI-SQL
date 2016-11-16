@@ -11,4 +11,5 @@ public interface TpsCreatorInterface {
 	void autoSetup(int n);
 	boolean isDebug();
 	void setDebug(boolean isDebug);
+	public void finishUp();
 }

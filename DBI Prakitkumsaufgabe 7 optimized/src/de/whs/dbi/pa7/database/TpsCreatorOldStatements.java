@@ -280,4 +280,8 @@ public class TpsCreatorOldStatements  implements TpsCreatorInterface {
 	public void setDebug(boolean isDebug) {
 		this.isDebug = isDebug;
 	}
+
+	public void finishUp() {
+		
+	}
 }
