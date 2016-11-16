@@ -55,11 +55,11 @@ public class TpsCreator implements TpsCreatorInterface {
 			"ALTER TABLE branches ADD PRIMARY KEY(branchid)",
 			"ALTER TABLE accounts ADD PRIMARY KEY(accid)",
 			"ALTER TABLE tellers ADD PRIMARY KEY(tellerid)",
-			"ALTER TABLE accounts ADD  FOREIGN KEY(branchid) REFERENCES PARENT(bracnhes)",
-			"ALTER TABLE tellers ADD  FOREIGN KEY(branchid) REFERENCES PARENT(bracnhes)",
-			"ALTER TABLE history ADD  FOREIGN KEY(branchid) REFERENCES PARENT(bracnhes)",
-			"ALTER TABLE history ADD  FOREIGN KEY(tellerid) REFERENCES PARENT(tellers)",
-			"ALTER TABLE history ADD  FOREIGN KEY(accid) REFERENCES PARENT(accounts)"
+			"ALTER TABLE accounts ADD  FOREIGN KEY(branchid) REFERENCES branches(branchid)",
+			"ALTER TABLE tellers ADD  FOREIGN KEY(branchid) REFERENCES branches(branchid)",
+			"ALTER TABLE history ADD  FOREIGN KEY(branchid) REFERENCES branches(branchid)",
+			"ALTER TABLE history ADD  FOREIGN KEY(tellerid) REFERENCES tellers(tellerid)",
+			"ALTER TABLE history ADD  FOREIGN KEY(accid) REFERENCES accounts(accid)"
 	};
 
 	
@@ -183,6 +183,7 @@ public class TpsCreator implements TpsCreatorInterface {
 
 			return true;
 		} catch (SQLException e) {
+			System.out.println(e.getMessage());
 			return false;
 		}
 	}
@@ -201,7 +202,9 @@ public class TpsCreator implements TpsCreatorInterface {
 
 			for (int i = 1; i <= n; i++) {
 				// Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
-				StringBuilder sb = new StringBuilder().append(i).append("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+				
+				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+				sb.insert(0, i);
 				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
 				
 				if(isDebug) {
@@ -225,21 +228,23 @@ public class TpsCreator implements TpsCreatorInterface {
 	 */
 	public boolean createAccountTupel(int n) {
 		int localConst = n*10000;
-		int randomNumber;
 		try {
 			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
 			
 			CopyIn ci = cpm.copyIn("COPY accounts(accid, NAME, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
 
 			for (int i = 1; i <= localConst; i++) {
-				randomNumber = ThreadLocalRandom.current().nextInt(1, n + 1);
-
-				// Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
-				StringBuilder sb = new StringBuilder().append(i).append("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(randomNumber).append("\n");
+				/* Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auchD
+				* Der Initialwert des Stringbuilders ist extrem wichtig, denn durch diesen Wert wird automatisch genug Speicher reserviert
+				*/
+				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(
+						ThreadLocalRandom.current().nextInt(1, n + 1)
+				).append("\n").insert(0, i);
+				
 				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
 				
 				if(isDebug) {
-					System.out.println(sb.toString());
+					System.out.print(sb.toString());
 				}
 			}
 	        ci.endCopy();			
@@ -259,17 +264,16 @@ public class TpsCreator implements TpsCreatorInterface {
 	 */
 	public boolean createTellerTupel(int n) {
 		int localConst = n*10;
-		
-		int randomNumber;
 		try {
 			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
 			CopyIn ci = cpm.copyIn("COPY tellers (tellerid, tellername, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
 			
 			for (int i = 1; i <= localConst; i++) {
-				randomNumber = ThreadLocalRandom.current().nextInt(1, n + 1);
 				
 				// Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
-				StringBuilder sb = new StringBuilder().append(i).append("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(randomNumber).append("\n");
+				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(
+						ThreadLocalRandom.current().nextInt(1, n + 1)
+				).append("\n").insert(0, i);
 				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
 				
 				if(isDebug) {
