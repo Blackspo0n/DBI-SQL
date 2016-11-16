@@ -48,7 +48,7 @@ public class TpsCreator implements TpsCreatorInterface {
 	 * @throws NullPointerException Das Verbindungsobjekt ist leer 
 	 */
 	public TpsCreator(DatabaseConnection connection) throws Exception {
-		
+		System.out.println("Info: Optimierte Version wird benutzt!");
 		if(connection == null ) {
 			throw new NullPointerException("connection object cannot be null");
 		}
@@ -149,7 +149,7 @@ public class TpsCreator implements TpsCreatorInterface {
 		
 		try {
 			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
-					"INSERT INTO branches (branchid, branchname, balance, address) VALUES (? , 'branch', 0, 'branch')"
+					"INSERT INTO branches (branchid, branchname, balance, address) VALUES (? , 'aaaaaaaaaaaaaaaaaaaa', 0, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')"
 			);
 			
 			for (int i = 1; i <= n; i++) {
@@ -184,7 +184,7 @@ public class TpsCreator implements TpsCreatorInterface {
 		
 		try {
 			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
-					"INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'account', 0,'test', trunc(random() * " + n + " + 1))"
+					"INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'aaaaaaaaaaaaaaaaaaaa', 0,'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', trunc(random() * " + n + " + 1))"
 			);
 			
 			for (int i = 1; i <= localConst; i++) {
@@ -217,7 +217,7 @@ public class TpsCreator implements TpsCreatorInterface {
 		
 		try {
 			PreparedStatement insertBranches = connection.databaseLink.prepareStatement(
-					"INSERT INTO tellers (tellerid, tellername, balance, address, branchid) VALUES(?, 'teller', 0, 'adress', trunc(random() * " + n + " + 1))"
+					"INSERT INTO tellers (tellerid, tellername, balance, address, branchid) VALUES(?, 'aaaaaaaaaaaaaaaaaaaa', 0, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', trunc(random() * " + n + " + 1))"
 			);
 			
 			for (int i = 1; i <= localConst; i++) {

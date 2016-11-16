@@ -51,7 +51,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		System.out.println("Lokale Datenbank verwenden? [J/n]:");
+		System.out.println("Lokale Datenbank verwenden? [j/n]:");
 		useLocal = ConsoleReader.readJn();
 		
 		ConnectionInformation infos = new ConnectionInformation();
@@ -62,7 +62,7 @@ public class Main {
 			infos.setHost("127.0.0.1");
 			infos.setDatabase("benchmark");
 			infos.setUser("postgres");
-			infos.setPassword("DBIPr");
+			infos.setPassword("DBI");
 		}
 		else {
 			
@@ -93,10 +93,10 @@ public class Main {
 			System.out.println("[OK]");
 			
 			// Nutzer fragen, ob er die unoptimierte Programmversion nutzen möchte
-			System.out.println("Unoptimierte Programmversion benutzen?? [j/N]:");
+			System.out.println("Optimierte Programmversion benutzen?? [j/n]:");
 			
 			// erstellen des jeweiligen TpsCreatorObjekts
-			if(ConsoleReader.readJn()) {
+			if(!ConsoleReader.readJn()) {
 				tpsDBCreator = new TpsCreatorOldStatements(con);
 			}
 			else {

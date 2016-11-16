@@ -45,7 +45,7 @@ public class TpsCreatorOldStatements  implements TpsCreatorInterface {
 	 * @throws NullPointerException Das Verbindungsobjekt ist leer 
 	 */
 	public TpsCreatorOldStatements(DatabaseConnection connection) throws Exception {
-		
+		System.out.println("Info: Unoptimierte Version wird benutzt!");
 		if(connection == null ) {
 			throw new NullPointerException("connection object cannot be null");
 		}
