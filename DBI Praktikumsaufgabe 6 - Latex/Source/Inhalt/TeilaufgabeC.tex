@@ -202,7 +202,8 @@ Selbst Größen jenseits $n > 50$ laufen binnen weniger Sekunden problemlos durc
 
 Um ein noch besseres Eregbnis zu erzielen kann man in PostgreSQL die
 \textit{asyncronen Commits} aktivieren. Diese sind Stanardmäßig dieaktiviert und
-müssen in der Konfigurationsdatei von PostgreSQL ersteinmal aktiviert werden\footnote{https://www.postgresql.org/docs/current/static/wal-async-commit.html}.
+müssen in der Konfigurationsdatei von PostgreSQL ersteinmal aktiviert
+werden\footnote{\url{https://www.postgresql.org/docs/current/static/wal-async-commit.html}}.
 
 Unter Unix-Systemen liegt die Konfigurationsdatei meistens unter \newline
 \gqq{\textit{/etc/postgresql/\{versionsnummer\}/main/postgresql.conf}}
@@ -210,13 +211,23 @@ Unter Unix-Systemen liegt die Konfigurationsdatei meistens unter \newline
 Aktivierte \& geänderte Serverkonfiguration:
 \begin{lstlisting}[title={Veränderte Serverkonfiguration}]
 shared_buffers		= 1GB
+
+#wal-writer Engine
 synchronous_commit	= off
 wal_writer_delay	= 5000ms
 commit_delay		= 50000
 wal_buffers			= 128MB
 \end{lstlisting}
 
-Der Performanceschub fällt je nach System unterschiedlich aus. So hat diese
+\textbf{shared\_buffer} beschreibt, wie viel Ram der Server belegen darf.
+Standardmäßig steht dieser Wert auf 128MB. Stellt man diesen Wert hoch erhöht
+sich der Durchsatz der Daten maginal. Ein guter Wert ist immer $1/4$ des
+Server-Rams. In unaseren  Fall ist das dementsprechend 1GB.
+
+Die \gqq{wal-writer}-Engine ist dafür verantwortlich, wie die Daten auf die
+Festplatte weggeschrieben werden.
+
+Der Performanceschub fällt je nach System unterschiedlich aus.So hat diese
 Konfiguration auf den Laptop eines Kommilitonen eine Einsparung von 100
 Millisekunden bei einer \textbf{10-tps-Datenbank} eingebracht.
 
@@ -237,7 +248,8 @@ statt des Domainnamens einzugeben. Dies wäre für \textbf{localhost} entweder \
 IPv4-Schreibweiße oder \gqq{[::1]} als IPv6 Schreibweise.
 
 Wir haben in unser Programm deswegen nur IP-Adressen verwendet um sicher zu gehen, dass wir 
-die Zugriffszeiten umgegehen.
+die Zugriffszeiten umgegehen. Einen Performanceschub im
+Benchmark bringt diese Optimierung nicht wirklich.
 
 \subsection{Gesamter Performancezuwachs}
 Durch das Schrittweiße optimieren des Programmcodes konnte ein betrachtlicher
@@ -246,8 +258,10 @@ jede der hier aufgeführten Optimierungen zu nutzen, doch es zeigt, was möglich
 ist, wenn man sich mit den jeweiligen Datenbanken und Datenbanktreibern beschäftigt.
 
 Die folgende Tabelle zeigt den Performancezuwachs prozentual zur unoptimierten
-Programmversion:
+Programmversion an einer \textbf{10-tps-Datenbank}: 
 
--------------- hier tabelle einfügen
+
+\tabelle{Leistungszuwachs
+durch Optimierungen}{tab:Zuwachs}{Zuwachs.tex}
 
 \clearpage
