@@ -56,12 +56,14 @@ public class Serialisierung
 		try 
 		{
 			ObjectInputStream objectInput = new ObjectInputStream(new FileInputStream("data.ser"));
-			Object o=null;
-			 while((o=objectInput.readObject())!=null)
+			Verbindungseinstellungen o=null;
+			
+			 while((o=(Verbindungseinstellungen)objectInput.readObject())!=null)
 			 {
 				 ve.add((Verbindungseinstellungen)o);
 			 }
 			 
+			
 			 objectInput.close();
 		} catch (FileNotFoundException e) 
 		{
