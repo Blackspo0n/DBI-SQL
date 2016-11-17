@@ -29,9 +29,11 @@ public class Benchmark {
 		PrintStream printStream = new PrintStream(new de.whs.dbi.pa7.funktionen_gui.CustomOutputStream(de.whs.dbi.pa7.gui.Ausgabe.textArea));
 		System.setOut(printStream);
 		System.setErr(printStream);
+		*/
+		
 		System.out.println("Brenchmarking gestartet");
 		System.out.println("Parameter: debugLog = " + debugLog + ", useTransaction = " + useTransaction + ", usePreamble = " + usePreamble);
-		*/
+
 		tpsDBCreator.setDebug(debugLog);
 		
 		if(!usePreamble) {

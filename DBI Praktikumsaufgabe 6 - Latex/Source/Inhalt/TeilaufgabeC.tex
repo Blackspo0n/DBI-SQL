@@ -58,121 +58,145 @@ Dieses erstellt uns dann eine  \hyperref[lst:bmv2]{Benchmark}-Klasse, die der
  
 Die Queries, die mittels einer Transaktion übertragen worden sind, sind bei
 einer \textbf{10-tps-Datenbank} um \ca das \textbf{11fache} schneller als die
+
 Queries die einzelnd zum Server geschickt werden.
 
-\begin{figure}[!htbp] 
-    \subfigure[mit
-    Transactions]{\includegraphics[width=0.49\textwidth]{Bilder/Auswahl_015.png}}
-    \subfigure[ohne
-    Transaction]{\includegraphics[width=0.49\textwidth]{Bilder/Auswahl_014.png}}
-\end{figure} 
-
 \subsection{Schlüsselbedingungen}
+In den create-Statements befinden sich Schlüsselbedingungen für die Primär- und
+Fremdschlüssel. Jeder Schlüssel erstellt auch einen sgn. Index. Beim Einfügen
+der Daten in die jeweiligen Tabellen ist so ein Index hinderlich, da anhand
+dieser einige Bedingungen geprüft werden und somit wertvolle Sekunden im
+Benchmarking kostet.
+
+Entkapselt man also diese und fügt diese erst am Ende des Benchmark-Vorgangs
+an, so braucht der Server diese Bedingungen nicht zu überprüfen. Wir müssen uns
+also eine Funktion schreiben, die Ende jedes Benchmarks ausgeführt wird.
+
+\begin{lstlisting}[caption={Alter Statements \& Funktion createKeys}]
+	/**
+	 * Alter Statements zum setzen der Keys
+	 */
+	
+	public String[] AlterStatements = {
+			"ALTER TABLE branches ADD PRIMARY KEY(branchid)",
+			"ALTER TABLE accounts ADD PRIMARY KEY(accid)",
+			"ALTER TABLE tellers ADD PRIMARY KEY(tellerid)",
+			"ALTER TABLE accounts ADD  FOREIGN KEY(branchid) REFERENCES branches(branchid)",
+			"ALTER TABLE tellers ADD  FOREIGN KEY(branchid) REFERENCES branches(branchid)",
+			"ALTER TABLE history ADD  FOREIGN KEY(branchid) REFERENCES branches(branchid)",
+			"ALTER TABLE history ADD  FOREIGN KEY(tellerid) REFERENCES tellers(tellerid)",
+			"ALTER TABLE history ADD  FOREIGN KEY(accid) REFERENCES accounts(accid)"
+	};
+	
+	/**
+	 * Erstellt die Schlüasselbedingungen
+	 * 
+	 * @return Gibt an, ob win Fehler vorhanden ist.
+	 */
+	public boolean createKeys() {
+	
+		try {
+			Statement statement = connection.databaseLink.createStatement();
+
+			for (String table : this.AlterStatements) {
+				statement.executeUpdate(table);
+				if(isDebug) {
+					System.out.println(table);
+				}
+			}
+
+			return true;
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
+	}
+		
+\end{lstlisting}
+
+Durch diese Funktion ist es jetzt möglich die Schlüsselfunktionen entkapselt von
+der Tabellen Definition anzulegen.
+
 
 \subsection{Implementierung des CopyManagers}
+Unser ausgewähltes DBMS PostgreSQL stellt ein \textbf{COPY}-Statement zur
+Verfügung. Dieses Statement erlaubt uns Daten aus einer Textdatei oder aber auch
+einer CSV Datei in unsere Datenbank zu importieren. 
 
+Das \textbf{COPY}-Stament ist durch seine starke Spezialisierung auf den
+Anwendungszwecks um einiges schneller als die ansich schon schnelle
+PreparedStatements.
 
-% \subsection{Prepared Statements}
-% Selbst in einer Transaktion wird jeder einzelne Query validiert. Wir besitzen
-% nun aber eine Masse von gleich strukturierten Statements. Jeden einzelnen zu
-% validieren kostet den Server Zeit und Ressourcen.
-%  
-% Wir haben also eine Möglichkeit gesucht eine vorher definierte und validierte
-% Struktur eines Queries zu bekommen. Dazu hat sich das Konstrukt 
-% \textbf{Prepared Statement}\footnote{\url{https://docs.oracle.com/javase/tutorial/jdbc/basics/prepared.html}} angeboten.
-%  
-% Wie der Name schon sagt, wird der Query im Prepared Stament einmal zum Server
-% geschickt und validiert. Anschließend kann man mit der Referenz
-% schnell und sicher die Daten dem Server übergeben.
-%  
-% Die umgeschriebene Funktion in der \hyperref[lst:tpsv2]{TpsCreator}-Klasse für
-% Accounts sieht nun folgendermaßen aus:
-%  \begin{lstlisting}[caption={Einbinden von Prepared Statements}]
-% 
-% 	public boolean createAccountTupel(int n) {
-% 		int localConst = n*10000;
-% 		int localRandom;		
-% 		try {
-% 			PreparedStatement insertBranches = connection.databaseLink.prepareStatement("INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'account', 0,'test', ?)");
-% 			
-% 			for (int i = 1; i <= localConst; i++) {
-% 				localRandom = ThreadLocalRandom.current().nextInt(1, n + 1);
-% 				insertBranches.setInt(1, i);
-% 				insertBranches.setInt(2, localRandom);
-% 				insertBranches.addBatch();
-% 				
-% 				if(isDebug) {
-% 					System.out.println("INSERT INTO branches (branchid, branchname, balance,address) VALUES(" + i + ", 'branch', 0, 'branch')");
-% 				}
-% 			}
-% 
-% 			insertBranches.executeBatch();
-% 			return true;
-% 		} catch (SQLException e) {
-% 			e.printStackTrace();
-% 		}
-% 		return false;
-% 	}
-%  \end{lstlisting}
-% 
-% Eine gute Eigenschaft von den Prepared Statements ist, dass sie die
-% Transaktionsverwaltung schon besitzen und damit bei gleichen Queries
-% deutlich schneller sind als ein normales Statement, welches ein und den selben
-% Query immer und immer wieder ausführt. Diese Eigenschaft besitzt ein
-% Prepared Statement auch, wenn das Feature \textit{autoCommit} aktiviert ist.
-% 
-% Um aber aussagekräftige Benchmarks zu erhalten, ist gerade das Feature
-% hinderlich, Wir möchten ja die Queries auch ohne Transaktion ausführen können,
-% deshalb müssen wir uns eine alte \gqq{Kopie} der Klasse behalten und bei Bedarf
-% instanziieren. Dafür legen wir ein Interface an, welches von der neuen Klasse
-% \hyperref[lst:tpsv2]{TpsCreator} und der alten Klasse
-% \hyperref[lst:tpsoldv2]{TpsCreatorOldStatements} implementiert wird.
-% Anschließend fragen wir in der \hyperref[lst:mainv2]{Main}-Klasse den
-% Nutzer, welche Version er verwenden möchte.
-% 
-% 
-% \begin{center}
-% \includegraphics[scale=0.8]{Bilder/Auswahl_016.png}
-% \end{center}
-% Mit den Prepared Statement ist unser Benchmark jetzt \textbf{36fach} schneller
-% als mit unserem ursprüngliches Benchmark-Tool, welches nur mit normalen
-% Statements lief.
-% 
-% \subsection{IDs vom Server generieren lassen}
-% Momentan benutzen wir die Ressourcen von unserem Javaprogramm um uns eine
-% zufällige ID zu generieren. Da wir aber so viel wie möglich vom Server
-% verarbeiten lassen wollen, lagern wir das Generieren der IDs auf unseren Server
-% aus, denn dieser hat mit Sicherheit die Möglichkeit aus unserem SQL-Query etwas
-% Effizentes zu generieren.
-% 
-% Wir bedienen uns also den Zufallszahlengenerator von PostgreSQL um uns
-% eine ID zu genrieren.
-% \begin{lstlisting}[language=sql]
-% SELECT rand();
-% \end{lstlisting}
-% 
-% Diese Funktion liefert uns eine Gleitkommazahl zwischen 0 und 1. Diese Zahl
-% müssten wir anschließend nur noch $ \cdot  n + 1 $ rechnen um eine zufällige ID
-% zwischen 1 und $n$ zu erzeugen. Das am Ende stehende $ + 1$ soll dafür sorgen,
-% dass $n$ auch generiert werden kann. Diese Zahl muss anschließend mittels der
-% Funktion \textit{trunc} in ein Integer gecastet werden.
-% 
-% Unser Query, der uns die IDs generiert, sieht dann folgendermaßen aus:
-% \begin{lstlisting}[language=sql]
-% SELECT trunc(random() *  n  + 1);
-% \end{lstlisting}
-% 
-% Diesen Query können wir jetzt auf unser Prepared Statement anwenden:
-% \begin{lstlisting}[language=sql, caption={INSERT-Query mit vom Server
-% generierten ID}]
-% INSERT INTO accounts (accid, NAME, balance, address, branchid) VALUES(?, 'account', 0,'test', trunc(random() * n + 1))
-% \end{lstlisting}
-% 
-% Diese Optimierung hat uns bei einer \textbf{10-tps-Datenbank} nochmal \ca
-% 500 Millisekunden gespart. Somit sind wir jetzt \textbf{38fach} schneller 
-% als mit dem Benchmark-Tool, welches wir als erstes entwickelt hatten.
-% 
-% --- vergleich rein machen
+Um dieses Feature zu nutzen, stellt uns der JDBC-Treiber von PostgreSQL eine
+\textbf{CopyManager}\footnote{\url{https://jdbc.postgresql.org/documentation/publicapi/org/postgresql/copy/CopyManager.html}}-Klasse
+zur Verfügung. Diesen Manager übergeben wir lediglich ein
+\textbf{COPY}-Statement.
+
+\begin{lstlisting}[caption={Instantiierung des CopyManagers}]
+CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
+CopyIn ci = cpm.copyIn("COPY branches (branchid, branchname, balance, address) FROM STDIN WITH DELIMITER '|'");
+\end{lstlisting}
+
+Mit dem dadurch erzeugtem \textbf{CopyIn}-Objekt sind wir jetzt dazu in der Lage
+Daten dem CopyManager zu übergeben. Das machen wir mittels der
+\textbf{writeToCopy}-Funktion:
+
+\begin{lstlisting}[caption={WriteToCopy-Funktion}]
+ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
+\end{lstlisting}
+
+Sind wir mit dem \textbf{COPY}-Vorgang fertig, müssen nur noch die Funktion
+\textbf{endCopy} um die Daten zum Server zu übertragen.
+
+Wenn wir also die create-Funktionen in der Klasse
+\hyperref[lst:tpsv2]{TpsCreator} abändern erhalten wir folgenden Code:
+
+\begin{lstlisting}[caption={createAccountTupel mit CopyManager}]
+	/**
+	 * Erstellt die Tupel in der Tabelle Accounts
+	 * 
+	 * @param n Anzahl der Tupel, die erstellt werden mal 10000
+	 * @return Gibt an, ob ein Fehler vorhanden ist
+	 */
+	public boolean createAccountTupel(int n) {
+		int localConst = n*10000;
+		try {
+			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
+			
+			CopyIn ci = cpm.copyIn("COPY accounts(accid, NAME, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
+
+			for (int i = 1; i <= localConst; i++) {
+				/* Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auchD
+				* Der Initialwert des Stringbuilders ist extrem wichtig, denn durch diesen Wert wird automatisch genug Speicher reserviert
+				*/
+				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(
+						ThreadLocalRandom.current().nextInt(1, n + 1)
+				).append("\n").insert(0, i);
+				
+				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
+				
+				if(isDebug) {
+					System.out.print(sb.toString());
+				}
+			}
+	        ci.endCopy();			
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+\end{lstlisting}
+
+Da wir mit der Variante viel mit Strings arbeiten, hat es sich angeboten einen
+StringBuilder anstatt der üblichen Verkettung zu nehmen, da der StringBuilder
+wesentlich performanter läuft als die Verkettung von Datentypen.
+
+Diese Art des Einfügen in die Datenbank erlaubt uns bei einer
+\textbf{50-tps-Datenbank} ein Benchmarkergebnis von 2500 Millisekunden.
+
+Selbst Größen jenseits $n > 50$ laufen binnen weniger Sekunden problemlos durch.
 
 \subsection{Servereinstellungen}
 
@@ -193,8 +217,8 @@ wal_buffers			= 128MB
 \end{lstlisting}
 
 Der Performanceschub fällt je nach System unterschiedlich aus. So hat diese
-Konfiguration auf den Laptop eines Kommilitonen ein 100 Millisekunden bei einer
-\textbf{10-tps-Datenbank} ausgemacht.
+Konfiguration auf den Laptop eines Kommilitonen eine Einsparung von 100
+Millisekunden bei einer \textbf{10-tps-Datenbank} eingebracht.
 
 \subsection{Adressauflösung von Domainnamen}
 Um das Ergebnis noch mehr zu verbessern kommt nun das Feintuning. Dazu
@@ -214,4 +238,16 @@ IPv4-Schreibweiße oder \gqq{[::1]} als IPv6 Schreibweise.
 
 Wir haben in unser Programm deswegen nur IP-Adressen verwendet um sicher zu gehen, dass wir 
 die Zugriffszeiten umgegehen.
+
+\subsection{Gesamter Performancezuwachs}
+Durch das Schrittweiße optimieren des Programmcodes konnte ein betrachtlicher
+Performancezuwachs erzielt werden. Zwar ist es in der Praxis nicht immer möglich
+jede der hier aufgeführten Optimierungen zu nutzen, doch es zeigt, was möglich
+ist, wenn man sich mit den jeweiligen Datenbanken und Datenbanktreibern beschäftigt.
+
+Die folgende Tabelle zeigt den Performancezuwachs prozentual zur unoptimierten
+Programmversion:
+
+-------------- hier tabelle einfügen
+
 \clearpage

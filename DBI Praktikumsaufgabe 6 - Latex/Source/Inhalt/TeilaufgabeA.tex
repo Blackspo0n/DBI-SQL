@@ -41,16 +41,16 @@ Klasse \gqq{DatabaseConnection} diesen Treiber in der
 \end{lstlisting}
 
 Die Verbindungsinformationen übergeben wir mittels der Klasse
-\nameref{lst:civ2}. Diese implementiert ein einfaches Model, welches
-nur die Parameter für die Datenbankverbindung beinhaltet.
+\hyperref[lst:civ2]{ConnectionInformation}. Diese implementiert ein einfaches
+Model, welches nur die Parameter für die Datenbankverbindung beinhaltet.
 
-Anschließend implementieren wir eine Klasse \nameref{lst:tpsv2},
+Anschließend implementieren wir eine Klasse \hyperref[lst:tpsv2]{TpsCreator},
 welche die gesamte Funktionalität zum Erstellen der \textbf{n-tps-Datenbank} beinhaltet.
-Dieser Klasse kann man wiederum ein \nameref{lst:dbv2}-Objekt
-übergeben. Durch diese Handhabung ist es möglich in einem Programm
-Datenbanken auf verschiedene Servern anzulegen. 
+Dieser Klasse kann man wiederum ein
+\hyperref[lst:dbv2]{DatabaseConnection}-Objekt übergeben. Durch diese Handhabung
+ist es möglich in einem Programm Datenbanken auf verschiedene Servern anzulegen.
 
-Die Queries der Klasse \nameref{lst:tpsv2}
+Die Queries der Klasse \hyperref[lst:tpsv2]{TpsCreator}
 führen wir mit anschließend normalen Statements aus. 
 
 \begin{lstlisting}[caption={Eine der drei Tupel Funktionen}]
@@ -78,11 +78,11 @@ einig, dass wir uns anstelle einer komplexen GUI Darstellung auf eine simple
 Konsolen-Anwendung beschränken wollen. Denn diese Form der
 Nutzerinteraktion hat große Vorteile gegenüber der Performance, da wir nicht
 das Swing-Framework laden und initialisieren müssen und uns so Wertvolle
-Sekunden im Benchmarking sparren können.
+Sekunden im Benchmarking sparen können.
 
 Um die Interaktion mit der Konsole so einfach wie möglich zu gestalten,
-schreiben wir uns eine Helfer Klasse ~\nameref{lst:crv2} und benutzen diese
-anschließend in unserer \nameref{lst:mainv2}-Klasse.
+schreiben wir uns eine Helfer Klasse \hyperref[lst:crv2]{ConsoleReader} und
+benutzen diese anschließend in unserer \hyperref[lst:mainv2]{Main}-Klasse.
 
 \begin{lstlisting}[caption={Verbindungsinformationen per Konsole}]
 System.out.println("Verbindungsinformationen eingeben!");
@@ -100,8 +100,8 @@ System.out.println("Password:");
 infos.setPassword(ConsoleReader.readString());
 \end{lstlisting}
 
-Am Ende unserer \nameref{lst:mainv2}-Klasse rufen wir die Funkion
-\textit{autoSetup} in dem instantiierten \nameref{lst:tpsv2}-Objekt auf. Diese Funktion erstellt uns
-anschließend die Datenbank. Ein Durchlauf mit einer \textbf{10-tps-Datenbank}
-dauert \ca 4 Minuten und ist alles andere als performant.
+Am Ende unserer \hyperref[lst:mainv2]{Main}-Klasse rufen wir die Funkion
+\textit{autoSetup} in dem initialisieren \hyperref[lst:tpsv2]{TpsCreator}-Objekt
+auf. Diese Funktion erstellt uns anschließend die Datenbank. Ein Durchlauf mit
+einer \textbf{10-tps-Datenbank} dauert \ca 4 Minuten und ist alles andere als performant.
 \clearpage
