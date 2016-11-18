@@ -1,7 +1,5 @@
 package de.whs.dbi.pa7.gui;
 
-import de.whs.dbi.pa7.Benchmark;
-import de.whs.dbi.pa7.funktionen_gui.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,9 +12,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import javax.swing.BoxLayout;
+
+import de.whs.dbi.pa7.funktionen_gui.*;
+
+
+
 
 public class MainGUI extends JFrame implements ActionListener
 {
@@ -37,7 +37,7 @@ public class MainGUI extends JFrame implements ActionListener
 		frame.setLocationRelativeTo(null);
 		//erstellen der Verbinungseinstellungen
 		verbindungsPanel= new JPanel();
-		verbindungsPanel.setBounds(76, 11, 314, 33);
+		verbindungsPanel.setBounds(30, 11, 452, 33);
 		verbindung(Serialisierung.ausgeben());
 		//Versionsauswahl
 		versionsAuswahl();
@@ -50,6 +50,7 @@ public class MainGUI extends JFrame implements ActionListener
 	private void verbindung(List <Verbindungseinstellungen> ve)
 	{
 		JLabel verbindungLabel=new JLabel("Auswahl einer Datenbank:");
+		verbindungLabel.setBounds(114, 9, 126, 14);
 		verbindungsmoeglichkeiten=ve;
 		buttons= new ButtonGroup();
 		for(Verbindungseinstellungen a: ve)
@@ -63,11 +64,14 @@ public class MainGUI extends JFrame implements ActionListener
 			verbindungsPanel.add(b);
 		}
 		verbindungseinstellung= new JButton("hinzufügen");
+		verbindungseinstellung.setBounds(293, 5, 85, 23);
 		verbindungseinstellung.addActionListener(this);
 		verbindungseinstellung.setActionCommand("VERBINDUNGSEINSTELLUNG");
 		
 		bestaetigen=new JButton("bestätigen");
+		bestaetigen.setBounds(10, 5, 83, 23);
 		bestaetigen.addActionListener(this);
+		verbindungsPanel.setLayout(null);
 		bestaetigen.setActionCommand("AUSWAHL_DATENBANK");
 		verbindungsPanel.add(bestaetigen);
 		
@@ -116,21 +120,24 @@ public class MainGUI extends JFrame implements ActionListener
 	private void versionsAuswahl()
 	{
 		JLabel versionLabel= new JLabel("Auswahl der Version:");
+		versionLabel.setBounds(5, 9, 101, 14);
 		ButtonGroup versionButton=new ButtonGroup();
 		JPanel versionPanel=new JPanel();
-		versionPanel.setLocation(73, 72);
-		versionPanel.setSize(293, 33);
-		versionPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		versionPanel.setLocation(30, 72);
+		versionPanel.setSize(452, 33);
+		versionPanel.setLayout(null);
 		
 		versionPanel.add(versionLabel);
 		
 		JRadioButton neu=new JRadioButton("Neue Version");
+		neu.setBounds(149, 5, 89, 23);
 		neu.addActionListener(this);
 		neu.setActionCommand("NEU");
 		versionButton.add(neu);
 		versionPanel.add(neu);
 				
 		JRadioButton alt=new JRadioButton("Alte Version");
+		alt.setBounds(279, 5, 83, 23);
 		alt.addActionListener(this);
 		frame.getContentPane().setLayout(null);
 		alt.setActionCommand("ALT");

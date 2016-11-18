@@ -34,7 +34,7 @@ public class Serialisierung
  
             // Objekte serialisiert in Datei ausgeben
             objectOutput.writeObject(ve);
-           
+          
  
             // Ausgabekanal schließen
             objectOutput.close();
@@ -58,11 +58,19 @@ public class Serialisierung
 			ObjectInputStream objectInput = new ObjectInputStream(new FileInputStream("data.ser"));
 			Verbindungseinstellungen o=null;
 			
+			Object test= objectInput.readObject();
+			
+			o= (Verbindungseinstellungen)test;
+		/*
 			 while((o=(Verbindungseinstellungen)objectInput.readObject())!=null)
 			 {
 				 ve.add((Verbindungseinstellungen)o);
 			 }
-			 
+			 */
+			System.out.println(o.getBezeichnung());
+			ve.add(o);
+			
+		
 			
 			 objectInput.close();
 		} catch (FileNotFoundException e) 
