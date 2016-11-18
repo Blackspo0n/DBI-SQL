@@ -3,13 +3,13 @@
 tps-Datenbank auf dem gewählten Datenbankmanagementsystem erzeugt.}
 
 Um überhaupt eine Verbindung zu unserem DBMS\footnote{Datenbank Magement
-System} PostgreSQL verbinden zu können, müssen wir uns erstmal den JDBC-Treiber
-für unser DBMS besorgen. Der JDBC-Treiber befindet sich auf der
+System} PostgreSQL aufbauen zu können, müssen wir uns erst einmal den
+JDBC-Treiber für unser DBMS besorgen. Der JDBC-Treiber befindet sich auf der
 Webseite von PostgreSQL\footnote{\url{https://jdbc.postgresql.org/download.html}}.
 
-Diesen haben wir anschließend in das Projekt eingebunden und haben mit der
-Klasse \gqq{DatabaseConnection} diesen Treiber in der
-\gqq{getConnection}-Methode laden lassen.
+Den Treiber binden wir nun in unserem Buildpath ein und erstellen
+uns eine Klasse \hyperref[lst:dbv2]{DatabaseConnection} die den Treiber in der
+\gqq{getConnection}-Methode laden lässt.
 
 \lstset{language=Java, backgroundcolor=\color{editorGray},
   basicstyle={\linespread{0.82}\footnotesize\ttfamily},   

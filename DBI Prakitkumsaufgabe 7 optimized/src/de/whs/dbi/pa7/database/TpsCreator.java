@@ -1,10 +1,7 @@
 package de.whs.dbi.pa7.database;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.postgresql.copy.CopyIn;

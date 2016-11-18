@@ -34,7 +34,7 @@ dieser legen wir dazu 2 neue Funktionen an:
 Jetzt brauchen wir noch die Funktionalität, um die Funktionen aufzurufen. Damit
 wir recht flexibel sind haben wir hierfür ein Konsolen-Menü implementiert.
 Dieses erstellt uns dann eine  \hyperref[lst:bmv2]{Benchmark}-Klasse, die der
-\hyperref[lst:tpsv2]{TpsCreator}-Klasse alle nötigen Parameter übergibt und das Benchmarking ausführt.\\
+\hyperref[lst:tpsv2]{TpsCreator}-Klasse alle nötigen Parameter übergibt und das Benchmarking ausführt.
 
 \begin{lstlisting}[caption={Renderer für das Konsolen Menü}]
 	public static int renderMenu() {
@@ -58,8 +58,7 @@ Dieses erstellt uns dann eine  \hyperref[lst:bmv2]{Benchmark}-Klasse, die der
  
 Die Queries, die mittels einer Transaktion übertragen worden sind, sind bei
 einer \textbf{10-tps-Datenbank} um \ca das \textbf{11fache} schneller als die
-
-Queries die einzelnd zum Server geschickt werden.
+Queries die einzelnd zum Server geschickt werden. 
 
 \subsection{Schlüsselbedingungen}
 In den create-Statements befinden sich Schlüsselbedingungen für die Primär- und
@@ -71,7 +70,6 @@ Benchmarking kostet.
 Entkapselt man also diese und fügt diese erst am Ende des Benchmark-Vorgangs
 an, so braucht der Server diese Bedingungen nicht zu überprüfen. Wir müssen uns
 also eine Funktion schreiben, die Ende jedes Benchmarks ausgeführt wird.
-
 \begin{lstlisting}[caption={Alter Statements \& Funktion createKeys}]
 	/**
 	 * Alter Statements zum setzen der Keys
@@ -130,10 +128,11 @@ PreparedStatements.
 Um dieses Feature zu nutzen, stellt uns der JDBC-Treiber von PostgreSQL eine
 \textbf{CopyManager}\footnote{\url{https://jdbc.postgresql.org/documentation/publicapi/org/postgresql/copy/CopyManager.html}}-Klasse
 zur Verfügung. Diesen Manager übergeben wir lediglich ein
-\textbf{COPY}-Statement.
+\textbf{COPY}-Statement:
 
-\begin{lstlisting}[caption={Instantiierung des CopyManagers}]
+\begin{lstlisting}[caption={Initialisierung des CopyManagers},numbers=none]
 CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
+
 CopyIn ci = cpm.copyIn("COPY branches (branchid, branchname, balance, address) FROM STDIN WITH DELIMITER '|'");
 \end{lstlisting}
 
@@ -141,7 +140,7 @@ Mit dem dadurch erzeugtem \textbf{CopyIn}-Objekt sind wir jetzt dazu in der Lage
 Daten dem CopyManager zu übergeben. Das machen wir mittels der
 \textbf{writeToCopy}-Funktion:
 
-\begin{lstlisting}[caption={WriteToCopy-Funktion}]
+\begin{lstlisting}[caption={WriteToCopy-Funktion},numbers=none]
 ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
 \end{lstlisting}
 
@@ -162,11 +161,10 @@ Wenn wir also die create-Funktionen in der Klasse
 		int localConst = n*10000;
 		try {
 			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
-			
 			CopyIn ci = cpm.copyIn("COPY accounts(accid, NAME, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
-
+			
 			for (int i = 1; i <= localConst; i++) {
-				/* Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auchD
+				/* Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
 				* Der Initialwert des Stringbuilders ist extrem wichtig, denn durch diesen Wert wird automatisch genug Speicher reserviert
 				*/
 				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(
@@ -201,8 +199,8 @@ Selbst Größen jenseits $n > 50$ laufen binnen weniger Sekunden problemlos durc
 \subsection{Servereinstellungen}
 
 Um ein noch besseres Eregbnis zu erzielen kann man in PostgreSQL die
-\textit{asyncronen Commits} aktivieren. Diese sind Stanardmäßig dieaktiviert und
-müssen in der Konfigurationsdatei von PostgreSQL ersteinmal aktiviert
+\textit{asyncronen Commits} aktivieren. Diese sind standardmäßig deaktiviert
+und müssen in der Konfigurationsdatei von PostgreSQL erst einmal aktiviert
 werden\footnote{\url{https://www.postgresql.org/docs/current/static/wal-async-commit.html}}.
 
 Unter Unix-Systemen liegt die Konfigurationsdatei meistens unter \newline
@@ -214,21 +212,25 @@ shared_buffers		= 1GB
 
 #wal-writer Engine
 synchronous_commit	= off
-wal_writer_delay	= 5000ms
 commit_delay		= 50000
+wal_writer_delay	= 5000ms
 wal_buffers			= 128MB
 \end{lstlisting}
 
 \textbf{shared\_buffer} beschreibt, wie viel Ram der Server belegen darf.
 Standardmäßig steht dieser Wert auf 128MB. Stellt man diesen Wert hoch erhöht
 sich der Durchsatz der Daten maginal. Ein guter Wert ist immer $1/4$ des
-Server-Rams. In unaseren  Fall ist das dementsprechend 1GB.
+Server-Rams. In unseren Fall ist das dementsprechend 1GB.
 
 Die \gqq{wal-writer}-Engine ist dafür verantwortlich, wie die Daten auf die
-Festplatte weggeschrieben werden.
+Festplatte weggeschrieben werden. Der hohe \textbf{delay}-Wert \zB. sorgt
+dafür, dass das Datenbanksystem nur alle 5 Sekunden 128MB auf die Festplatte
+schreiben darf. So zwingen wir unser DBMS vieles im Ram zu verwalten, was
+wesentlich performanter ist, da der Ram sehr geringe Zugriffszeiten besitzt. Wir
+laufen aber im Fehlerfall gefahr Daten zu verlieren.
 
-Der Performanceschub fällt je nach System unterschiedlich aus.So hat diese
-Konfiguration auf den Laptop eines Kommilitonen eine Einsparung von 100
+Der schlussendliche Performanceschub fällt je nach System unterschiedlich aus.
+So hat diese Konfiguration auf den Laptop eines Kommilitonen eine Einsparung von 100
 Millisekunden bei einer \textbf{10-tps-Datenbank} eingebracht.
 
 \subsection{Adressauflösung von Domainnamen}
