@@ -26,11 +26,11 @@ public class Benchmark {
 		 * Anbindung an die TextArea
 		 
 		
-		PrintStream printStream = new PrintStream(new de.whs.dbi.pa7.funktionen_gui.CustomOutputStream(de.whs.dbi.pa7.gui.Ausgabe.textArea));
-		System.setOut(printStream);
-		System.setErr(printStream);
+		PrintStream printStream = new PrintStream(System.out);
+		String check
+		while()
+		printStream.write(1);
 		*/
-		
 		System.out.println("Brenchmarking gestartet");
 		System.out.println("Parameter: debugLog = " + debugLog + ", useTransaction = " + useTransaction + ", usePreamble = " + usePreamble);
 

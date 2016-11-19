@@ -80,8 +80,9 @@ public class MainGUI extends JFrame implements ActionListener
 		//Auswahl der Verbindung.
 		for(Verbindungseinstellungen a: verbindungsmoeglichkeiten)
 		{
-			if(e.getActionCommand().equals(a.getBezeichnung()))
+			if(e.getActionCommand().equals(a.getDatabase()))
 			{
+				
 				de.whs.dbi.pa7.AnbindungGUI.verbinden(a.getHost(), a.getDatabase(), a.getUser(), a.getPassword());
 			}
 		}

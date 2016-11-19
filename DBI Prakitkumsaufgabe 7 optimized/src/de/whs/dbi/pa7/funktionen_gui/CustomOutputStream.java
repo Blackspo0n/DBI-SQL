@@ -17,7 +17,15 @@ public class CustomOutputStream extends OutputStream {
         this.textArea = textArea;
     }
      
-    @Override
+    public JTextArea getTextArea() {
+		return textArea;
+	}
+
+	public void setTextArea(JTextArea textArea) {
+		this.textArea = textArea;
+	}
+
+	@Override
     public void write(int b) throws IOException {
         // redirects data to the text area
         textArea.append(String.valueOf((char)b));
