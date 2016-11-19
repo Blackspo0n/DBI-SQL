@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import de.whs.dbi.pa7.funktionen_gui.*;
+import java.awt.FlowLayout;
 
 
 
@@ -28,7 +29,7 @@ public class MainGUI extends JFrame implements ActionListener
 	public ButtonGroup buttons;
 	public JPanel verbindungsPanel;
 	JButton verbindungseinstellung;
-	JButton bestaetigen;
+	
 	public MainGUI ()
 	{
 		this.frame= new JFrame("Benchmark");
@@ -37,7 +38,7 @@ public class MainGUI extends JFrame implements ActionListener
 		frame.setLocationRelativeTo(null);
 		//erstellen der Verbinungseinstellungen
 		verbindungsPanel= new JPanel();
-		verbindungsPanel.setBounds(30, 11, 452, 33);
+		verbindungsPanel.setBounds(30, 11, 452, 131);
 		verbindung(Serialisierung.ausgeben());
 		//Versionsauswahl
 		versionsAuswahl();
@@ -50,7 +51,6 @@ public class MainGUI extends JFrame implements ActionListener
 	private void verbindung(List <Verbindungseinstellungen> ve)
 	{
 		JLabel verbindungLabel=new JLabel("Auswahl einer Datenbank:");
-		verbindungLabel.setBounds(114, 9, 126, 14);
 		verbindungsmoeglichkeiten=ve;
 		buttons= new ButtonGroup();
 		for(Verbindungseinstellungen a: ve)
@@ -64,16 +64,11 @@ public class MainGUI extends JFrame implements ActionListener
 			verbindungsPanel.add(b);
 		}
 		verbindungseinstellung= new JButton("hinzufügen");
-		verbindungseinstellung.setBounds(293, 5, 85, 23);
 		verbindungseinstellung.addActionListener(this);
 		verbindungseinstellung.setActionCommand("VERBINDUNGSEINSTELLUNG");
+		verbindungsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
-		bestaetigen=new JButton("bestätigen");
-		bestaetigen.setBounds(10, 5, 83, 23);
-		bestaetigen.addActionListener(this);
-		verbindungsPanel.setLayout(null);
-		bestaetigen.setActionCommand("AUSWAHL_DATENBANK");
-		verbindungsPanel.add(bestaetigen);
+		
 		
 		verbindungsPanel.add(verbindungLabel);
 		verbindungsPanel.add(verbindungseinstellung);
@@ -123,7 +118,7 @@ public class MainGUI extends JFrame implements ActionListener
 		versionLabel.setBounds(5, 9, 101, 14);
 		ButtonGroup versionButton=new ButtonGroup();
 		JPanel versionPanel=new JPanel();
-		versionPanel.setLocation(30, 72);
+		versionPanel.setLocation(30, 147);
 		versionPanel.setSize(452, 33);
 		versionPanel.setLayout(null);
 		
@@ -149,7 +144,7 @@ public class MainGUI extends JFrame implements ActionListener
 	private void optionen()
 	{
 		JPanel optionPanel=new JPanel();
-		optionPanel.setBounds(30, 116, 421, 267);
+		optionPanel.setBounds(30, 191, 421, 267);
 		optionPanel.setLayout(null);
 		JLabel optionLabel=new JLabel("Benchmark, transactions, excl. drop & create");
 		optionLabel.setBounds(32, 3, 217, 14);

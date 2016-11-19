@@ -31,7 +31,7 @@ public class Serialisierung
         try
         {
             ObjectOutputStream objectOutput = new ObjectOutputStream(new FileOutputStream("data.ser"));
- 
+            System.out.println(ve.bezeichnung);
             // Objekte serialisiert in Datei ausgeben
             objectOutput.writeObject(ve);
           

@@ -22,13 +22,13 @@ public class Verbindungseinstellungen implements Serializable
 	public String user;
 	public String password;
 	
-	public Verbindungseinstellungen(String bezeichnung, String host, String database, String user, String passwort)
+	public Verbindungseinstellungen(String bezeichnung, String host, String database, String user, String password)
 	{
-		bezeichnung=this.bezeichnung;
-		host=this.host;
-		database= this.database;
-		user=this.user;
-		passwort=this.password;
+		this.bezeichnung=bezeichnung;
+		this.host=host;
+		this.database=database;
+		this.user=user;
+		this.password=password;
 	}
 	public Verbindungseinstellungen(String bezeichnung, String host, String database, String user)
 	{
