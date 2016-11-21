@@ -21,15 +21,6 @@ public class Benchmark {
 	 * @param usePreamble Gibt an, ob die drop- und createstatements mit ins Benchmark mit einfließen sollen
 	 */
 	public static void BenchmarkTask(int size, TpsCreatorInterface tpsDBCreator, boolean debugLog, boolean useTransaction, boolean usePreamble) {
-		
-		/*
-		 * Anbindung an die TextArea
-		 
-		
-		PrintStream printStream = new PrintStream(new de.whs.dbi.pa7.funktionen_gui.CustomOutputStream(de.whs.dbi.pa7.gui.Ausgabe.textArea));
-		System.setOut(printStream);
-		System.setErr(printStream);
-		*/
 		de.whs.dbi.pa7.funktionen_gui.Dokument_erstellen.erstellenTextdatei();
 		System.out.println("Brenchmarking gestartet");
 		System.out.println("Parameter: debugLog = " + debugLog + ", useTransaction = " + useTransaction + ", usePreamble = " + usePreamble);
