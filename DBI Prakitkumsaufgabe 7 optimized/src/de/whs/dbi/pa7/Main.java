@@ -60,9 +60,10 @@ public class Main {
 			// Lokale Informationen unserer Gruppe.
 			// Diese Zugangsdaten werden nicht bei einer anderen Gruppe funktionieren.
 			infos.setHost("127.0.0.1");
+			//infos.setHost("192.168.122.70");
 			infos.setDatabase("benchmark");
 			infos.setUser("postgres");
-			infos.setPassword("DBIPr");
+			infos.setPassword("DBI");
 		}
 		else {
 			

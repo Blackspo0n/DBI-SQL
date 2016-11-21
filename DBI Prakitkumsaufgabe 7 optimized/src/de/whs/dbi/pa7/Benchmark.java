@@ -30,7 +30,7 @@ public class Benchmark {
 		System.setOut(printStream);
 		System.setErr(printStream);
 		*/
-		
+		de.whs.dbi.pa7.funktionen_gui.Dokument_erstellen.erstellenTextdatei();
 		System.out.println("Brenchmarking gestartet");
 		System.out.println("Parameter: debugLog = " + debugLog + ", useTransaction = " + useTransaction + ", usePreamble = " + usePreamble);
 

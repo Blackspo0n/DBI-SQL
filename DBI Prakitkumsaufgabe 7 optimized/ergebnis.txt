@@ -1,0 +1,8 @@
+Ergebnisse der Messung am Mon Nov 21 17:55:52 CET 2016:
+Brenchmarking gestartet
+Parameter: debugLog = false, useTransaction = true, usePreamble = false
+Branches angelegt! Dauer 35 Millisekunden.
+Accounts angelegt! Dauer 2132 Millisekunden.
+Teller angelegt! Dauer 123 Millisekunden.
+Benchmark abgeschlossen. Gesamtdauer 2340 Millisekunden.
+Beende Anwendung...

@@ -58,17 +58,14 @@ public class Serialisierung
 			ObjectInputStream objectInput = new ObjectInputStream(new FileInputStream("data.ser"));
 			Verbindungseinstellungen o=null;
 			
-			Object test= objectInput.readObject();
 			
-			o= (Verbindungseinstellungen)test;
-		/*
+		
 			 while((o=(Verbindungseinstellungen)objectInput.readObject())!=null)
 			 {
 				 ve.add((Verbindungseinstellungen)o);
 			 }
-			 */
 			System.out.println(o.getBezeichnung());
-			ve.add(o);
+			
 			
 		
 			
