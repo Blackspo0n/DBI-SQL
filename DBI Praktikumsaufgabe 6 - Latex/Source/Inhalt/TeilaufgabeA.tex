@@ -4,11 +4,11 @@ tps-Datenbank auf dem gewählten Datenbankmanagementsystem erzeugt.}
 
 Um überhaupt eine Verbindung zu unserem DBMS\footnote{Datenbank Magement
 System} PostgreSQL aufbauen zu können, müssen wir uns erst einmal den
-JDBC-Treiber für unser DBMS besorgen. Der JDBC-Treiber befindet sich auf der
+JDBC-Treiber für unser DBMS herunterladen. Der JDBC-Treiber befindet sich auf der
 Webseite von PostgreSQL\footnote{\url{https://jdbc.postgresql.org/download.html}}.
 
 Den Treiber binden wir nun in unserem Buildpath ein und erstellen
-uns eine Klasse \hyperref[lst:dbv2]{DatabaseConnection} die den Treiber in der
+uns eine Klasse \hyperref[lst:dbv2]{DatabaseConnection}, die den Treiber in der
 \gqq{getConnection}-Methode laden lässt.
 
 \lstset{language=Java, backgroundcolor=\color{editorGray},
@@ -42,16 +42,16 @@ uns eine Klasse \hyperref[lst:dbv2]{DatabaseConnection} die den Treiber in der
 
 Die Verbindungsinformationen übergeben wir mittels der Klasse
 \hyperref[lst:civ2]{ConnectionInformation}. Diese implementiert ein einfaches
-Model, welches nur die Parameter für die Datenbankverbindung beinhaltet.
+Modell, welches nur die Parameter für die Datenbankverbindung beinhaltet.
 
 Anschließend implementieren wir eine Klasse \hyperref[lst:tpsv2]{TpsCreator},
 welche die gesamte Funktionalität zum Erstellen der \textbf{n-tps-Datenbank} beinhaltet.
 Dieser Klasse kann man wiederum ein
 \hyperref[lst:dbv2]{DatabaseConnection}-Objekt übergeben. Durch diese Handhabung
-ist es möglich in einem Programm Datenbanken auf verschiedene Servern anzulegen.
+ist es möglich, in einem Programm, Datenbanken auf verschiedene Servern anzulegen.
 
 Die Queries der Klasse \hyperref[lst:tpsv2]{TpsCreator}
-führen wir mit anschließend normalen Statements aus. 
+führen wir anschließend mit normalen Statements aus. 
 
 \begin{lstlisting}[caption={Eine der drei Tupel Funktionen}]
 	/**
@@ -73,7 +73,7 @@ führen wir mit anschließend normalen Statements aus.
 	}
 \end{lstlisting}
 
-Als nächstes kümmern wir uns um die Benutzerinteraktion. Wir waren uns
+Als nächstes befassen wir uns mit der Benutzerinteraktion. Wir waren uns
 einig, dass wir uns anstelle einer komplexen GUI Darstellung auf eine simple
 Konsolen-Anwendung beschränken wollen. Denn diese Form der
 Nutzerinteraktion hat große Vorteile gegenüber der Performance, da wir nicht
@@ -101,7 +101,7 @@ infos.setPassword(ConsoleReader.readString());
 \end{lstlisting}
 
 Am Ende unserer \hyperref[lst:mainv2]{Main}-Klasse rufen wir die Funkion
-\textit{autoSetup} in dem initialisieren \hyperref[lst:tpsv2]{TpsCreator}-Objekt
+\textit{autoSetup}, in dem initialisieren \hyperref[lst:tpsv2]{TpsCreator}-Objekt, 
 auf. Diese Funktion erstellt uns anschließend die Datenbank. Ein Durchlauf mit
-einer \textbf{10-tps-Datenbank} dauert \ca 4 Minuten und ist alles andere als performant.
+einer \textbf{10-tps-Datenbank} dauert \ca 4 Minuten und ist nicht performant.
 \clearpage

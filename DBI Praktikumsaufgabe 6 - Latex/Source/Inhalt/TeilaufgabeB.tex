@@ -8,7 +8,7 @@ Die reine Spaltenanzahl lässt sich folgendermaßen ausrechnen:
 n + n \cdot 10 + n \cdot 100000 = \mbox{Spaltenanzahl}
 \end{eqnarray}
 
-Also sind bei einer 1-tps-Datenbank 100011 Datensätze enthalten. Plus den 4
+Also sind bei einer 1-tps-Datenbank 100011 Datensätze enthalten. Inklusive der vier
 Tabellen sind wir dann bei einer Anzahl von 100015 Statements.
 
 Die Größe der Datenbank kann man in zwei Kategorien.
@@ -30,7 +30,7 @@ ermitteln}]
   ORDER BY pg_total_relation_size(C.oid) DESC
 \end{lstlisting}
 
-Wenn wir diesen Query ausführen erhalten wir folgende Ausgabe:
+Wenn wir diesen Query ausführen, erhalten wir folgende Ausgabe:
 \tabelle{Ausgabe des Query}{tab:databaseSize}{databaseSize.tex}
 
 Die so errechnete Größe liegt bei 16441344 bytes. Umgerechnet ergibt das: 
