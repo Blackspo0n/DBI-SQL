@@ -52,9 +52,9 @@ public class DatabaseConnection
 		 * Der Compiler übersetzt " + var + " automatisch in ein StringBuilder Objekt
 		 */
 		databaseLink = DriverManager.getConnection(
-				"jdbc:postgresql://" + ci.getHost() +"/" + ci.getDatabase(),
+				"jdbc:postgresql://" + ci.getHost() +"/" + ci.getDatabase() + "?useCompression=true",
 				ci.getUser(), 
 				ci.getPassword()
-		);		
+		);
 	}
 }

@@ -32,31 +32,30 @@ public class TpsCreator implements TpsCreatorInterface {
 	/**
 	 * Tabellen die in dem Shema enthalten sind, momentan nur nötig zum "droppen" der Datenbank
 	 */
-	public String[] tables = { "branches", "accounts", "tellers", "history"};
+	public String[] tables = {"branches", "accounts", "tellers", "history"};
 	
 	/**
 	 * Die Create-Statements für das Schema
 	 */
-	public String[] schema ={
+	public String[] schema = {
 			"CREATE TABLE branches (branchid INT NOT NULL, branchname CHAR(20) NOT NULL, balance INT NOT NULL, address CHAR(72) NOT NULL)",
-			"CREATE TABLE accounts ( accid INT NOT NULL, NAME CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL)",
-			"CREATE TABLE tellers ( tellerid INT NOT NULL, tellername CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL)",
-			"CREATE TABLE history ( accid INT NOT NULL, tellerid INT NOT NULL, delta INT NOT NULL, branchid INT NOT NULL, accbalance INT NOT NULL, cmmnt CHAR(30) NOT NULL)",
+			"CREATE TABLE accounts (accid INT NOT NULL, NAME CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL)",
+			"CREATE TABLE tellers (tellerid INT NOT NULL, tellername CHAR(20) NOT NULL, balance INT NOT NULL, branchid INT NOT NULL, address CHAR(68) NOT NULL)",
+			"CREATE TABLE history (accid INT NOT NULL, tellerid INT NOT NULL, delta INT NOT NULL, branchid INT NOT NULL, accbalance INT NOT NULL, cmmnt CHAR(30) NOT NULL)",
 	};
 	
 	/**
 	 * Alter Statements zum setzen der Keys
 	 */
-	
 	public String[] AlterStatements = {
 			"ALTER TABLE branches ADD PRIMARY KEY(branchid)",
 			"ALTER TABLE accounts ADD PRIMARY KEY(accid)",
 			"ALTER TABLE tellers ADD PRIMARY KEY(tellerid)",
-			"ALTER TABLE accounts ADD  FOREIGN KEY(branchid) REFERENCES branches(branchid)",
-			"ALTER TABLE tellers ADD  FOREIGN KEY(branchid) REFERENCES branches(branchid)",
-			"ALTER TABLE history ADD  FOREIGN KEY(branchid) REFERENCES branches(branchid)",
-			"ALTER TABLE history ADD  FOREIGN KEY(tellerid) REFERENCES tellers(tellerid)",
-			"ALTER TABLE history ADD  FOREIGN KEY(accid) REFERENCES accounts(accid)"
+			"ALTER TABLE accounts ADD FOREIGN KEY(branchid) REFERENCES branches(branchid)",
+			"ALTER TABLE tellers ADD FOREIGN KEY(branchid) REFERENCES branches(branchid)",
+			"ALTER TABLE history ADD FOREIGN KEY(branchid) REFERENCES branches(branchid)",
+			"ALTER TABLE history ADD FOREIGN KEY(tellerid) REFERENCES tellers(tellerid)",
+			"ALTER TABLE history ADD FOREIGN KEY(accid) REFERENCES accounts(accid)"
 	};
 
 	
@@ -69,13 +68,13 @@ public class TpsCreator implements TpsCreatorInterface {
 	 */
 	public TpsCreator(DatabaseConnection connection) throws Exception {
 		System.out.println("Info: Optimierte Version wird benutzt!");
+		
 		if(connection == null ) {
 			throw new NullPointerException("connection object cannot be null");
 		}
 		
 		try {
 			connection.databaseLink.isValid(0);
-			//connection.databaseLink.setAutoCommit(false);
 		}
 		catch(Exception err) {
 			throw err;
@@ -159,8 +158,6 @@ public class TpsCreator implements TpsCreatorInterface {
 		}
 	}
 	
-	
-	
 	/**
 	 * Erstellt die Tabellen
 	 * 
@@ -224,14 +221,15 @@ public class TpsCreator implements TpsCreatorInterface {
 	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
 	public boolean createAccountTupel(int n) {
-		int localConst = n*10000;
+		int localConst = n*100000;
+		
 		try {
 			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
 			
 			CopyIn ci = cpm.copyIn("COPY accounts(accid, NAME, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
 
 			for (int i = 1; i <= localConst; i++) {
-				/* Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auchD
+				/* Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch.
 				* Der Initialwert des Stringbuilders ist extrem wichtig, denn durch diesen Wert wird automatisch genug Speicher reserviert
 				*/
 				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(
@@ -261,6 +259,7 @@ public class TpsCreator implements TpsCreatorInterface {
 	 */
 	public boolean createTellerTupel(int n) {
 		int localConst = n*10;
+		
 		try {
 			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
 			CopyIn ci = cpm.copyIn("COPY tellers (tellerid, tellername, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
@@ -304,11 +303,6 @@ public class TpsCreator implements TpsCreatorInterface {
 			return;
 		}
 		
-		/**
-		 * Jetzt kommen die Datensätze in die Datenbank yay \o/
-		 */
-		
-		
 		if(!createBranchTupel(n)) {
 			System.out.println("Branches konnten nicht angelegt werden. Stoppe Setup ...");
 			return;
@@ -321,7 +315,6 @@ public class TpsCreator implements TpsCreatorInterface {
 			System.out.println("Teller konnten nicht angelegt werden. Stoppe Setup ...");
 			return;
 		}
-		
 
 		System.out.println("Erstellen der " + n + "-tps-Datenbak erfolgreich");
 	}

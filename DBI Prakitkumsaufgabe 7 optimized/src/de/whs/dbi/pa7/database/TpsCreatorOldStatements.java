@@ -169,7 +169,7 @@ public class TpsCreatorOldStatements  implements TpsCreatorInterface {
 	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
 	public boolean createAccountTupel(int n) {
-		int localConst = n*10000;
+		int localConst = n*100000;
 		int localRandom;
 		
 		try {

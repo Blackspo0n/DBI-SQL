@@ -5,13 +5,19 @@ erstellten Datenbanken benötigt?}
 
 Die reine Spaltenanzahl lässt sich folgendermaßen ausrechnen:
 \begin{eqnarray}
-n + n \cdot 10 + n \cdot 10000 = \mbox{Spaltenanzahl}
+n + n \cdot 10 + n \cdot 100000 = \mbox{Spaltenanzahl}
 \end{eqnarray}
 
-Also sind bei einer 1-tps-Datenbank 10011 Datensätze enthalten. Plus den 4
-Tabellen sind wir dann bei einer Anzahl von 10015 Statements.
+Also sind bei einer 1-tps-Datenbank 100011 Datensätze enthalten. Plus den 4
+Tabellen sind wir dann bei einer Anzahl von 100015 Statements.
 
-Folgender SQL-Query liefert uns die Größe jeder einzelner Tabelle:
+Die Größe der Datenbank kann man in zwei Kategorien.
+\begin{itemize}
+  \item Relationale Größe
+  \item Physikalische Größe
+\end{itemize}
+
+Folgender SQL-Query liefert uns die relationale-Größe jeder einzelner Tabelle:
 \begin{lstlisting}[language=sql, caption={Größe der Tabelle und Datensätze
 ermitteln}]
   SELECT nspname || '.' || relname AS relation,
@@ -27,8 +33,8 @@ ermitteln}]
 Wenn wir diesen Query ausführen erhalten wir folgende Ausgabe:
 \tabelle{Ausgabe des Query}{tab:databaseSize}{databaseSize.tex}
 
-Die so errechnete Größe liegt bei 1736704 bytes. Umgerechnet ergibt das: 
-1,65 MB.
+Die so errechnete Größe liegt bei 16441344 bytes. Umgerechnet ergibt das: 
+15,68 MB.
 
 Die tatsächliche physikalische Größe der gesamten Datenbank lässt sich mit
 folgendem Query bestimmen:
@@ -38,7 +44,7 @@ SELECT d.datname AS Name,  pg_catalog.pg_get_userbyid(d.datdba) AS Owner, pg_cat
     ORDER BY pg_catalog.pg_database_size(d.datname) DESC
 \end{lstlisting}
 
-Die tatsächliche Größe der Datenbank beträgt dabei: 17932460 Bytes. Umgerechnet
-ist die Datenbank dementsprechend 17,1 MB groß.
+Die tatsächliche Größe der Datenbank beträgt dabei: 24469676 Bytes. Umgerechnet
+ist die Datenbank dementsprechend 23,34 MB groß.
 
-Die Differenz beider Größen beträgt also 15,45 MB.
+Die Differenz beider Größen beträgt also 7,66 MB.

@@ -21,7 +21,7 @@ public class Benchmark {
 	 * @param usePreamble Gibt an, ob die drop- und createstatements mit ins Benchmark mit einfließen sollen
 	 */
 	public static void BenchmarkTask(int size, TpsCreatorInterface tpsDBCreator, boolean debugLog, boolean useTransaction, boolean usePreamble) {
-		de.whs.dbi.pa7.funktionen_gui.Dokument_erstellen.erstellenTextdatei();
+		//de.whs.dbi.pa7.funktionen_gui.Dokument_erstellen.erstellenTextdatei();
 		System.out.println("Brenchmarking gestartet");
 		System.out.println("Parameter: debugLog = " + debugLog + ", useTransaction = " + useTransaction + ", usePreamble = " + usePreamble);
 
@@ -56,13 +56,15 @@ public class Benchmark {
 		tpsDBCreator.createTellerTupel(size);
 		System.out.println("Teller angelegt! Dauer " + (System.currentTimeMillis() - localTime) + " Millisekunden.");
 		
+		tpsDBCreator.finishUp();
+		
 		if(useTransaction) {
 			tpsDBCreator.endAndCommitTransaction();
 		}
 		
 		System.out.println("Benchmark abgeschlossen. Gesamtdauer " + getCurrentMilliseconds() + " Millisekunden.");
 
-		tpsDBCreator.finishUp();
+		
 	}
 	
 	/**

@@ -4,6 +4,7 @@ einzelne Verbesserungsideen und die jeweiligen Laufzeitveränderungen für eine 
 Ausführung Ihres Programms bei der Erzeugung einer 10-tps-Datenbank!}
 
 \subsection{Transaktion}
+\subsubsection*{Optimierung}
 Um den Durchsatz der Daten zu erhöhen, lassen sich die Queries in einer
 \textbf{Transaktion}\footnote{\url{https://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html}} zusammenfassen.  
 
@@ -55,12 +56,20 @@ Dieses erstellt uns dann eine  \hyperref[lst:bmv2]{Benchmark}-Klasse, die der
 	}
 \end{lstlisting}
 
- 
+\subsubsection*{Bewertung}
 Die Queries, die mittels einer Transaktion übertragen worden sind, sind bei
 einer \textbf{10-tps-Datenbank} um \ca das \textbf{11fache} schneller als die
 Queries die einzelnd zum Server geschickt werden. 
 
+Wenn man in der JDBC Bibliothek mit großen Datenmengen arbeitet, lohnt es sich
+performancemäßig dieses AutoCommit aus zu schalten. Der Nachteil, dass man eine
+Transaktion selbst abschließen muss, ist gegenüber dem Performancegewinn eher zu
+vernachlässigen.
+\clearpage
+
+
 \subsection{Schlüsselbedingungen}
+\subsubsection*{Optimierung}
 In den create-Statements befinden sich Schlüsselbedingungen für die Primär- und
 Fremdschlüssel. Jeder Schlüssel erstellt auch einen sgn. Index. Beim Einfügen
 der Daten in die jeweiligen Tabellen ist so ein Index hinderlich, da anhand
@@ -112,18 +121,21 @@ also eine Funktion schreiben, die Ende jedes Benchmarks ausgeführt wird.
 		
 \end{lstlisting}
 
-Durch diese Funktion ist es jetzt möglich die Schlüsselfunktionen entkapselt von
-der Tabellen Definition anzulegen.
-
+\subsubsection*{Bewertung}
+Durch die entkapselung der Schlüsselbedingungen sparen wir uns im Benchmarking
+einige Millisekunden. Insgesamt ist ein Performancezuwachs um 10 \% zu messen. 
+ 
+ Diese Handhabung der der Schlüsselbedongungen sollte jedoch nicht in einem
+ Produktivsystem verwendet werden, denn so hindert man das DBMS etwaige
+ Optimierungen an dem Datenbestand vorzunehmen. Dies äußert sich in längere
+ Anfragezeiten gegenüber Datenbank.
+\clearpage
 
 \subsection{Implementierung des CopyManagers}
+\subsubsection*{Optimierung}
 Unser ausgewähltes DBMS PostgreSQL stellt ein \textbf{COPY}-Statement zur
 Verfügung. Dieses Statement erlaubt uns Daten aus einer Textdatei oder aber auch
 einer CSV Datei in unsere Datenbank zu importieren. 
-
-Das \textbf{COPY}-Stament ist durch seine starke Spezialisierung auf den
-Anwendungszwecks um einiges schneller als die ansich schon schnelle
-PreparedStatements.
 
 Um dieses Feature zu nutzen, stellt uns der JDBC-Treiber von PostgreSQL eine
 \textbf{CopyManager}\footnote{\url{https://jdbc.postgresql.org/documentation/publicapi/org/postgresql/copy/CopyManager.html}}-Klasse
@@ -191,13 +203,23 @@ Da wir mit der Variante viel mit Strings arbeiten, hat es sich angeboten einen
 StringBuilder anstatt der üblichen Verkettung zu nehmen, da der StringBuilder
 wesentlich performanter läuft als die Verkettung von Datentypen.
 
-Diese Art des Einfügen in die Datenbank erlaubt uns bei einer
-\textbf{50-tps-Datenbank} ein Benchmarkergebnis von 2500 Millisekunden.
+\subsubsection*{Bewertung}
+Das \textbf{COPY}-Stament ist dank seiner starken Spezialisierung auf den
+Anwendungszwecks um einiges schneller als die ansich schon schnellen
+\textit{PreparedStatements}.
 
-Selbst Größen jenseits $n > 50$ laufen binnen weniger Sekunden problemlos durch.
+In Verbindung mit dem in JDBC-Treiber zur Verfügung stehenden CopyManagers
+erlaubt uns das bei einer \textbf{10-tps-Datenbank} ein Benchmarkergebnis von
+2500 Millisekunden. Damit sind wir \textbf{36fach} schneller als in der
+ursprünglichen Version.
 
-\subsection{Servereinstellungen}
+Selbst Datenbank-Größen jenseits $n > 50$ laufen binnen weniger Sekunden
+problemlos durch.
+\clearpage
 
+
+\subsection{Optimierungseinstellungen im DBMS}
+\subsubsection*{Optimierung}
 Um ein noch besseres Eregbnis zu erzielen kann man in PostgreSQL die
 \textit{asyncronen Commits} aktivieren. Diese sind standardmäßig deaktiviert
 und müssen in der Konfigurationsdatei von PostgreSQL erst einmal aktiviert
@@ -229,29 +251,35 @@ schreiben darf. So zwingen wir unser DBMS vieles im Ram zu verwalten, was
 wesentlich performanter ist, da der Ram sehr geringe Zugriffszeiten besitzt. Wir
 laufen aber im Fehlerfall gefahr Daten zu verlieren.
 
+\subsubsection*{Bewertung}
 Der schlussendliche Performanceschub fällt je nach System unterschiedlich aus.
 So hat diese Konfiguration auf den Laptop eines Kommilitonen eine Einsparung von 100
 Millisekunden bei einer \textbf{10-tps-Datenbank} eingebracht.
 
-\subsection{Adressauflösung von Domainnamen}
-Um das Ergebnis noch mehr zu verbessern kommt nun das Feintuning. Dazu
-haben wir uns jetzt nicht das DBMS zugewendet, sondern haben uns auf die
-Netzwerkebene begeben.
+\clearpage
 
-Eine Datenbank spricht man normalerweiße mit einer Domain an. 
-Eine Domain muss aber erst einmal aufgelöst werden.
-Das ist ein massiver Nachteil gegenüber der herkömmlicher IP. Jeder
-DNS-Server \bzw DNS-Cache muss in irgendeiner Tabelle nachschauen, welche Domain
-zu welcher IP gehört. Das kostet beim Verbindungsaufbau wertvolle Zeit.
-
-Selbst der lokale DNS-Cache muss dies \zB für \textbf{localhost} machen.
-Möchten wir also die Zugriffszeiten umgehen, brauchen wir einfach nur die IP-Adresse
-statt des Domainnamens einzugeben. Dies wäre für \textbf{localhost} entweder \gqq{127.0.0.1} als
-IPv4-Schreibweiße oder \gqq{[::1]} als IPv6 Schreibweise.
-
-Wir haben in unser Programm deswegen nur IP-Adressen verwendet um sicher zu gehen, dass wir 
-die Zugriffszeiten umgegehen. Einen Performanceschub im
-Benchmark bringt diese Optimierung nicht wirklich.
+% \subsection{Adressauflösung von Domainnamen}
+% \subsubsection*{Optimierung}
+% Um das Ergebnis noch mehr zu verbessern kommt nun das Feintuning. Dazu
+% haben wir uns jetzt nicht das DBMS zugewendet, sondern haben uns auf die
+% Netzwerkebene begeben.
+% 
+% Eine Datenbank spricht man normalerweiße mit einer Domain an. 
+% Eine Domain muss aber erst einmal aufgelöst werden.
+% Das ist ein massiver Nachteil gegenüber der herkömmlicher IP. Jeder
+% DNS-Server \bzw DNS-Cache muss in irgendeiner Tabelle nachschauen, welche Domain
+% zu welcher IP gehört. Das kostet beim Verbindungsaufbau wertvolle Zeit.
+% 
+% Selbst der lokale DNS-Cache muss dies \zB für \textbf{localhost} machen.
+% Möchten wir also die Zugriffszeiten umgehen, brauchen wir einfach nur die IP-Adresse
+% statt des Domainnamens einzugeben. Dies wäre für \textbf{localhost} entweder \gqq{127.0.0.1} als
+% IPv4-Schreibweiße oder \gqq{[::1]} als IPv6 Schreibweise.
+% 
+% \subsubsection*{Bewertung}
+% In unserem Programm setzten wir 
+% Wir haben in unser Programm deswegen nur IP-Adressen verwendet um sicher zu gehen, dass wir 
+% die Zugriffszeiten umgegehen. Einen Performanceschub im
+% Benchmark bringt diese Optimierung nicht wirklich.
 
 \subsection{Gesamter Performancezuwachs}
 Durch das Schrittweiße optimieren des Programmcodes konnte ein betrachtlicher

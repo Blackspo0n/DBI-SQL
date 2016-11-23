@@ -63,7 +63,7 @@ public class Main {
 			//infos.setHost("192.168.122.70");
 			infos.setDatabase("benchmark");
 			infos.setUser("postgres");
-			infos.setPassword("DBI");
+			infos.setPassword("DBIPr");
 		}
 		else {
 			
@@ -108,7 +108,6 @@ public class Main {
 		catch ( Exception err){
 			
 			//Fehlerfall
-
 			err.printStackTrace();
 			System.err.println(err.getMessage());
 			System.err.println("Konnte keine Verbindung zur Datenbank aufbauen!");
