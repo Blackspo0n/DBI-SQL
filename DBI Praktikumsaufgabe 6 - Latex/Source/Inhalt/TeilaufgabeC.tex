@@ -176,9 +176,6 @@ Nach Änderung create-Funktionen, in der Klasse
 			CopyIn ci = cpm.copyIn("COPY accounts(accid, NAME, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
 			
 			for (int i = 1; i <= localConst; i++) {
-				/* Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
-				* Der Initialwert des Stringbuilders ist extrem wichtig, denn durch diesen Wert wird automatisch genug Speicher reserviert
-				*/
 				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(
 						ThreadLocalRandom.current().nextInt(1, n + 1)
 				).append("\n").insert(0, i);
