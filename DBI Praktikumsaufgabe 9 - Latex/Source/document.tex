@@ -1,0 +1,61 @@
+\documentclass[
+	toc=listof, 
+	toc=bibliography, % Literaturverzeichnis in das Inhaltsverzeichnis aufnehmen
+	footnotes=multiple, % Trennen von direkt aufeinander folgenden Fußnoten
+	parskip=half, % vertikalen Abstand zwischen Absätzen verwenden anstatt
+	% horizontale Einrückung von Folgeabsätzen
+	headlines=1
+]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[scaled]{uarial}
+\usepackage{accsupp}    
+
+\newcommand{\noncopynumber}[1]{
+    \BeginAccSupp{method=escape,ActualText={}}
+    #1
+    \EndAccSupp{}
+}
+
+\newcommand{\titel}{Datenbank- und Informationssysteme}
+\newcommand{\untertitel}{Praktikumsaufgabe 7 - Benchmarking}
+ 
+\newcommand{\abgabedatum}{1. Dezember 2016}
+\newcommand{\keywords}{DBI, JDBC, SQL, Query, postgresql, Java}
+\newcommand{\datum}{\today}
+ 
+\newcommand{\autoren}{
+	Jonas Stadtler//jonas.stadler@studmail.w-hs.de,
+	Mario Kellner//mario.kellner@studmail.w-hs.de,
+	Markus Hausmann//markus.hausmann@studmail.w-hs.de
+}
+
+\input{Meta.tex}
+\input{Allgemein/Packages.tex} 
+\input{Allgemein/Seitenstil.tex}
+\input{Allgemein/Befehle.tex}
+
+\begin{document}
+\input{Deckblatt.tex}
+\clearpage
+
+\pdfbookmark[1]{Inhaltsverzeichnis}{toc}
+\pagenumbering{Roman}
+\tableofcontents 
+\clearpage
+
+\pagenumbering{arabic}
+\input{Inhalt.tex}
+ 
+\lstlistoflistings
+\clearpage
+ 
+\listoftables
+\clearpage
+
+\appendix
+\pagenumbering{roman}
+\input{Anhang.tex}
+ 
+\clearpage
+\end{document} 

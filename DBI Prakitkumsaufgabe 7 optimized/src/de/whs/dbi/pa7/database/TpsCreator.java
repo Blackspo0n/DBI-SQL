@@ -1,5 +1,11 @@
 package de.whs.dbi.pa7.database;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringReader;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.ThreadLocalRandom;
@@ -58,6 +64,10 @@ public class TpsCreator implements TpsCreatorInterface {
 			"ALTER TABLE history ADD FOREIGN KEY(accid) REFERENCES accounts(accid)"
 	};
 
+	
+	public String fileBranches;
+	public String fileAccounts;
+	public String fileTellers;
 	
 	/**
 	 * Unser Konstruktor. Er Überprüft, ob ein nicht leeres DatabaseConnection Objekt übergeben worden ist.
@@ -192,22 +202,13 @@ public class TpsCreator implements TpsCreatorInterface {
 		try {
 			
 			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
-			CopyIn ci = cpm.copyIn("COPY branches (branchid, branchname, balance, address) FROM STDIN WITH DELIMITER '|'");
+			long ci = cpm.copyIn("COPY branches (branchid, branchname, balance, address) FROM STDIN WITH DELIMITER '|'", new FileReader("branches.txt"));
 
-			for (int i = 1; i <= n; i++) {
-				// Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
-				
-				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
-				sb.insert(0, i);
-				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
-				
-				if(isDebug) {
-					System.out.println(sb.toString());
-				}
-			}
-	        ci.endCopy();			
 			return true;
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -221,30 +222,15 @@ public class TpsCreator implements TpsCreatorInterface {
 	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
 	public boolean createAccountTupel(int n) {
-		int localConst = n*100000;
-		
 		try {
 			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
-			
-			CopyIn ci = cpm.copyIn("COPY accounts(accid, NAME, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
-
-			for (int i = 1; i <= localConst; i++) {
-				/* Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch.
-				* Der Initialwert des Stringbuilders ist extrem wichtig, denn durch diesen Wert wird automatisch genug Speicher reserviert
-				*/
-				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(
-						ThreadLocalRandom.current().nextInt(1, n + 1)
-				).append("\n").insert(0, i);
-				
-				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
-				
-				if(isDebug) {
-					System.out.print(sb.toString());
-				}
-			}
-	        ci.endCopy();			
+			long ci = cpm.copyIn("COPY accounts(accid, NAME, balance, address, branchid) FROM STDIN WITH DELIMITER '|'", new FileReader("accounts.txt"));
+		
 			return true;
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -257,28 +243,15 @@ public class TpsCreator implements TpsCreatorInterface {
 	 * @param n Anzahl der Tupel, die erstellt werden mal 10
 	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
-	public boolean createTellerTupel(int n) {
-		int localConst = n*10;
-		
+	public boolean createTellerTupel(int n) {		
 		try {
 			CopyManager cpm = new CopyManager((BaseConnection) connection.databaseLink);
-			CopyIn ci = cpm.copyIn("COPY tellers (tellerid, tellername, balance, address, branchid) FROM STDIN WITH DELIMITER '|'");
-			
-			for (int i = 1; i <= localConst; i++) {
-				
-				// Stringbuilder immer neu erstellen, denn je größer dieser wird, desto langsamer wird dieser auch
-				StringBuilder sb = new StringBuilder("|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|").append(
-						ThreadLocalRandom.current().nextInt(1, n + 1)
-				).append("\n").insert(0, i);
-				ci.writeToCopy(sb.toString().getBytes(), 0, sb.length());
-				
-				if(isDebug) {
-					System.out.println(sb.toString());
-				}
-			}
-	        ci.endCopy();
+			long ci = cpm.copyIn("COPY tellers (tellerid, tellername, balance, address, branchid) FROM STDIN WITH DELIMITER '|'", new FileReader("tellers.txt"));
 			return true;
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -336,5 +309,51 @@ public class TpsCreator implements TpsCreatorInterface {
 	@Override
 	public void finishUp() {
 		this.createKeys();
+	}
+
+	public void createFiles(int size) {
+		System.out.println("Erstelle Benchmark Datein!");
+
+		FileWriter fw1;
+		try {
+			System.out.print("Erstelle Branches ...");
+
+			fw1 = new FileWriter(new File("branches.txt"));
+			for (int i = 1; i <= size; i++) {
+				
+				fw1.write(i + "|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+				
+			}
+			fw1.close();
+			
+			System.out.println("[OK]");
+			System.out.print("Erstelle Accounts ...");			
+			fw1 = new FileWriter(new File("accounts.txt"));
+			for (int i = 1; i <= size*100000; i++) {
+
+				 fw1.write(i + "|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|" + ThreadLocalRandom.current().nextInt(1, size + 1) + "\n");
+			}
+			
+			fw1.close();
+
+			System.out.println("[OK]");
+			System.out.print("Erstelle Tellers ...");
+
+			fw1 = new FileWriter(new File("tellers.txt"));
+			for (int i = 1; i <= size*10; i++) {
+				
+				fw1.write(i +"|aaaaaaaaaaaaaaaaaaaa|0|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa|" +
+						ThreadLocalRandom.current().nextInt(1, size + 1) +
+				"\n");
+			}
+			
+			fw1.close();
+			System.out.println("[OK]");
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 }
