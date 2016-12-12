@@ -123,7 +123,6 @@ public class tpsCreator {
 
 			return true;
 		} catch (SQLException e) {
-
 			e.printStackTrace();
 		}
 		
@@ -138,7 +137,7 @@ public class tpsCreator {
 	 * @return Gibt an, ob ein Fehler vorhanden ist
 	 */
 	public boolean createAccountTupel(int n) {
-		int localConst = n*10000;
+		int localConst = n*100000;
 		int localRandom;
 		
 		try {

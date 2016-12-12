@@ -284,4 +284,7 @@ public class TpsCreatorOldStatements  implements TpsCreatorInterface {
 	public void finishUp() {
 		
 	}
+	public void createFiles(int size) {
+		
+	}
 }

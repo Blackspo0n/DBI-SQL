@@ -12,4 +12,5 @@ public interface TpsCreatorInterface {
 	boolean isDebug();
 	void setDebug(boolean isDebug);
 	public void finishUp();
+	public void createFiles(int size);
 }
