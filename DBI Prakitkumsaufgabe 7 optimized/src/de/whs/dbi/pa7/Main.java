@@ -63,7 +63,7 @@ public class Main {
 			//infos.setHost("192.168.122.70");
 			infos.setDatabase("benchmark");
 			infos.setUser("postgres");
-			infos.setPassword("DBIPr");
+			infos.setPassword("DBI");
 		}
 		else {
 			

@@ -2,6 +2,7 @@ package de.w_hs.dbi.pa9;
 
 import de.w_hs.dbi.pa9.database.ConnectionInformation;
 import de.w_hs.dbi.pa9.database.DatabaseConnection;
+import de.w_hs.dbi.pa9.function.ProgramStage;
 import de.w_hs.dbi.pa9.function.TXHandler;
 
 public class Main 
@@ -24,10 +25,15 @@ public class Main
 			{
 				System.out.println("Verbunden!");
 			}
-			TXHandler txh= new TXHandler(connection);
-			System.out.println(txh.einzahlungTX(1, 1, 1, 200));
-			System.out.println(txh.kontostandTX(1));
-			System.out.println(txh.analyseTX(200));
+			else
+			{
+				return;
+			}
+			ProgramStage program = new ProgramStage(connection);
+			program.attackTime();
+			program.benchStage();
+			program.boomOutStage();
+			System.out.println("Finish!");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
