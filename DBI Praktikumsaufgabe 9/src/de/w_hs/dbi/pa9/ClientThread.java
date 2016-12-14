@@ -6,6 +6,14 @@ import de.w_hs.dbi.pa9.database.ConnectionInformation;
 import de.w_hs.dbi.pa9.database.DatabaseConnection;
 import de.w_hs.dbi.pa9.function.ProgramStage;
 
+/**
+ *  Zuweisungen an Threads.
+ *  
+ *  @author Mario Kellner
+	@author Markus Hausmann
+ *  @author Jonas Stadtler
+ *
+ */
 public class ClientThread extends Thread {
 	private DatabaseConnection threadCon;
 	static boolean startTrans = false;
@@ -21,7 +29,6 @@ public class ClientThread extends Thread {
 	synchronized boolean getStartTrans () {
 		return startTrans;
 	}
-	
 	public void run() {
 		try {
 			threadCon.connect();

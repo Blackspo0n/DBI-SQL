@@ -19,6 +19,14 @@ public class Main
 		Main.txCountSum = txCountSum;
 	}
 
+	/**
+	 * Main Funktion.
+	 * @param args
+	 * @throws Exception
+	 * @author Mario Kellner
+	 * @author Markus Hausmann
+ *	   @author Jonas Stadtler
+	 */
 	public static void main(String args[]) throws Exception
 	{
 		

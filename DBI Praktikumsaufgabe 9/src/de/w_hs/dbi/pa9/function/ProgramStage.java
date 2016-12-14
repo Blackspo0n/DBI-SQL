@@ -5,6 +5,17 @@ import java.sql.SQLException;
 import de.w_hs.dbi.pa9.Main;
 import de.w_hs.dbi.pa9.database.DatabaseConnection;
 
+/**
+ * 
+ * Diese Klasse enthält alle die drei Schritte des Programmablaufs. Zudem werden hier die Abfrage
+ * Werte per Zufall definiert und die Gewichtung erfolgt im geforderten Verhältnis.
+ *
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ * 
+ *
+ */
 public class ProgramStage 
 {
 	private DatabaseConnection connection;
@@ -18,6 +29,11 @@ public class ProgramStage
 		this.connection = con;
 		this.txh = new TXHandler(con);
 	}
+	/**
+	 * Entscheidet per gewichteten Zufall darüber, welche Abfrage an die Datenbank geschickt wird..
+	 * 
+	 * @return Gibt die Zahl 1, 2 oder 3 zurück. Dadurch wird im folgenden über die Abfrage entschieden.
+	 */
 	public int choose()
 	{
 		int number=(int)(Math.random()*100);
@@ -31,6 +47,11 @@ public class ProgramStage
 		}
 		return 3;
 	}
+	/**
+	 * Entscheidet über die auszuführende Abfrage.
+	 * 
+	 * @throws SQLException Fehler, welcher bei der Abfrage an die Datenbank auftreten kann.
+	 */
 	private void doTX() throws SQLException
 	{
 		switch(choose())
@@ -50,6 +71,13 @@ public class ProgramStage
 				break;
 		}
 	}
+	/**
+	 * Entscheidet über die jeweiligen Zahlen, welche mit der Abfrage zur Datenbank geschickt werden.
+	 * @param name Bezeichnung der anzusprechenden Tabelle.
+	 * @param n Größe der Datenbank in TPS.
+	 * @return Zufällige, aber passende Übergabewerte, welche zur Abfrage an die Datenbank 
+	 * verwendet werden.
+	 */
 	private int chooseNumber(String name, int n)
 	{
 		double number=Math.random();
@@ -70,6 +98,12 @@ public class ProgramStage
 		}
 		return (int)(number+1);
 	}
+	/**
+	 * Ausführen des ersten Programmteils.
+	 * 
+	 * @throws SQLException Möglicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
+	 */
 	public void attackTime() throws SQLException, InterruptedException
 	{
 		System.out.println("Attack Time!");
@@ -80,6 +114,12 @@ public class ProgramStage
 			Thread.sleep(50);
 		}
 	}
+	/**
+	 * Ausführen des zweiten Programmteils.
+	 * 
+	 * @throws SQLException Möglicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
+	 */
 	public void benchStage() throws SQLException, InterruptedException
 	{
 		System.out.println("Starte die Benchphase!");
@@ -110,6 +150,12 @@ public class ProgramStage
 		System.out.println("Anzahl der Transaktionen pro Sekunde: " + (txCounter/300));
 		
 	}
+	/**
+	 * Ausführen des dritten Programmteils.
+	 * 
+	 * @throws SQLException  Möglicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
+	 */
 	public void boomOutStage() throws SQLException, InterruptedException
 	{
 		System.out.println("Boom Out Stage!");
