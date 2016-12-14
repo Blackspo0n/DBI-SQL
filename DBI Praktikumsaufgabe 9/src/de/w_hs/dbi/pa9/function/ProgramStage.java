@@ -2,13 +2,14 @@ package de.w_hs.dbi.pa9.function;
 
 import java.sql.SQLException;
 
+import de.w_hs.dbi.pa9.Main;
 import de.w_hs.dbi.pa9.database.DatabaseConnection;
 
 public class ProgramStage 
 {
 	private DatabaseConnection connection;
 	private TXHandler txh;
-	public ProgramStage(DatabaseConnection con)
+	public ProgramStage(DatabaseConnection con) throws SQLException
 	{
 		if(con == null)
 		{
@@ -81,13 +82,33 @@ public class ProgramStage
 	}
 	public void benchStage() throws SQLException, InterruptedException
 	{
-		System.out.println("Bench Stag!");
+		System.out.println("Starte die Benchphase!");
+		int txCounter = 0;
+		
+
 		long start=System.currentTimeMillis();
+		long start2=System.currentTimeMillis();
+		
 		while(start+300000>=System.currentTimeMillis())
 		{
+
 			doTX();
+			txCounter++;
+			
+			if(System.currentTimeMillis()-start2 >= 1000) {
+				System.out.println("Anzahl der Transaktionen pro Sekunde: " + txCounter/((System.currentTimeMillis()-start)/1000));
+				
+				start2 = System.currentTimeMillis();
+				
+			}
+			
 			Thread.sleep(50);
 		}
+		
+		Main.setTxCountSum(Main.getTxCountSum() + txCounter);
+		System.out.println("Anzahl der Transaktionen: " +txCounter);
+		System.out.println("Anzahl der Transaktionen pro Sekunde: " + (txCounter/300));
+		
 	}
 	public void boomOutStage() throws SQLException, InterruptedException
 	{

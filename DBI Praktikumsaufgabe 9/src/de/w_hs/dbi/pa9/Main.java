@@ -8,31 +8,50 @@ import de.w_hs.dbi.pa9.function.TXHandler;
 public class Main 
 {
 	public static DatabaseConnection connection=null;
+	public static int txCountSum;
 	
-	
-	public static void main(String args[])
+
+	public static synchronized int getTxCountSum() {
+		return txCountSum;
+	}
+
+	public static synchronized void setTxCountSum(int txCountSum) {
+		Main.txCountSum = txCountSum;
+	}
+
+	public static void main(String args[]) throws Exception
 	{
+		
 		ConnectionInformation infos= new ConnectionInformation();
 		infos.setHost("127.0.0.1");
 		infos.setDatabase("benchmark");
 		infos.setUser("postgres");
-		infos.setPassword("DBI");
+		infos.setPassword("DBIPr");
 		
+
 		try {
-			connection=new DatabaseConnection(infos);
-			connection.connect();
-			if(connection.databaseLink.isValid(0))
-			{
-				System.out.println("Verbunden!");
-			}
-			else
-			{
-				return;
-			}
-			ProgramStage program = new ProgramStage(connection);
-			program.attackTime();
-			program.benchStage();
-			program.boomOutStage();
+		    // Create the threads
+		    Thread[] threadList = new Thread[5];
+
+		    // spawn threads
+		    for (int i = 0; i < 5; i++)
+		    {
+		        threadList[i] = new ClientThread(infos);
+		        threadList[i].start();
+		    }
+		    
+		    // Start everyone at the same time
+		    Thread.sleep(1000);
+		    
+		    ClientThread.setStartTrans();
+
+			for (int i = 0; i < 5; i++)
+	        {
+	           threadList[i].join();
+	        }
+			
+			System.out.println("Gesamte Anzahl der Transaktionen: " + getTxCountSum());
+			
 			System.out.println("Finish!");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
