@@ -51,7 +51,7 @@ public class Main
 		    // Start everyone at the same time
 		    Thread.sleep(1000);
 		    
-		    while(time <= System.currentTimeMillis()) {
+		    while(time < System.currentTimeMillis()) {
 		    	Thread.sleep(1);
 		    }
 		    
