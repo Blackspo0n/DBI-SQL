@@ -18,7 +18,7 @@ public class Main
 	public static synchronized void setTxCountSum(int txCountSum) {
 		Main.txCountSum = txCountSum;
 	}
-
+	public static long time;
 	/**
 	 * Main Funktion.
 	 * @param args
@@ -36,7 +36,7 @@ public class Main
 		infos.setUser("postgres");
 		infos.setPassword("DBIPr");
 		
-
+		
 		try {
 		    // Create the threads
 		    Thread[] threadList = new Thread[5];
@@ -51,17 +51,23 @@ public class Main
 		    // Start everyone at the same time
 		    Thread.sleep(1000);
 		    
-		    ClientThread.setStartTrans();
-
-			for (int i = 0; i < 5; i++)
-	        {
-	           threadList[i].join();
-	        }
-
-			System.out.println("Gesamte Anzahl der Transaktionen: " + getTxCountSum());
-			System.out.println("TPS: " + (double)getTxCountSum()/(double)300);
-			
-			System.out.println("Finish!");
+		    while(System.currentTimeMillis()<time)
+		    {
+		    	if(System.currentTimeMillis() == time)
+		    	{
+				    ClientThread.setStartTrans();
+		
+					for (int i = 0; i < 5; i++)
+			        {
+			           threadList[i].join();
+			        }
+				    
+					System.out.println("Gesamte Anzahl der Transaktionen: " + getTxCountSum());
+					System.out.println("TPS: " + (double)getTxCountSum()/(double)300);
+					
+					System.out.println("Finish!");
+		    	}
+		    }
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
