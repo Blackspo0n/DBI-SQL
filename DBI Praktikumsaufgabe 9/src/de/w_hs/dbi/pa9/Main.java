@@ -29,6 +29,8 @@ public class Main
 	 */
 	public static void main(String args[]) throws Exception
 	{
+		System.out.println(System.currentTimeMillis());
+		
 		
 		ConnectionInformation infos= new ConnectionInformation();
 		infos.setHost("127.0.0.1");
@@ -49,8 +51,6 @@ public class Main
 		    }
 		    
 		    // Start everyone at the same time
-		    Thread.sleep(1000);
-		    
 		    while(time <= System.currentTimeMillis()) {
 		    	Thread.sleep(1);
 		    }
@@ -67,24 +67,6 @@ public class Main
 			
 			System.out.println("Finish!");
 		    
-		    
-		    /*while(System.currentTimeMillis()<time)
-		    {
-		    	if(System.currentTimeMillis() == time)
-		    	{
-				    ClientThread.setStartTrans();
-		
-					for (int i = 0; i < 5; i++)
-			        {
-			           threadList[i].join();
-			        }
-				    
-					System.out.println("Gesamte Anzahl der Transaktionen: " + getTxCountSum());
-					System.out.println("TPS: " + (double)getTxCountSum()/(double)300);
-					
-					System.out.println("Finish!");
-		    	}
-		    }*/
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

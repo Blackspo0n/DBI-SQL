@@ -48,9 +48,6 @@ public class DatabaseConnection
 	 */
 	public void connect() throws SQLException
 	{
-		/*
-		 * Der Compiler übersetzt " + var + " automatisch in ein StringBuilder Objekt
-		 */
 		databaseLink = DriverManager.getConnection(
 				"jdbc:postgresql://" + ci.getHost() +"/" + ci.getDatabase() + "?useCompression=true",
 				ci.getUser(), 
