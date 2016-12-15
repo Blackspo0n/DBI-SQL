@@ -3,6 +3,7 @@ package de.w_hs.dbi.pa9.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Unsere Datebankklasse ermöglicht die Kommunikation
@@ -38,7 +39,12 @@ public class DatabaseConnection
 		
 		ci = cInfo;
 	}
-	
+	public void clearHistory() throws SQLException
+	{
+		Statement statement= databaseLink.createStatement();
+
+		statement.executeUpdate("TRUNCATE TABLE history");
+	}
 	/**
 	 * 
 	 * List die Informatioen aus dem Objekt ci (ConnectionInformation) und versucht eine Verbindung 

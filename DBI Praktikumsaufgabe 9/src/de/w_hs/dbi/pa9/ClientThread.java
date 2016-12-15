@@ -51,6 +51,8 @@ public class ClientThread extends Thread {
 			{
 				return;
 			}
+			//delate history
+			threadCon.clearHistory();
 			
 			System.out.println("[Thread " + threadID +"]Auf Startsignal warten ...");
 			
