@@ -68,7 +68,7 @@ public class ClientThread extends Thread {
 			program.benchStage();
 			program.boomOutStage();
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		}
 
 	}

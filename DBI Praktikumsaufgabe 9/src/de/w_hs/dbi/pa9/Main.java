@@ -51,9 +51,12 @@ public class Main
 		    }
 		    
 		    // Start everyone at the same time
-		    while(time < System.currentTimeMillis()) {
+		    System.out.println("Wartezeit:" + (time-System.currentTimeMillis()));
+		    while(time > System.currentTimeMillis()) {
 		    	Thread.sleep(1);
 		    }
+		    
+		    System.out.println("Wartezeit erreicht");
 		    
 		    ClientThread.setStartTrans();
 			
