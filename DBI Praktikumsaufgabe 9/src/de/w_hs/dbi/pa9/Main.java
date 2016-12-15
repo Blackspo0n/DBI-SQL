@@ -57,8 +57,9 @@ public class Main
 	        {
 	           threadList[i].join();
 	        }
-			
+
 			System.out.println("Gesamte Anzahl der Transaktionen: " + getTxCountSum());
+			System.out.println("TPS: " + (double)getTxCountSum()/(double)300);
 			
 			System.out.println("Finish!");
 		} catch (Exception e) {

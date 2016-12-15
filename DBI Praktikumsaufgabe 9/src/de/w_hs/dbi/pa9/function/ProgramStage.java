@@ -106,12 +106,21 @@ public class ProgramStage
 	 */
 	public void attackTime() throws SQLException, InterruptedException
 	{
-		System.out.println("Attack Time!");
+		System.out.println("Führe Aufwämnphase durch");
+		
 		long start=System.currentTimeMillis();
+		long start2=System.currentTimeMillis();
+		
 		while(start+240000>=System.currentTimeMillis())
 		{
 			doTX();
 			Thread.sleep(50);
+			if(System.currentTimeMillis()-start2 >= 1000) {
+				System.out.println("Verbleibene Sekunden: " + (240 - ((System.currentTimeMillis()-start)/1000)));
+				
+				start2 = System.currentTimeMillis();
+				
+			}
 		}
 	}
 	/**
@@ -136,8 +145,9 @@ public class ProgramStage
 			txCounter++;
 			
 			if(System.currentTimeMillis()-start2 >= 1000) {
-				System.out.println("Anzahl der Transaktionen pro Sekunde: " + txCounter/((System.currentTimeMillis()-start)/1000));
-				
+				System.out.println("Anzahl der Transaktionen pro Sekunde: " + (double)txCounter/(double)((System.currentTimeMillis()-start)/1000));
+
+				System.out.println("Verbleibene Sekunden: " + (300 - ((System.currentTimeMillis()-start)/1000)));
 				start2 = System.currentTimeMillis();
 				
 			}
@@ -147,7 +157,7 @@ public class ProgramStage
 		
 		Main.setTxCountSum(Main.getTxCountSum() + txCounter);
 		System.out.println("Anzahl der Transaktionen: " +txCounter);
-		System.out.println("Anzahl der Transaktionen pro Sekunde: " + (txCounter/300));
+		System.out.println("Anzahl der Transaktionen pro Sekunde: " + (double)((double)txCounter/(double)300));
 		
 	}
 	/**
@@ -164,6 +174,7 @@ public class ProgramStage
 		{
 			doTX();
 			Thread.sleep(50);
+			
 		}
 	}
 }
