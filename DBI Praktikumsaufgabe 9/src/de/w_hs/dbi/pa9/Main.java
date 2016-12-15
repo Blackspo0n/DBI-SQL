@@ -51,7 +51,24 @@ public class Main
 		    // Start everyone at the same time
 		    Thread.sleep(1000);
 		    
-		    while(System.currentTimeMillis()<time)
+		    while(time <= System.currentTimeMillis()) {
+		    	Thread.sleep(1);
+		    }
+		    
+		    ClientThread.setStartTrans();
+			
+			for (int i = 0; i < 5; i++)
+	        {
+	           threadList[i].join();
+	        }
+		    
+			System.out.println("Gesamte Anzahl der Transaktionen: " + getTxCountSum());
+			System.out.println("TPS: " + (double)getTxCountSum()/(double)300);
+			
+			System.out.println("Finish!");
+		    
+		    
+		    /*while(System.currentTimeMillis()<time)
 		    {
 		    	if(System.currentTimeMillis() == time)
 		    	{
@@ -67,7 +84,7 @@ public class Main
 					
 					System.out.println("Finish!");
 		    	}
-		    }
+		    }*/
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
