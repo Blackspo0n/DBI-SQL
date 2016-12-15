@@ -18,7 +18,7 @@ public class Main
 	public static synchronized void setTxCountSum(int txCountSum) {
 		Main.txCountSum = txCountSum;
 	}
-	public static long time;
+	public static long time= 1481830618139l;
 	/**
 	 * Main Funktion.
 	 * @param args
@@ -34,7 +34,7 @@ public class Main
 		infos.setHost("127.0.0.1");
 		infos.setDatabase("benchmark");
 		infos.setUser("postgres");
-		infos.setPassword("DBIPr");
+		infos.setPassword("DBI");
 		
 		
 		try {
