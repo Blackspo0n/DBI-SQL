@@ -18,7 +18,7 @@ public class Main
 	public static synchronized void setTxCountSum(int txCountSum) {
 		Main.txCountSum = txCountSum;
 	}
-	public static long time= 1481830618139l;
+	public static long time = 1481831418534L;
 	/**
 	 * Main Funktion.
 	 * @param args
@@ -29,14 +29,14 @@ public class Main
 	 */
 	public static void main(String args[]) throws Exception
 	{
-		System.out.println(System.currentTimeMillis());
+		System.out.println(System.currentTimeMillis()+60000);
 		
 		
-		ConnectionInformation infos= new ConnectionInformation();
+		ConnectionInformation infos = new ConnectionInformation();
 		infos.setHost("127.0.0.1");
 		infos.setDatabase("benchmark");
 		infos.setUser("postgres");
-		infos.setPassword("DBI");
+		infos.setPassword("DBIPr");
 		
 		
 		try {
@@ -51,7 +51,7 @@ public class Main
 		    }
 		    
 		    // Start everyone at the same time
-		    System.out.println("Wartezeit:" + (time-System.currentTimeMillis()));
+		    System.out.println("Wartezeit:" + (time - System.currentTimeMillis()));
 		    while(time > System.currentTimeMillis()) {
 		    	Thread.sleep(1);
 		    }

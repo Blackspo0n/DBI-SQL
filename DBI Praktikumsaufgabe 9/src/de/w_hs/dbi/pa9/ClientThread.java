@@ -24,8 +24,7 @@ public class ClientThread extends Thread {
 		return nextThreadID++;
 	}
 
-	
-	
+
 	
 	public ClientThread(ConnectionInformation infos) throws Exception {
 		threadCon = new DatabaseConnection(infos);
@@ -39,6 +38,7 @@ public class ClientThread extends Thread {
 	synchronized boolean getStartTrans () {
 		return startTrans;
 	}
+
 	public void run() {
 		try {
 			threadCon.connect();
@@ -70,7 +70,5 @@ public class ClientThread extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
-	
 }
