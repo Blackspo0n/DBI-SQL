@@ -23,7 +23,7 @@ public class Main
 		Main.txCountSum = txCountSum;
 	}
 	
-	public static long time = 1482163986513L;
+	public static long time = = System.currentTimeMillis()+1000;
 	
 	/**
 	 * Main Funktion.
@@ -31,7 +31,7 @@ public class Main
 	 * @throws Exception
 	 * @author Mario Kellner
 	 * @author Markus Hausmann
- *	   @author Jonas Stadtler
+	 * @author Jonas Stadtler
 	 */
 	public static void main(String args[])
 	{
