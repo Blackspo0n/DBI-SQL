@@ -23,7 +23,7 @@ public class Main
 		Main.txCountSum = txCountSum;
 	}
 	
-	public static long time = = System.currentTimeMillis()+1000;
+	public static long time = System.currentTimeMillis()+1000;
 	
 	/**
 	 * Main Funktion.
@@ -44,8 +44,7 @@ public class Main
 		infos.setUser("postgres");
 		infos.setPassword("DBIPr");
 		
-		
-		
+	
 		try
 		{
 			// Erstelle Verbindung um die History !einmalig! zu löschen!			
