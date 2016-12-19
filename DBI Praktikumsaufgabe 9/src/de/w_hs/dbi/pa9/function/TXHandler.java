@@ -70,7 +70,7 @@ public class TXHandler
 	/**
 	 * Anzahl der Einzahlungen mit dem Betrag delta sollen ermittelt werden.
 	 * @param delta Einzahlungsbetrag
-	 * @return Anzahl der Einzahlungen mit dem Betrag delta wird zurückgegeben.
+	 * @return Anzahl der Einzahlungen mit dem Betrag delta wird zurÃ¼ckgegeben.
 	 * @throws SQLException Fehler bei der Datenbank Abfrage, mit spezifizierter Fehlermeldung.
 	 */
 	public int analyseTX(double delta) throws SQLException

@@ -49,10 +49,8 @@ public class ClientThread extends Thread {
 			}
 			else
 			{
-				return;
+				throw new SQLException("Keine Verbindung zur Datenbank möglich");
 			}
-			//delate history
-			threadCon.clearHistory();
 			
 			System.out.println("[Thread " + threadID +"]Auf Startsignal warten ...");
 			
@@ -64,11 +62,31 @@ public class ClientThread extends Thread {
 			
 			
 			ProgramStage program = new ProgramStage(threadCon);
-			program.attackTime();
+			
+
+			System.out.println("[Thread " + threadID +"]Führe Funktion attackStage aus!");
+			program.attackStage();
+			
+			System.out.println("[Thread " + threadID +"]Führe Funktion benchStage aus!");
 			program.benchStage();
+			
+			System.out.println("[Thread " + threadID +"]Führe Funktion boomOutStage aus!");
 			program.boomOutStage();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
+		catch (SQLException sqle)
+		{
+			System.out.println("Datenbank Fehler: " + sqle.getMessage());
+			sqle.printStackTrace();
+			
+			Main.abortProgramm();
+		}
+		catch (Exception e)
+		{
+			System.out.println("Ein Fehler ist aufgetreten: " + e.getMessage());
+			e.printStackTrace();
+
+			Main.abortProgramm();
+		}
+			
 	}
 }

@@ -1,5 +1,7 @@
 package de.w_hs.dbi.pa9;
 
+import java.sql.SQLException;
+
 import de.w_hs.dbi.pa9.database.ConnectionInformation;
 import de.w_hs.dbi.pa9.database.DatabaseConnection;
 import de.w_hs.dbi.pa9.function.ProgramStage;
@@ -11,14 +13,17 @@ public class Main
 	public static int txCountSum;
 	
 
-	public static synchronized int getTxCountSum() {
+	public static synchronized int getTxCountSum()
+	{
 		return txCountSum;
 	}
 
-	public static synchronized void setTxCountSum(int txCountSum) {
+	public static synchronized void setTxCountSum(int txCountSum)
+	{
 		Main.txCountSum = txCountSum;
 	}
-	public static long time = 1481831418534L;
+	
+	public static long time = 1482159752510L;
 	/**
 	 * Main Funktion.
 	 * @param args
@@ -27,10 +32,9 @@ public class Main
 	 * @author Markus Hausmann
  *	   @author Jonas Stadtler
 	 */
-	public static void main(String args[]) throws Exception
+	public static void main(String args[])
 	{
 		System.out.println(System.currentTimeMillis()+60000);
-		
 		
 		ConnectionInformation infos = new ConnectionInformation();
 		infos.setHost("127.0.0.1");
@@ -39,7 +43,14 @@ public class Main
 		infos.setPassword("DBIPr");
 		
 		
-		try {
+		
+		try
+		{
+			// Erstelle Verbindung um die History !einmalig! zu löschen!			
+			DatabaseConnection con = new DatabaseConnection(infos);
+			con.connect();
+			con.clearHistory();
+			
 		    // Create the threads
 		    Thread[] threadList = new Thread[5];
 
@@ -51,8 +62,9 @@ public class Main
 		    }
 		    
 		    // Start everyone at the same time
-		    System.out.println("Wartezeit:" + (time - System.currentTimeMillis()));
-		    while(time > System.currentTimeMillis()) {
+		    System.out.println("Wartezeit für die Threads beträgt " + (time - System.currentTimeMillis()) + " Millisekunden");
+		    while(time > System.currentTimeMillis())
+		    {
 		    	Thread.sleep(1);
 		    }
 		    
@@ -70,10 +82,20 @@ public class Main
 			
 			System.out.println("Finish!");
 		    
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+		} 
+		catch (SQLException sqle)
+		{
+			System.out.println("Datenbank Fehler: " + sqle.getMessage());
+			sqle.printStackTrace();
+		}
+		catch (Exception e)
+		{
+			System.out.println("Ein Fehler ist aufgetreten: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
 	
+	public static void abortProgramm() {
+		System.exit(0);
+	}
 }
