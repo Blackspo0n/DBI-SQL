@@ -7,8 +7,8 @@ import de.w_hs.dbi.pa9.database.DatabaseConnection;
 
 /**
  * 
- * Diese Klasse enthält alle die drei Schritte des Programmablaufs. Zudem werden hier die Abfrage
- * Werte per Zufall definiert und die Gewichtung erfolgt im geforderten Verhältnis.
+ * Diese Klasse enthÃ¤lt alle die drei Schritte des Programmablaufs. Zudem werden hier die Abfrage
+ * Werte per Zufall definiert und die Gewichtung erfolgt im geforderten VerhÃ¤ltnis.
  *
  * @author Mario Kellner
  * @author Markus Hausmann
@@ -18,21 +18,29 @@ import de.w_hs.dbi.pa9.database.DatabaseConnection;
  */
 public class ProgramStage 
 {
+	private int TransactionNumber;
+	private int AccountsNumber;
+	private int BranchesNumber;
+	private int TellersNumber;
+	private int deltaNumber;
 	private DatabaseConnection connection;
 	private TXHandler txh;
+	
 	public ProgramStage(DatabaseConnection con) throws SQLException
 	{
 		if(con == null)
 		{
 			throw new NullPointerException("Connection darf nicht NULL sein!");
 		}
+		
 		this.connection = con;
 		this.txh = new TXHandler(con);
 	}
+	
 	/**
-	 * Entscheidet per gewichteten Zufall darüber, welche Abfrage an die Datenbank geschickt wird..
+	 * Entscheidet per gewichteten Zufall darÃ¼ber, welche Abfrage an die Datenbank geschickt wird..
 	 * 
-	 * @return Gibt die Zahl 1, 2 oder 3 zurück. Dadurch wird im folgenden über die Abfrage entschieden.
+	 * @return Gibt die Zahl 1, 2 oder 3 zurÃ¼ck. Dadurch wird im folgenden Ã¼ber die Abfrage entschieden.
 	 */
 	public int choose()
 	{
@@ -47,35 +55,12 @@ public class ProgramStage
 		}
 		return 3;
 	}
+	
 	/**
-	 * Entscheidet über die auszuführende Abfrage.
-	 * 
-	 * @throws SQLException Fehler, welcher bei der Abfrage an die Datenbank auftreten kann.
-	 */
-	private void doTX() throws SQLException
-	{
-		switch(choose())
-		{
-			case 1:
-				txh.kontostandTX(chooseNumber("accounts", 100));
-				break;
-			case 2:
-				txh.einzahlungTX(
-						chooseNumber("accounts", 100),
-						chooseNumber("tellers", 100),
-						chooseNumber("branches", 100),
-						chooseNumber("delta", 100));
-				break;
-			case 3:
-				txh.analyseTX(chooseNumber("delta", 100));
-				break;
-		}
-	}
-	/**
-	 * Entscheidet über die jeweiligen Zahlen, welche mit der Abfrage zur Datenbank geschickt werden.
+	 * Entscheidet Ã¼ber die jeweiligen Zahlen, welche mit der Abfrage zur Datenbank geschickt werden.
 	 * @param name Bezeichnung der anzusprechenden Tabelle.
-	 * @param n Größe der Datenbank in TPS.
-	 * @return Zufällige, aber passende Übergabewerte, welche zur Abfrage an die Datenbank 
+	 * @param n GrÃ¶ÃŸe der Datenbank in TPS.
+	 * @return ZufÃ¤llige, aber passende Ãœbergabewerte, welche zur Abfrage an die Datenbank 
 	 * verwendet werden.
 	 */
 	private int chooseNumber(String name, int n)
@@ -98,83 +83,118 @@ public class ProgramStage
 		}
 		return (int)(number+1);
 	}
-	/**
-	 * Ausführen des ersten Programmteils.
-	 * 
-	 * @throws SQLException Möglicher Fehler bei der DB-Abfrage.
-	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
-	 */
-	public void attackTime() throws SQLException, InterruptedException
-	{
-		System.out.println("FÃ¼hre AufwÃ¤mnphase durch");
+	
+	public void thinkTime() throws InterruptedException {
+		long startTime = System.currentTimeMillis();
 		
-		long start=System.currentTimeMillis();
-		long start2=System.currentTimeMillis();
+		this.generateNumbers();
 		
-		while(start+240000>=System.currentTimeMillis())
-		{
-			doTX();
-			Thread.sleep(50);
-			if(System.currentTimeMillis()-start2 >= 1000) {
-				System.out.println("Verbleibene Sekunden: " + (240 - ((System.currentTimeMillis()-start)/1000)));
-				
-				start2 = System.currentTimeMillis();
-				
-			}
+		while(System.currentTimeMillis()-startTime <= 50) {
+			Thread.sleep(1);
 		}
 	}
+	
+	public void generateNumbers() {
+		this.TransactionNumber = choose();
+		this.AccountsNumber = chooseNumber("accounts", 100);
+		this.TellersNumber = chooseNumber("tellers", 100);
+		this.BranchesNumber = chooseNumber("branches", 100);
+		this.deltaNumber = chooseNumber("delta", 100);
+	}
+	
+	
 	/**
-	 * Ausführen des zweiten Programmteils.
+	 * Entscheidet Ã¼ber die auszufÃ¼hrende Abfrage. 
+	 * Die zufÃ¤lligen Werte werden von der Funktion generateNumbers berechnet.
 	 * 
-	 * @throws SQLException Möglicher Fehler bei der DB-Abfrage.
-	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
+	 * @throws SQLException Fehler, welcher bei der Abfrage an die Datenbank auftreten kann.
+	 */
+	private void doTX() throws SQLException
+	{
+		switch(this.TransactionNumber)
+		{
+			case 1:
+				txh.kontostandTX(this.AccountsNumber);
+				break;
+			case 2:
+				txh.einzahlungTX(
+						this.AccountsNumber,
+						this.TellersNumber,
+						this.BranchesNumber,
+						this.deltaNumber
+				);
+				break;
+			case 3:
+				txh.analyseTX(this.deltaNumber);
+				break;
+		}
+	}
+	
+	/**
+	 * AusfÃ¼hren des ersten Programmteils.
+	 * 
+	 * @throws SQLException MÃ¶glicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException MÃ¶glicher Fehler bei der Wartezeit.
+	 */
+	public void attackStage() throws SQLException, InterruptedException
+	{	
+		long start = System.currentTimeMillis();
+		
+		// generiere Initialnummern
+		this.generateNumbers();
+		
+		while(start + 240000 >= System.currentTimeMillis())
+		{
+			doTX();
+			this.thinkTime();
+		}
+	}
+	
+	/**
+	 * AusfÃ¼hren des zweiten Programmteils.
+	 * 
+	 * @throws SQLException MÃ¶glicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException MÃ¶glicher Fehler bei der Wartezeit.
 	 */
 	public void benchStage() throws SQLException, InterruptedException
 	{
-		System.out.println("Starte die Benchphase!");
 		int txCounter = 0;
+		long start = System.currentTimeMillis();
 		
-
-		long start=System.currentTimeMillis();
-		long start2=System.currentTimeMillis();
+		// generiere Initialnummern
+		this.generateNumbers();
 		
-		while(start+300000>=System.currentTimeMillis())
+		while(start + 300000 >= System.currentTimeMillis())
 		{
-
 			doTX();
 			txCounter++;
-			
-			if(System.currentTimeMillis()-start2 >= 1000) {
-				System.out.println("Anzahl der Transaktionen pro Sekunde: " + (double)txCounter/(double)((System.currentTimeMillis()-start)/1000));
-
-				System.out.println("Verbleibene Sekunden: " + (300 - ((System.currentTimeMillis()-start)/1000)));
-				start2 = System.currentTimeMillis();
-				
-			}
-			
-			Thread.sleep(50);
+			this.thinkTime();	
 		}
 		
 		Main.setTxCountSum(Main.getTxCountSum() + txCounter);
-		System.out.println("Anzahl der Transaktionen: " +txCounter);
+		
+		System.out.println("Anzahl der Transaktionen: " + txCounter);
 		System.out.println("Anzahl der Transaktionen pro Sekunde: " + (double)((double)txCounter/(double)300));
 		
 	}
+	
 	/**
-	 * Ausführen des dritten Programmteils.
+	 * AusfÃ¼hren des dritten Programmteils.
 	 * 
-	 * @throws SQLException  Möglicher Fehler bei der DB-Abfrage.
-	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
+	 * @throws SQLException  MÃ¶glicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException MÃ¶glicher Fehler bei der Wartezeit.
 	 */
 	public void boomOutStage() throws SQLException, InterruptedException
 	{
-		System.out.println("Boom Out Stage!");
-		long start=System.currentTimeMillis();
-		while(start+60000>=System.currentTimeMillis())
+		long start = System.currentTimeMillis();
+		
+		// generiere Initialnummern
+		this.generateNumbers();
+		
+		while(start + 60000 >= System.currentTimeMillis())
 		{
 			doTX();
-			Thread.sleep(50);
-			
+			this.thinkTime();
 		}
 	}
 }
