@@ -18,7 +18,7 @@ public class Main
 	public static synchronized void setTxCountSum(int txCountSum) {
 		Main.txCountSum = txCountSum;
 	}
-	public static long time= 1481830618139l;
+	public static long time= 148183061813l;
 	/**
 	 * Main Funktion.
 	 * @param args
