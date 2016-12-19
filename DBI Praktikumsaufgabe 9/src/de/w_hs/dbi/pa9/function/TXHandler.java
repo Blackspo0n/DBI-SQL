@@ -57,30 +57,11 @@ public class TXHandler
 	{
 		connection.databaseLink.setAutoCommit(false);
 		
-		PreparedStatement pstmt = connection.databaseLink.prepareStatement(
-				"UPDATE ? SET balance = balance + " + delta + " WHERE ? = ?"
-		);
-
-		pstmt.setString(1, "branches");
-		pstmt.setString(2, "branchid");
-		pstmt.setInt(3, branchID);
-		pstmt.addBatch();
-
-		pstmt.setString(1, "tellers");
-		pstmt.setString(2, "tellerid");
-		pstmt.setInt(3, tellerID);
-		pstmt.addBatch();
-		
-
-		pstmt.setString(1, "accounts");
-		pstmt.setString(2, "accid");
-		pstmt.setInt(3, accID);
-		pstmt.addBatch();
-
-		pstmt.executeBatch();
-		
+		statement.executeUpdate("UPDATE branches SET balance=balance+"+delta+" WHERE branchid="+branchID);
+		statement.executeUpdate("UPDATE tellers SET balance=balance+"+delta+" WHERE tellerid="+tellerID);
+		statement.executeUpdate("UPDATE accounts SET balance=balance+"+delta+" WHERE accid="+accID);
 		statement.executeUpdate("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt)"
-				+ "VALUES(" + accID + ", " + tellerID + ", " + delta + ", " + branchID + ", (SELECT balance FROM accounts WHERE accid=" + accID + "), ' ')");
+				+ "VALUES("+accID+", "+tellerID+", "+delta+", "+branchID+", (SELECT balance FROM accounts WHERE accid="+accID+"), ' ')");
 		
 		ResultSet rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid = " + accID);
 		
