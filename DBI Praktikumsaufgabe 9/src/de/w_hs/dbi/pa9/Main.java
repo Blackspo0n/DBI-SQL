@@ -23,7 +23,7 @@ public class Main
 		Main.txCountSum = txCountSum;
 	}
 	
-	public static long time = 1482162861538L;
+	public static long time = 1482163986513L;
 	
 	/**
 	 * Main Funktion.
@@ -38,7 +38,8 @@ public class Main
 		System.out.println(System.currentTimeMillis()+60000);
 		
 		ConnectionInformation infos = new ConnectionInformation();
-		infos.setHost("127.0.0.1");
+		//infos.setHost("127.0.0.1");
+		infos.setHost("192.168.122.70");
 		infos.setDatabase("benchmark");
 		infos.setUser("postgres");
 		infos.setPassword("DBIPr");
