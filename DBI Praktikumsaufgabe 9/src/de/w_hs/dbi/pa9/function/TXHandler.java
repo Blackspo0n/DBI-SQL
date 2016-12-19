@@ -1,5 +1,6 @@
 package de.w_hs.dbi.pa9.function;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -18,11 +19,13 @@ public class TXHandler
 {
 	private DatabaseConnection connection;
 	private Statement statement;
+	
 	public TXHandler(DatabaseConnection con) throws SQLException
 	{
 		this.connection=con;
 		statement = connection.databaseLink.createStatement();
 	}
+	
 	/**
 	 * Abfrage eines Kontostandes.
 	 * 
@@ -33,13 +36,17 @@ public class TXHandler
 	public double kontostandTX(int accID) throws SQLException
 	{
 		Statement statement = connection.databaseLink.createStatement();
-		ResultSet rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid="+accID);
+		
+		ResultSet rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid = " + accID);
+		
 		if(rs.next() == false)
 		{
 			throw new SQLException("Kontonummer nicht vorhanden!");
 		}
+		
 		return rs.getDouble(1);
 	}
+	
 	/**
 	 * Ermittlung eiens neuen Kontostandes.
 	 * 
@@ -50,16 +57,36 @@ public class TXHandler
 	{
 		connection.databaseLink.setAutoCommit(false);
 		
-		statement.executeUpdate("UPDATE branches SET balance=balance+"+delta+" WHERE branchid="+branchID);
-		statement.executeUpdate("UPDATE tellers SET balance=balance+"+delta+" WHERE tellerid="+tellerID);
-		statement.executeUpdate("UPDATE accounts SET balance=balance+"+delta+" WHERE accid="+accID);
-		statement.executeUpdate("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt)"
-				+ "VALUES("+accID+", "+tellerID+", "+delta+", "+branchID+", (SELECT balance FROM accounts WHERE accid="+accID+"), ' ')");
-		ResultSet rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid="+accID);
+		PreparedStatement pstmt = connection.databaseLink.prepareStatement(
+				"UPDATE ? SET balance = balance + " + delta + " WHERE ? = ?"
+		);
+
+		pstmt.setString(1, "branches");
+		pstmt.setString(2, "branchid");
+		pstmt.setInt(3, branchID);
+		pstmt.addBatch();
+
+		pstmt.setString(1, "tellers");
+		pstmt.setString(2, "tellerid");
+		pstmt.setInt(3, tellerID);
+		pstmt.addBatch();
 		
+
+		pstmt.setString(1, "accounts");
+		pstmt.setString(2, "accid");
+		pstmt.setInt(3, accID);
+		pstmt.addBatch();
+
+		pstmt.executeBatch();
+		
+		statement.executeUpdate("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt)"
+				+ "VALUES(" + accID + ", " + tellerID + ", " + delta + ", " + branchID + ", (SELECT balance FROM accounts WHERE accid=" + accID + "), ' ')");
+		
+		ResultSet rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid = " + accID);
 		
 		connection.databaseLink.commit();
 		connection.databaseLink.setAutoCommit(true);
+		
 		if(rs.next() == false)
 		{
 			throw new SQLException("Kontonummer nicht vorhanden");
@@ -67,6 +94,7 @@ public class TXHandler
 		
 		return rs.getDouble(1);
 	}
+	
 	/**
 	 * Anzahl der Einzahlungen mit dem Betrag delta sollen ermittelt werden.
 	 * @param delta Einzahlungsbetrag
@@ -76,12 +104,14 @@ public class TXHandler
 	public int analyseTX(double delta) throws SQLException
 	{
 		Statement statement = connection.databaseLink.createStatement();
-		ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM history WHERE delta="+delta);
+		
+		ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM history WHERE delta=" + delta);
+		
 		if(rs.next() == false)
 		{
-			throw new SQLException("Kein Eintrag mit dem Wert "+delta+" vorhanden!");
+			throw new SQLException("Kein Eintrag mit dem Wert " + delta + " vorhanden!");
 		}
-		return rs.getInt(1);
 		
+		return rs.getInt(1);
 	}
 }
