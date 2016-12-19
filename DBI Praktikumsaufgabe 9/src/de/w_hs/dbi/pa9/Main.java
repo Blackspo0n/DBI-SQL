@@ -18,14 +18,14 @@ public class Main
 	public static synchronized void setTxCountSum(int txCountSum) {
 		Main.txCountSum = txCountSum;
 	}
-	public static long time= 148183061813l;
+	public static long time= System.currentTimeMillis()+100;
 	/**
 	 * Main Funktion.
 	 * @param args
 	 * @throws Exception
 	 * @author Mario Kellner
 	 * @author Markus Hausmann
- *	   @author Jonas Stadtler
+	 * @author Jonas Stadtler
 	 */
 	public static void main(String args[]) throws Exception
 	{
