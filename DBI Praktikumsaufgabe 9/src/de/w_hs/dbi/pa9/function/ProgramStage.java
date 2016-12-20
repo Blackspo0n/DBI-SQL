@@ -89,7 +89,7 @@ public class ProgramStage
 		
 		this.generateNumbers();
 		
-		while(System.currentTimeMillis()-startTime <= 50) {
+		while(System.currentTimeMillis()-startTime < 50) {
 			Thread.sleep(1);
 		}
 	}

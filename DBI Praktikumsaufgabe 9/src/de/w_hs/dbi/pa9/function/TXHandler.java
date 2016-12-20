@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.postgresql.util.PSQLException;
+
 import de.w_hs.dbi.pa9.database.DatabaseConnection;
 
 /**
@@ -55,22 +57,35 @@ public class TXHandler
 	 */
 	public double einzahlungTX(int accID, int tellerID, int branchID, double delta) throws SQLException
 	{
-		connection.databaseLink.setAutoCommit(false);
+		ResultSet rs = null;
 		
-		statement.executeUpdate("UPDATE branches SET balance=balance+"+delta+" WHERE branchid="+branchID);
-		statement.executeUpdate("UPDATE tellers SET balance=balance+"+delta+" WHERE tellerid="+tellerID);
-		statement.executeUpdate("UPDATE accounts SET balance=balance+"+delta+" WHERE accid="+accID);
-		statement.executeUpdate("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt)"
-				+ "VALUES("+accID+", "+tellerID+", "+delta+", "+branchID+", (SELECT balance FROM accounts WHERE accid="+accID+"), ' ')");
-		
-		ResultSet rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid = " + accID);
-		
-		connection.databaseLink.commit();
-		connection.databaseLink.setAutoCommit(true);
-		
-		if(rs.next() == false)
-		{
-			throw new SQLException("Kontonummer nicht vorhanden");
+		try {
+			connection.databaseLink.setAutoCommit(false);
+			
+			statement.executeUpdate("UPDATE branches SET balance=balance+"+delta+" WHERE branchid="+branchID);
+			statement.executeUpdate("UPDATE tellers SET balance=balance+"+delta+" WHERE tellerid="+tellerID);
+			statement.executeUpdate("UPDATE accounts SET balance=balance+"+delta+" WHERE accid="+accID);
+			statement.executeUpdate("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt)"
+					+ "VALUES("+accID+", "+tellerID+", "+delta+", "+branchID+", (SELECT balance FROM accounts WHERE accid="+accID+"), ' ')");
+			
+			rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid = " + accID);
+			
+			connection.databaseLink.commit();
+			
+			if(rs.next() == false)
+			{
+				throw new SQLException("Kontonummer nicht vorhanden");
+			}
+			
+		}
+		catch (PSQLException e) {
+			System.out.println(e.getMessage());
+			connection.databaseLink.rollback();
+			
+		}
+		finally {
+
+			connection.databaseLink.setAutoCommit(true);
 		}
 		
 		return rs.getDouble(1);

@@ -1,0 +1,31 @@
+\section{Ausführung der Messung}
+
+Zum Ausführen von 5 remote Load Driver wird zunächst für alle 5 erzeugten
+Threads, welche die Nebenläufigkeit ermöglichen, eine Verbindung zur Datenbank
+erzeugt. Diese Verbindung zur Datenbank wird zunächst für das leeren der
+Tabelle history verwendet. Nach dem leeren der Tabelle beginnen die Threads
+gleichzeitig mit der Einschwingphase und gehen nach dieser in die Messphase
+über, um nach der folgenden Ausschwingphase das Programm zu beenden.
+
+Mit dem Start der Einschwingphase beginnen die Threads mit der zufälligen
+Auswahl einer Abfrage an die Datenbank, dies erfolgt unabhängig voneinander.
+Nach der Auswahl der Abfrage werden die Zufallsdaten für die Abfrage mit Hilfe
+der Funktion chooseNumber() ermittelt, welche die Informationen über die
+benötigt Variable übermittelt bekommt. Durch das übergeben der Bezeichnung, der
+benötigten Variablen, und der Größe der Datenbank, soll gewährleistet sein,
+dass es zu keinen fehlerhaften Abfragen und einer dadurch fehlerhaften Messung
+kommt. Die Zahlen werden von der Funktion im zulässigen Bereich zufällig
+ausgewählt und sind unabhängig von den nebenläufigen Threads. Nach dem
+Ausführen der Anfrage wird eine Pause von 50ms eingelegt. In der Messphase wird
+vor der Pause eine Variable um einen erhöht, welche die Anzahl der Abfragen
+zählt und im weiteren Verlauf, mit Hilfe von synchronized, die Anzahl aller
+Abfragen aus den 5 Threads, in der Messphase, addiert. Diese Variable ist die
+Grundlage für die Rechnung der Anfragen je Sekunde.
+
+Bei der Ausführung auf mehreren Computern werden die Threads zu einem
+vordefinierten Zeitpunkt,  gleichzeitig auf allen Computern, gestartet. Die
+Ermittlung der Anfragen je Sekunde erfolgt nach Beendigung der Programme
+händisch, durch das Addieren aller Anfragen und das Teilen dieser durch die 5
+Minuten bzw. 300 Sekunden der Messphase.
+
+\clearpage
