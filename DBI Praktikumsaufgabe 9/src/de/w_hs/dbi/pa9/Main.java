@@ -22,7 +22,7 @@ public class Main
 	{
 		Main.txCountSum = txCountSum;
 	}
-	
+
 	public static long time = 1482235928208L;
 	
 	/**
@@ -35,10 +35,9 @@ public class Main
 	 */
 	public static void main(String args[])
 	{
-		System.out.println(System.currentTimeMillis()+60000);
+		System.out.println(System.currentTimeMillis()+240000);
 		
 		ConnectionInformation infos = new ConnectionInformation();
-		//infos.setHost("127.0.0.1");
 		infos.setHost("192.168.122.70");
 		infos.setDatabase("benchmark");
 		infos.setUser("postgres");
