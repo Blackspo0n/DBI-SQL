@@ -1,3 +1,50 @@
 \section{Implementierung der Aufgabe}
 
+\subsection{Verbindungsaufbau}
+Der erste Schritt beim Erstellen des Programms befasste sich mit dem Erstellen
+einer Verbindung zur PostgreSQl-Datenbank. Dazu wurde die Klasse
+DatabaseConnection, sowie ConnectionInformation implementiert. Die Klasse
+ConnectionInformation dient der Erstellung eines gleichnamigen Objektes,
+welches alle Informationen zur Datenbankanbindung enthält und an das Objekt vom
+Typ DatabaseConnection  übergeben wird. Mit Hilfe der Funktion connect(), des
+Objekts DatabaseConnection, wird eine Verbindung erzeugt, welche die
+übergebenen Parameter verwendet.
+
+\subsection{Erstellen der Abfragen}
+Die Erstellung der Abfragen findet in der Klasse TXHandler statt, welche ein
+gleichnamiges Objekt erzeugt. Das entstehende Objekt kann die Funktion
+kontostandTX aufrufen, welche den Kontostand abfragt und zurückgibt. Es kann
+außerdem mit Hilfe der Funktion einzahlungTX eine Einzahlung vornehmen, welche
+den aktuellen Kontostand zurückgibt. Des Weiteren kann mit der Funktion
+analyseTX nach der Häufigkeit der Einzahlung eines bestimmten Betrags gesucht
+werden, wobei die Häufigkeit zurückgegeben wird.
+
+\subsection{Erstellung der Programm-Schritte}
+Die oben beschriebenen Abfragemöglichkeiten werden in den vorgegebenen
+Schritten Einschwingphase, Messphase und Auss chwingphase in einer 35
+(kontostandTX) zu 50 (einzahlungTX) zu 15 (analyseTX) ausgeführt. Die Verteilung
+nach diesem Verhältnis übernimmt dabei die Funktion choose(). Das Aufrufen der
+jeweiligen Funktion mit zufällig gewählten Parametern übernimmt die Funktion
+doTX(). Wobei die zufälligen Werte durch die Funktion chooseNumber() bestimmt
+werden, diese Funktion achtet dabei darauf, dass keine unzulässigen Werte
+abgefragt werden.
+
+Die Einschwingphase wird in der Funktion attackTime() beschrieben und dauert
+wie in den Vorgaben beschrieben genau vier Minuten, wobei nach jeder Abfrage
+eine Pause von 50ms eingelegt wird. Die Messphase wird als Funktion
+benchStage() dargestellt und dauert genau fünf Minuten, wobei auch jeweils nach
+jeder Abfrage eine Pause von 50ms eingelegt wird. Die Ausschwingphase wird in
+der Funktion boomOutStage() dargestellt und dauert gemäß der Anforderungen eine
+Minute, wobei nach jeder Abfrage 50ms Pause eingehalten werden.
+
+\subsection{Erstellung der Threads}
+
+Die erstellung der Threads zum mehrfachen starten des Load-Drivers findet in der
+Main Methode statt. Dabei werden Funktionen aus der Klasse ClientThread bzw.
+des erzeugten Objekts aufgerufen. In der Funktion run() erfolgt zudem das
+Aufrufen der Programmschritte, diese werden je Thread aufgerufen.
+
+\subsection{Exception-Handling}
+
+
 \clearpage

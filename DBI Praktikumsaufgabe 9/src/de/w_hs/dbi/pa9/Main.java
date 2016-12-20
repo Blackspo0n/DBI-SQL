@@ -23,7 +23,7 @@ public class Main
 		Main.txCountSum = txCountSum;
 	}
 	
-	public static long time = 1482233929871L;
+	public static long time = 1482235928208L;
 	
 	/**
 	 * Main Funktion.

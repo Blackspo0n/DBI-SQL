@@ -1,3 +1,73 @@
-\section{Ausgangssituation}
+\section{Einleitung}
+\subsection{Ausgangssituation}
+
+Die Aufgabenstellung sieht vor, dass ein Programm entwickelt wird mitdem es
+möglich ist Lasten gegen unser gewähltes DBMS zu setzen. 
+
+Dabei sind uns einige 
+
+\subsection{Mögliche Ausarbeitungen}
+
+Es besteht die Möglichkeit für die Aufgabenstellung ein vorhandenes Framework zu
+benutzen. Wir haben uns aber bewusst gegen dieses Framework entschieden, da wir
+die Programmfunkionalität selbst implementieren wollten.
+
+Im folgenden werden einige Mögliche Ausarbeitungsvorschläge aufgezeigt, die man
+in die Implementierung des Programms übernehmen kann:
+
+\begin{itemize}
+  \item 
+\end{itemize}
+
+Aufgrund der Aufgabenstellung ist die Möglichkeit einer Verbesserung an
+lediglich drei Stellen gegeben. So könnte man das Absenden der Statements bzw.
+deren Inhalt, die zufällige Auswahl der Daten innerhalb der Statements oder die
+internen Einstellungen der Datenbank optimieren, um einen höheren Durchsatz zu
+erzielen.
+
+Der restliche Ablauf des Programms ist aufgrund der vorgegebene \gqq{ThinkTime}
+nicht änderbar oder wird vor dem Ausführen der Messungen durchgeführt. Die Vorgaben machen das
+Programm zudem beabsichtigt langsamer als es sein müsste. Denn nach jeder
+Abfrage bzw. Update wird eine Pause von 50ms eingelegt, in welcher das Programm
+abwartet und keine Transaktionen starten darf. Zudem muss über alle Werte und
+Operationen per Zufall entschieden werden. Aufgrund der Vorgaben konvergiert
+die maximale Abfrage je Sekunde, bei fünf nebenläufigen Load-Driver-Programmen,
+gegen 20.
+
+Bei der Anfrageoptimierung ist es wichtig, möglichst wenig Daten abzufragen, um
+unnötigen Datentransfer zu verhindern. Zudem sollte darauf geachtet werden
+möglichst wenige Abfragen durchzuführen, dies kann zum Beispiel durch das
+Verwenden von Subselects erreicht werden. Um die Abfrage noch weiter zu
+verbessern ist es außerdem wichtig die Datenbanksprache SQL gut zu kennen und
+möglichst viele Operationen von dieser bearbeiten zu lassen. Dies spart nicht
+nur unnötigen Code ein, sondern spart auch Abfragen und Datentransfer.
+
+Eine weitere Möglichkeit zur Optimierung des Programms ist es, die Daten welche
+zufällig für die Abfragen ausgewählt werden nicht über die Funktion
+MATH.Random() zu bestimmen. Das Gleiche gilt auch für die verteilte Auswahl der
+auszuführenden Operationen. Ein Lösungsansatz wäre es, die einzutragenden Daten
+vor dem Start des Benchmarkings in ein Array oder .txt Datei einzutragen und
+diese dann lediglich an den entsprechenden Stellen einzutragen. Für die Auswahl
+der Operation gilt das Gleiche Prinzip. So kann man vor dem Start des
+Benchmarkings ein Array mit Zahlen von eins bis 100 Füllen. Bei der Abfrage in
+der Schleife können dann die Zahlen eins bis 35 für die Auswahl des
+Kontostandes verwendet werden, 36 bis 85 für die Auswahl Einzahlung und 86 bis
+100 für die Auswahl des Kontostandes stehen. Dabei ist die Voraussetzung eines
+zufällig Ausgewählten Vorgangs in der zehnminütigen Schleife des
+Load-Driver-Programms erfüllt. Denn das Programm verwendet zufällige Werte,
+welche die geforderten Wahrscheinlichkeiten erfüllen. Zudem erfolgt die
+Auswertung, der Werte und die Entscheidung welche Funktion gestartet wird
+innerhalb der Schleife.
+
+Die dritte Möglichkeit ist es, die Einstellungen der Datenbank zu Optimieren.
+Diese Optimierung wirkt sich auf die Ressourcennutzung, sowie die
+Nachverfolgbarkeit der Datenbankeinträge bzw. Abfragen aus. Dabei sind die
+technischen Voraussetzungen, welche der verwendete Computer bietet von großer
+Bedeutung. Besonders wichtig ist dabei die Art der Festplatte, so ist eine
+SSD-Festplatte in der Lage deutlich schneller Daten zu schreiben oder zu lesen,
+als eine HDD-Festplatte. Aber nicht nur die Festplatte ist von Bedeutung, denn
+ein Puffer, welcher beim Schreiben besonders wichtig ist, benötigt
+Arbeitsspeicher. Des Weiteren, ist ein s tarker Prozessor von Vorteil, da dieser
+ein schnelleres Ausführen des Programms ermöglicht.
 
 \clearpage
