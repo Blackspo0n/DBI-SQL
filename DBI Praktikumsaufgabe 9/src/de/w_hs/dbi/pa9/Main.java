@@ -23,7 +23,7 @@ public class Main
 		Main.txCountSum = txCountSum;
 	}
 	
-	public static long time = System.currentTimeMillis()+1000;
+	public static long time = 1482233929871L;
 	
 	/**
 	 * Main Funktion.
