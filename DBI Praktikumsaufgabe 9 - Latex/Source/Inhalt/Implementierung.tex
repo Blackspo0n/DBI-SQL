@@ -61,7 +61,7 @@ Funktion \textbf{einzahlungsTX} eine Einzahlung vornehmen.
 		return rs.getDouble(1);
 	}
 \end{lstlisting}
-
+ 
 
 Des Weiteren kann mit der Funktion \textbf{analyseTX} nach der Häufigkeit der
 Einzahlung eines bestimmten Betrags gesucht werden, wobei die Häufigkeit zurückgegeben wird.
@@ -209,7 +209,7 @@ ein Fehler auf, wird dieser mittels dem \textbf{throws}-Statement
 			System.out.println("Datenbank Fehler: " + sqle.getMessage());
 			sqle.printStackTrace();
 		}
-% 		catch (Exception e) {
+ 		catch (Exception e) {
 			System.out.println("Ein Fehler ist aufgetreten: " + e.getMessage());
 			e.printStackTrace();
 		}
