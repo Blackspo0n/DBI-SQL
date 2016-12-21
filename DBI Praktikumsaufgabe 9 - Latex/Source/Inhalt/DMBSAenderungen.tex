@@ -1,28 +1,27 @@
 \section{Änderungen am Datenbank Management System}
 
-Am Datenbankmanagement-System (DBMS) werden einige Einstellungen über die
-postreSQL.conf ausgeführt. In dieser Datei sind die Einstellungen des DBMS
-gespeichert und können vom Benutzer verändert werden.
+Am Datenbankmanagement-System (DBMS) sind einige Einstellungen über die postresql.conf änderbar. In 
+dieser Datei sind die Einstellungen des DBMS gespeichert und können vom Benutzer editiert werden.
+ 
+Zunächst wird von uns die Anzahl der Verbindungen, welche gleichzeitig zur Datenbank bestehen 
+dürfen, von voreingestellten 100 auf die von uns benötigten
+18 heruntergesetzt.
+Dies soll einen Performancegewinn bringen, da zu viele erlaubte Verbindungen unnötig Ressourcen 
+ziehen, zudem haben wir eine ideale Ausgangssituation, da auf 8 virtuellen Kernen lediglich 18 
+Verbindungen existieren. Dies erfüllt die Idealbedingung von zwei bis drei erlaubten Verbindungen 
+je Kern.
 
-Zunächst wird von uns die Anzahl der Verbindungen, welche gleichzeitig zur
-Datenbank bestehen dürfen, (max\_connections) von voreingestellten 100 auf die
-von uns benötigten 18 heruntergesetzt. Dies soll einen Performancegewinn
-bringen, da zu viele Erlaubte Verbindungen unnötig Ressourcen ziehen, zudem
-haben wir eine ideale Ausgangssituation, da auf 8 virtuellen Kernen lediglich
-18 Verbindungen existieren. Dies erfüllt die Idealbedingung von zwei bis drei
-erlaubten Verbindungen je Kern.
+Wir haben uns im Weiteren mit der Pufferspeicherung in der .conf Datei befasst, welche 
+ Dazu wird dem Pufferspeicher ¼ des Ram zugewiesen. Der restliche Ram wird für 
+den  verwendet, welcher der Planung und Ausführung von
+Querys dient.
+  
+Zudem haben wir dem einen höheren Wert zugewiesen, eine Optimierung ist hierbei nur 
+möglich, wenn man die Anzahl der maximalen Verbindungen kennt. Wir haben uns für den Wert 
+ entschieden, da dieser sich aufgrund von
+Internetrecherche und nach einigen Tests als effektiv erwiesen hat.  ist für die 
+Verknüpfung von Tabellen oder Umsetzung bestimmter Klauseln wichtig und weist zu, wie viel Speicher 
+je Sortier-und Hashoperation verwendet werden kann.
 
-Wir haben uns im Weiteren mit der Pufferspeicherung befasst in der .conf Datei
-shared\_buffers heißt. Dazu wird dem Pufferspeicher ein ¼ des Ram zugewiesen.
-Der restliche Ram wird für den effective\_cache\_size verwendet, welcher der
-Planung und Ausführung von Querys dient.
-
-Zudem haben wir work\_mem einen höheren Wert zugewiesen, eine Optimierung ist
-hierbei nur möglich, wenn man die Anzahl der benötigten Verbindungen kennt. Wir
-haben uns für den Wert RAM/(max\_connections * 16) entschieden, da dieser sich
-aufgrund von Internetrecherche und nach einigen Tests als effektiv erwiesen
-hat. Work\_mem ist für die Verknüpfung von Tabellen oder Umsetzung bestimmter
-Klauseln wichtig und wist zu, wie viel Speicher je Sortier-und Hashoperation
-verwendet werden kann.
 
 \clearpage
