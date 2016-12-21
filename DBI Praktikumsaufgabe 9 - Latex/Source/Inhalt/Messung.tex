@@ -9,9 +9,9 @@ Ausschwingphase das Programm zu beenden.
 
 Mit dem Start der Einschwingphase beginnen die Threads mit der zufälligen Auswahl einer Operation 
 und der damit verbundenen Transaktion, dies erfolgt unabhängig voneinander. Nach der Auswahl der 
-Abfrage werden die Zufallsdaten für die Abfrage mit Hilfe der Funktion chooseNumber() ermittelt, 
-welche die Informationen über die benötigt Variable übermittelt bekommt. Durch das Übergeben der 
-Bezeichnung der benötigten Variablen und der Größe der Datenbank, soll gewährleistet sein, dass es 
+Abfrage werden die Zufallsdaten für die Abfrage mit Hilfe der Funktion
+\textbf{chooseNumber()} ermittelt, welche die Informationen über die benötigt
+Variable übermittelt bekommt. Durch das Übergeben der Bezeichnung der benötigten Variablen und der Größe der Datenbank, soll gewährleistet sein, dass es 
 zu keinen fehlerhaften Abfragen und einer dadurch fehlerhaften Messung kommt. Die Zahlen werden von 
 der Funktion im zulässigen Bereich zufällig ausgewählt und sind unabhängig von den nebenläufigen 
 Threads. Nach dem Ausführen der Anfrage wird eine Pause von 50ms eingelegt, während dieser Pause 
