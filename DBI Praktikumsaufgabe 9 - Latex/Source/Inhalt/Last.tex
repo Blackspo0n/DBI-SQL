@@ -1,9 +1,65 @@
 \section{Bewertung und Dokumentation der Lasten}
 
-\subsection{5}
+\subsection{Last 5}
+Bei der ersten Last, also der Verwendung von 5 nebenläufigen
+Load-Driver-Programmen auf einem PC, haben wir durch die Optimierungen eine
+Verbesserung von 85 TPS auf insgesamt 95 erreicht. Nach der Verbesserung des
+Clients, also der Ermittlung der Zufallsvariablen während der Pause von 50ms,
+erreichten wir einen Wert von 93 TPS. Bei einigen anderen Messung erreichten
+wir lediglich geringe Ergebnisse, da nebenher laufende Programme am
+Test-Computer die Messergebnisse negativ beeinflusst haben.
 
-\subsection{5x5}
+Nach der Optimierung des Programms haben wir das DBMS optimiert und einen Wert
+von 95 TPS erreicht. Dieser Wert ist stabil, weicht also bei weiteren Messungen
+maximal um 0,5 TPS nach Unten oder Oben ab.
 
-\subsection{5x5x5}
+
+\subsection{Last 5x5}
+Bei der zweiten Last, also der Verwendung von 5 nebenläufigen
+Load-Driver-Programmen auf zwei Computern, welche Abfragen an die gleiche
+Datenbank schicken, haben wir einen Bestwert von 185 TPS erzielt. Bei der
+ersten Messung, also der Messung des nicht optimierten Programms, haben wir
+einen Wert von 243 TPS erreicht, welchen wir durch die Optimierung des
+Programms auf 181 TPS erhöhen konnten. Trotz Optimierung der Datenbank war es
+nicht möglich einen Wert über 185 TPS zu erreichen.
+
+Dies ist für uns nicht nachvollziehbar, denn wir haben durch das erhöhen des
+Puffers und einer Anpassung der Einstellung auf die benötigte Funktionalität,
+eine ideale Situation für die Abfrage und das Schreiben von Daten geschaffen.
+Besonders bei einer größeren Menge von Anfragen haben wir mit einer deutlich
+stärkeren Leistung des DBMS gerechnet, wenn man die Einstellungen optimiert.
+
+Alle Ergebnisse, in jeder Phase der Entwicklung, waren stabil und es gab auch
+keine Probleme mit dem Einfluss von nebenher laufenden Programmen. Jedoch ist
+uns Aufgefallen, dass immer ein Computer bessere Ergebnisse liefert als der
+Andere. Daher vermuten wir, dass die Abfragen je nachdem welcher Computer diese
+Abschickt priorisiert oder zunächst zurückgestellt werden.
+
+\clearpage
+
+\subsection{Last 5x5x5}
+Bei der dritten Last, also der Verwendung von 5 nebenläufigen
+Load-Driver-Programmen auf drei Computern, welche Abfragen an die gleiche
+Datenbank schicken, haben wir einen Bestwert von 267 TPS erzielt. Bei unserer
+ersten Messung haben wir lediglich einen Wert 243 TPS erreicht, welchen wir
+durch die Verbesserung des Programms um 9 TPS, auf 252 TPS, steigern konnten.
+Diese Steigerung  ist im Verhältnis zu den beiden anderen Lasten eher gering.
+Denn hier steigern wir die Leistungsfähigkeit des Programms und somit müsste
+rein logische betrachtet die Leistung um den dreifachen Wert steigen, als sie
+dies bei Last eins, in der gleichen Situation, getan hat. Demnach müsste die
+Anzahl der TPS statt um 9, um etwa 3 mal 8, also um etwa 24 steigen.
+
+Die Steigerung von 252 TPS auf 267, bei der Optimierung des DBMS ist ebenfalls
+geringer als erwartet. Denn unserer Überlegung nach müssten sich die
+Auswirkungen der Optimierung besonders stark bei einer größeren Menge von
+Abfragen zeigen. Dem ist aber folglich nicht so, dies könnte daran liegen, dass
+das DBMS mit einer solchen Menge an Abfragen und den bereitgestellten
+Ressourcen der virtuellen Maschine nicht auskommt und lediglich eine Erhöhung
+der Ressourcen zu einem besseren Ergebnis führt.
+
+Bei dieser Last war es uns leider nicht möglich so viele Messungen wie bei den
+Anderen durchzuführen, somit ist es nicht möglich Schwankungen der Ergebnisse
+auszuschließen, jedoch sind uns keine besonders starken Abweichungen
+aufgefallen.
 
 \clearpage

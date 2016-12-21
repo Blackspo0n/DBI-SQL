@@ -2,49 +2,91 @@
 
 \subsection{Verbindungsaufbau}
 Der erste Schritt beim Erstellen des Programms befasste sich mit dem Erstellen
-einer Verbindung zur PostgreSQl-Datenbank. Dazu wurde die Klasse
-DatabaseConnection, sowie ConnectionInformation implementiert. Die Klasse
-ConnectionInformation dient der Erstellung eines gleichnamigen Objektes,
-welches alle Informationen zur Datenbankanbindung enthält und an das Objekt vom
-Typ DatabaseConnection  übergeben wird. Mit Hilfe der Funktion connect(), des
-Objekts DatabaseConnection, wird eine Verbindung erzeugt, welche die
-übergebenen Parameter verwendet.
+einer Verbindung zur PostgreSQl-Datenbank. 
+
+Dazu wurde die Klasse \textbf{ConnectionInformation}, sowie
+\textbf{ConnectionInformation} aus dem vorherigen Projekt implementiert. 
+
+Die Klasse \textbf{ConnectionInformation} dient der Erstellung eines gleichnamigen
+Objektes, welches alle Informationen zur Datenbankanbindung enthält und an das
+Objekt vom Typ \textbf{DatabaseConnection} übergeben wird. Mit Hilfe der Funktion
+\textbf{connect()}, des Objekts \textbf{DatabaseConnection}, wird eine Verbindung
+erzeugt, welche die übergebenen Parameter verwendet.
 
 \subsection{Erstellen der Abfragen}
-Die Erstellung der Abfragen findet in der Klasse TXHandler statt, welche ein
-gleichnamiges Objekt erzeugt. Das entstehende Objekt kann die Funktion
-kontostandTX aufrufen, welche den Kontostand abfragt und zurückgibt. Es kann
-außerdem mit Hilfe der Funktion einzahlungTX eine Einzahlung vornehmen, welche
-den aktuellen Kontostand zurückgibt. Des Weiteren kann mit der Funktion
-analyseTX nach der Häufigkeit der Einzahlung eines bestimmten Betrags gesucht
-werden, wobei die Häufigkeit zurückgegeben wird.
+Die Erstellung der Abfragen findet in der Klasse \textbf{TXHandler} statt, welche
+ein gleichnamiges Objekt erzeugt. 
+
+Das entstehende Objekt kann die Funktion \gqq{kontostandTX} aufrufen, welche den
+Kontostand abfragt und zurückgibt.Es kann außerdem mit Hilfe der Funktion
+einzahlungTX eine Einzahlung vornehmen, welche den aktuellen Kontostand zurückgibt.
+
+
+---------------- code hier einfügen
+
+Des Weiteren kann mit der Funktion \textbf{analyseTX} nach der Häufigkeit der
+Einzahlung eines bestimmten Betrags gesucht werden, wobei die Häufigkeit zurückgegeben wird.
 
 \subsection{Erstellung der Programm-Schritte}
-Die oben beschriebenen Abfragemöglichkeiten werden in den vorgegebenen
-Schritten Einschwingphase, Messphase und Auss chwingphase in einer 35
-(kontostandTX) zu 50 (einzahlungTX) zu 15 (analyseTX) ausgeführt. Die Verteilung
-nach diesem Verhältnis übernimmt dabei die Funktion choose(). Das Aufrufen der
-jeweiligen Funktion mit zufällig gewählten Parametern übernimmt die Funktion
+Die oben beschriebenen Abfrage-Möglichkeiten werden in den vorgegebenen
+Schritten Einschwingphase, Messphase und Ausschwingphase in einer Gwichtung von
+35/50/15 ausgeführt.
+
+Die Verteilung nach diesem Verhältnis übernimmt dabei die Funktion
+\gqq{choose()}.
+
+--- code verteilungsfunktion
+
+Das Aufrufen der jeweiligen Funktion mit zufällig gewählten Parametern übernimmt die Funktion
 doTX(). Wobei die zufälligen Werte durch die Funktion chooseNumber() bestimmt
 werden, diese Funktion achtet dabei darauf, dass keine unzulässigen Werte
 abgefragt werden.
 
-Die Einschwingphase wird in der Funktion attackTime() beschrieben und dauert
-wie in den Vorgaben beschrieben genau vier Minuten, wobei nach jeder Abfrage
-eine Pause von 50ms eingelegt wird. Die Messphase wird als Funktion
-benchStage() dargestellt und dauert genau fünf Minuten, wobei auch jeweils nach
-jeder Abfrage eine Pause von 50ms eingelegt wird. Die Ausschwingphase wird in
-der Funktion boomOutStage() dargestellt und dauert gemäß der Anforderungen eine
-Minute, wobei nach jeder Abfrage 50ms Pause eingehalten werden.
+
+-- code doTX
+
+Die Einschwingphase wird in der Funktion \textbf{attackStage()} implementiert
+und dauert wie in den Vorgaben beschrieben genau vier Minuten.
+
+Die Messphase wird als Funktion \textbf{benchStage()} implementiert und dauert
+genau fünf Minuten.
+
+Die Ausschwingphase wird in der Funktion \textbf{boomOutStage()} dargestellt und
+dauert gemäß der Anforderungen eine Minute.
+
+In jeder Funktion wird die \gqq{thinkTime} von 50 Millisekunden berücksichtigt.
 
 \subsection{Erstellung der Threads}
 
-Die erstellung der Threads zum mehrfachen starten des Load-Drivers findet in der
-Main Methode statt. Dabei werden Funktionen aus der Klasse ClientThread bzw.
-des erzeugten Objekts aufgerufen. In der Funktion run() erfolgt zudem das
-Aufrufen der Programmschritte, diese werden je Thread aufgerufen.
+Die Threads, welche jeweils einen Lastclient bereitstellt wird in der Klass
+\gqq{ClientThread} implementiert. Diese erbt von der Klasse Thread und
+implemtiert ein \textbf{run}-Funktion.
+
+----- code ausschnitt clientthread
+
+Die Instanziierung der Threads finden anschließend in der
+\textbf{main}-Methode des Programms statt. Nach der Erstellung der Threads
+soll mittels eines \textbf{timestamps} auf ein Startsignal gewartet werden.
+
+Das Startsignal wird gegeben, wenn der zuvor festgelegte \textbf{timestamp}
+überschritten worden ist:
+
+----------- protgrammcode von der schleife
+
 
 \subsection{Exception-Handling}
 
+Das Exceptionhandlung findet global in der \textbf{main}-Methode statt. Tritt
+ein Fehler auf, wird dieser mittels dem \textbf{throws}-Statement
+\gqq{hochgebubbelt} bis dieser in unserer \textbf{catch}-Klausel behandelt wird.
+
+---- code vom catchblock
+
+Da die \textbf{run}-Methode der Klasse \textbf{Thread} kein \textbf{throws}
+unterstützt würde die fehlerbehandlung für die Threads gesondert implementiert.
+Zusätzlich wird von den Threads die Funktion \textbf{abortProgramm}
+ausgeführt, wenn ein unbehandelter fehler im Thread auftreten sollte. Dies führt
+dazu, dass dsa Programm automatisch die Ausführung des Programmcodes
+unterbricht.
 
 \clearpage

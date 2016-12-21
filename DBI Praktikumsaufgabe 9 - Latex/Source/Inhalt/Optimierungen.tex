@@ -1,0 +1,26 @@
+\section{Optimierungen im Programm}
+Das erstellte Programm war bereits in der ersten Version effizient. Denn die
+benötigten SQL-Befehle waren von Anfang an optimiert. Bei der Erstellung der
+SQL-Befehle wurde darauf geachtet möglichst wenige Befehle mit möglichst wenig
+abgefragten Variablen  zu erstellen.
+
+(Quelltext, wo die SQL Befehle gezeigt werden)
+
+Durch das Verwenden des Operators count (*) sparen wir uns eine Schleife im
+Programm, welche die Anzahl der Elemente, mit der geforderten Bedingung,
+ermittelt. Dabei wird auch Zeit gespart, da sich lediglich ein Element im
+ResultSet befindet und auch nur eins aufgerufen werden muss. Eine weitere
+Optimierung ist die Verwendung eines Subselects beim Insert-Befehl. Dieser
+ermöglicht es auf einen Select-Befehl verzichten zu können.
+
+Die Verwendung von einfachen excecuteUpdate-Befehlen macht in diesem Fall mehr
+Sinn als das Verwenden von PreparedStatements. Denn wir müssten bei der
+Verwendung von PreparedStatements für jede einzelne Tabelle, welche wir
+anspreche wollen, ein neues PreparedStatements erstellen um ein Update
+durchzuführen. Dadurch würden wir keine höhere Effizienz erreichen.
+
+Die einzig effiziente Änderung die wir durchgeführt haben ist, dass wir die
+Zufallswerte innerhalb der 50ms Pause durchgeführt wird und wir dadurch je
+Durchgang einige tausendstel Sekunden sparen.
+
+\clearpage
