@@ -1,25 +1,43 @@
 \section{Ausgangssituation}
-Am Datenbankmanagement-System (DBMS) sind einige Einstellungen über die postresql.conf änderbar. In 
-dieser Datei sind die Einstellungen des DBMS gespeichert und können vom Benutzer editiert werden. 
+Die Aufgabenstellung sieht vor, dass ein Programm entwickelt wird, mit dem es möglich sein soll 
+Lasten gegen unser gewähltes DBMS zu setzen. 
 
-Zunächst wird von uns die Anzahl der Verbindungen, welche gleichzeitig zur Datenbank bestehen 
-dürfen, (max\_connections) von voreingestellten 100 auf die von uns benötigten
-18 heruntergesetzt.
-Dies soll einen Performancegewinn bringen, da zu viele erlaubte Verbindungen unnötig Ressourcen 
-ziehen, zudem haben wir eine ideale Ausgangssituation, da auf 8 virtuellen Kernen lediglich 18 
-Verbindungen existieren. Dies erfüllt die Idealbedingung von zwei bis drei erlaubten Verbindungen 
-je Kern.
+Zur Optimierung des geforderten Programms haben wir einige Lösungsansätze verfolgt, welche im 
+Folgenden erläutert werden. Zunächst werden unsere Grundsätzlichen Überlegungen eines 
+Optimierungsansatzes dargestellt. Dieser Ansatz orientiert sich an den vorgegeben Rahmenbedingungen 
+und bildet die grundlegende Überlegung bei der Entwicklung unseres Programms.
 
-Wir haben uns im Weiteren mit der Pufferspeicherung in der .conf Datei befasst, welche 
-shared\_buffers heißt. Dazu wird dem Pufferspeicher ¼ des Ram zugewiesen. Der
-restliche Ram wird für den effective\_cache\_size verwendet, welcher der Planung
-und Ausführung von Querys dient.
+Aufgrund der Vorgaben ist die Möglichkeit einer Verbesserung an lediglich drei Stellen gegeben. So 
+könnte man das Absenden der Statements bzw. deren Inhalt, die zufällige Auswahl der Daten innerhalb 
+der Statements oder die internen Einstellungen der Datenbank optimieren, um einen höheren Durchsatz 
+zu erzielen.
 
-Zudem haben wir dem work\_mem einen höheren Wert zugewiesen, eine Optimierung
-ist hierbei nur möglich, wenn man die Anzahl der maximalen Verbindungen kennt. Wir haben uns für den Wert 
-RAM/(max\_connections * 16) entschieden, da dieser sich aufgrund von
-Internetrecherche und nach einigen Tests als effektiv erwiesen hat. Work\_mem
-ist für die Verknüpfung von Tabellen oder Umsetzung bestimmter Klauseln wichtig und weist zu, wie viel Speicher je Sortier-und Hashoperation 
-verwendet werden kann.
+Der restliche Teil des Programms ist aufgrund der Vorgabe nicht änderbar oder wird vor dem Ausführen 
+der Messungen durchgeführt. Die Vorgaben verlangsamen das Programm, denn nach jeder der 
+auszuführenden Operationen wird eine Pause von 50ms eingelegt, in welcher das Programm abwartet und 
+keine Transaktionen starten darf.  Zudem muss über alle Werte und Operationen per Zufall entschieden 
+werden. Aufgrund der Vorgaben konvergiert die maximale Abfrage je Sekunde gegen 20. 
+
+Bei der Anfrageoptimierung ist es wichtig, möglichst wenig Daten abzufragen, um unnötigen 
+Datentransfer zu verhindern. Zudem sollte darauf geachtet werden möglichst wenige Abfragen 
+durchzuführen, dies kann zum Beispiel durch das Verwenden von Subselects erreicht werden. Um die 
+Abfrage noch weiter zu verbessern ist es außerdem wichtig die Datenbanksprache SQL gut zu kennen 
+und möglichst viele Operationen von dieser durchführen zu lassen. Dies spart nicht nur unnötigen 
+Code ein, sondern auch Datentransfer.
+
+Eine weitere Möglichkeit zur Optimierung des Programms ist es, die Daten welche zufällig für die 
+Abfragen ausgewählt werden, während der 50ms langen Pause nach jeder Transaktion bestimmen zu 
+lassen. 
+
+Die dritte Möglichkeit ist, die Einstellungen der Datenbank zu Optimieren. Diese Optimierung wirkt 
+sich auf die Ressourcennutzung, sowie die Nachverfolgbarkeit der Datenbankeinträge bzw. Abfragen 
+aus. Dabei sind die technischen Voraussetzungen, welche der verwendete Computer bietet von großer 
+Bedeutung. Besonders wichtig ist dabei die Art der Festplatte, so ist eine SSD-Festplatte in der 
+Lage deutlich schneller Daten zu schreiben oder zu lesen, als eine HDD-Festplatte. Aber nicht nur 
+die Festplatte ist von Bedeutung, denn ein Puffer, welcher beim Schreiben besonders wichtig ist, 
+benötigt Arbeitsspeicher. Des Weiteren, ist ein starker Prozessor von Vorteil, da dieser ein 
+schnelleres Ausführen des Programms ermöglicht.
+
+
 
 \clearpage
