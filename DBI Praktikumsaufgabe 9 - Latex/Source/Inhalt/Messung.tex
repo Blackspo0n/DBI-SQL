@@ -10,18 +10,18 @@ Ausschwingphase das Programm zu beenden.
 Mit dem Start der Einschwingphase beginnen die Threads mit der zufälligen Auswahl einer Operation 
 und der damit verbundenen Transaktion, dies erfolgt unabhängig voneinander. Nach der Auswahl der 
 Abfrage werden die Zufallsdaten für die Abfrage mit Hilfe der Funktion
-\textbf{chooseNumber()} ermittelt, welche die Informationen über die benötigt
-Variable übermittelt bekommt. Durch das Übergeben der Bezeichnung der benötigten Variablen und der Größe der Datenbank, soll gewährleistet sein, dass es 
-zu keinen fehlerhaften Abfragen und einer dadurch fehlerhaften Messung kommt. Die Zahlen werden von 
+\textbf{chooseNumber()} ermittelt, welche die Informationen über die benötigte
+Variable übermittelt bekommt. Durch das Übergeben der Bezeichnung, der
+benötigten Variablen und der Größe der Datenbank, soll gewährleistet sein, dass es zu keinen fehlerhaften Abfragen und einer dadurch fehlerhaften Messung kommt. Die Zahlen werden von 
 der Funktion im zulässigen Bereich zufällig ausgewählt und sind unabhängig von den nebenläufigen 
-Threads. Nach dem Ausführen der Anfrage wird eine Pause von 50ms eingelegt, während dieser Pause 
-werden die Zufallsdaten für die nächste Abfrage ermittelt. In der Messphase wird vor der Pause eine 
-Variable um einen erhöht, welche die Anzahl der Abfragen zählt und im weiteren Verlauf, mit Hilfe 
+Threads. Nach dem Ausführen der Anfrage wird eine Pause von 50ms eingelegt.
+Während dieser Pause werden die Zufallsdaten für die nächste Abfrage ermittelt.
+In der Messphase wird vor der Pause eine Variable um einen erhöht, welche die Anzahl der Abfragen zählt und im weiteren Verlauf, mit Hilfe 
 von synchronized, die Anzahl aller Abfragen aus den 5 Threads in der Messphase addiert. Diese 
 Variable ist die Grundlage für die Rechnung der Anfragen je Sekunde.
 
-Bei der Ausführung auf mehreren Computern werden die Threads zu einem vordefinierten Zeitpunkt, 
-gleichzeitig auf allen Computern, gestartet. Die Ermittlung der Anfragen je Sekunde erfolgt nach 
+Bei der Ausführung auf mehreren Computern werden die Threads zu einem vordefinierten Zeitpunkt 
+gleichzeitig auf allen Computern gestartet. Die Ermittlung der Anfragen je Sekunde erfolgt nach 
 Beendigung der Programme händisch, durch das Addieren der Ergebnisse der drei Anwendungen.
 
 

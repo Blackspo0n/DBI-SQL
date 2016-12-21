@@ -18,8 +18,8 @@ Die Erstellung der Abfragen findet in der Klasse \textbf{TXHandler} statt, welch
 ein gleichnamiges Objekt erzeugt. 
 
 Das entstehende Objekt kann die Funktion \textbf{kontostandTX} aufrufen, welche
-den Kontostand abfragt und zurückgibt. Es ist ebenfalls Möglich mit Hilfe der
-Funktion \textbf{einzahlungsTX} eine Einzahlung vornehmen. 
+den Kontostand abfragt und zurückgibt. Es ist ebenfalls möglich mit Hilfe der
+Funktion \textbf{einzahlungTX} eine Einzahlung vorzunehmen. 
 
 \lstset{language=Java, backgroundcolor=\color{editorGray},
   basicstyle={\linespread{0.82}\footnotesize\ttfamily},   
@@ -33,7 +33,7 @@ Funktion \textbf{einzahlungsTX} eine Einzahlung vornehmen.
   {ö}{{\"o}}1,
     numberstyle=\tiny\noncopynumber,
       }
-\begin{lstlisting}[caption={einzahlungsTX-Funktion in TXHandler.java}]
+\begin{lstlisting}[caption={einzahlungTX-Funktion in TXHandler.java}]
 	/**
 	 * Ermittlung eiens neuen Kontostandes.
 	 * @return Neuer errechneter Kontostand.
@@ -95,7 +95,7 @@ Die Verteilung nach diesem Verhältnis übernimmt dabei die Funktion
 
 Das Aufrufen der jeweiligen Funktion mit zufällig gewählten Parametern
 übernimmt die Funktion \textbf{doTX()}. Wobei die zufälligen Werte durch die
-Funktion \textbf{chooseNumber()} bestimmt werden, diese Funktion achtet dabei
+Funktion \textbf{chooseNumber()} bestimmt werden. Diese Funktion achtet dabei
 darauf, dass keine unzulässigen Werte abgefragt werden.
 
 
@@ -201,8 +201,8 @@ Das Startsignal wird gegeben, wenn der zuvor festgelegte \textbf{timestamp}
 \subsection{Exception-Handling}
 
 Das Exceptionhandlung findet global in der \textbf{Main}-Methode statt. Tritt
-ein Fehler auf, wird dieser mittels dem \textbf{Throws}-Statement
-\gqq{hochgebubbelt} bzw. weitergegeben bis dieser in unserer \textbf{Catch}-Klausel behandelt wird.
+ein Fehler auf, wird dieser mittels dem \textbf{Throws}-Statement 
+weitergegeben bis dieser in unserer \textbf{Catch}-Klausel behandelt wird.
 
 \begin{lstlisting}[caption={Catch-Block}]
 		catch (SQLException sqle){
@@ -216,10 +216,10 @@ ein Fehler auf, wird dieser mittels dem \textbf{Throws}-Statement
 \end{lstlisting}
 
 Da die \textbf{run}-Methode der Klasse \textbf{Thread} kein \textbf{throws}
-unterstützt würde die Fehlerbehandlung für die Threads gesondert implementiert.
+unterstützt, würde die Fehlerbehandlung für die Threads gesondert implementiert.
 Zusätzlich wird von den Threads die Funktion \textbf{abortProgramm}
 ausgeführt, wenn ein unbehandelter fehler im Thread auftreten sollte. Dies führt
-dazu, dass dsa Programm automatisch die Ausführung des Programmcodes
+dazu, dass das Programm automatisch die Ausführung des Programmcodes
 unterbricht.
 
 \clearpage

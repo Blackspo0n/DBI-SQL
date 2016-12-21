@@ -17,13 +17,13 @@ welche \textbf{shared\_buffers} heißt. Dazu wird dem Pufferspeicher ¼ des Rams
 zugewiesen. Der restliche Ram wird für den \textbf{effective\_cache\_size}
 verwendet, welcher der Planung und Ausführung von Querys dient.
 
-Zudem haben wir dem \textbf{work\_mem} einen höheren Wert zugewiesen, eine
+Zudem haben wir dem \textbf{work\_mem} einen höheren Wert zugewiesen. Eine
 Optimierung ist hierbei nur möglich, wenn man die Anzahl der maximalen Verbindungen kennt.
 
 
 Wir haben uns für den Wert $RAM/(max\_connections * 16)$ entschieden, da
 dieser sich aufgrund von Internetrecherche und nach einigen Tests als effektiv
-erwiesen hat. \textbf{work\_mem}ist für die Verknüpfung von Tabellen oder
+erwiesen hat. \textbf{work\_mem} ist für die Verknüpfung von Tabellen oder
 Umsetzung bestimmter Klauseln wichtig und weist zu, wie viel Speicher je Sortier-und
 Hashoperation verwendet werden kann.
 
