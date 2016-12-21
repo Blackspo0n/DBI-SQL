@@ -1,2 +1,636 @@
 \section{Anhang}
-\subsection{Programm (optimiert)}
+
+\begin{lstlisting}[caption={Main}, label={lst:pr1}]
+package de.w_hs.dbi.pa9;
+
+import java.sql.SQLException;
+
+import de.w_hs.dbi.pa9.database.ConnectionInformation;
+import de.w_hs.dbi.pa9.database.DatabaseConnection;
+import de.w_hs.dbi.pa9.function.ProgramStage;
+import de.w_hs.dbi.pa9.function.TXHandler;
+
+public class Main 
+{
+	public static DatabaseConnection connection=null;
+	public static int txCountSum;
+	
+
+	public static synchronized int getTxCountSum()
+	{
+		return txCountSum;
+	}
+
+	public static synchronized void setTxCountSum(int txCountSum)
+	{
+		Main.txCountSum = txCountSum;
+	}
+
+	public static long time = 1482235928208L;
+	
+	/**
+	 * Main Funktion.
+	 * @param args
+	 * @throws Exception
+	 * @author Mario Kellner
+	 * @author Markus Hausmann
+	 * @author Jonas Stadtler
+	 */
+	public static void main(String args[])
+	{
+		ConnectionInformation infos = new ConnectionInformation();
+		infos.setHost("192.168.122.70");
+		infos.setDatabase("benchmark");
+		infos.setUser("postgres");
+		infos.setPassword("DBIPr");
+		
+	
+		try
+		{
+			// Erstelle Verbindung um die History !einmalig! zu löschen!			
+			DatabaseConnection con = new DatabaseConnection(infos);
+			con.connect();
+			con.clearHistory();
+			
+		    // Create the threads
+		    Thread[] threadList = new Thread[5];
+
+		    // spawn threads
+		    for (int i = 0; i < 5; i++)
+		    {
+		        threadList[i] = new ClientThread(infos);
+		        threadList[i].start();
+		    }
+		    
+		    // Start everyone at the same time
+		    System.out.println("Wartezeit für die Threads beträgt " + (time - System.currentTimeMillis()) + " Millisekunden");
+		    while(time > System.currentTimeMillis())
+		    {
+		    	Thread.sleep(1);
+		    }
+		    
+		    System.out.println("Wartezeit erreicht");
+		    
+		    ClientThread.setStartTrans();
+			
+			for (int i = 0; i < 5; i++)
+	        {
+	           threadList[i].join();
+	        }
+		    
+			System.out.println("Gesamte Anzahl der Transaktionen: " + getTxCountSum());
+			System.out.println("TPS: " + (double)getTxCountSum()/(double)300);
+			
+			System.out.println("Finish!");
+		    
+		} 
+		catch (SQLException sqle)
+		{
+			System.out.println("Datenbank Fehler: " + sqle.getMessage());
+			sqle.printStackTrace();
+		}
+		catch (Exception e)
+		{
+			System.out.println("Ein Fehler ist aufgetreten: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	public static void abortProgramm() {
+		System.exit(0);
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={ClientThread}, label={lst:pr2}]
+package de.w_hs.dbi.pa9;
+
+import java.sql.SQLException;
+
+import de.w_hs.dbi.pa9.database.ConnectionInformation;
+import de.w_hs.dbi.pa9.database.DatabaseConnection;
+import de.w_hs.dbi.pa9.function.ProgramStage;
+
+/**
+ *  Zuweisungen an Threads.
+ *  
+ *  @author Mario Kellner
+	@author Markus Hausmann
+ *  @author Jonas Stadtler
+ *
+ */
+public class ClientThread extends Thread {
+	private DatabaseConnection threadCon;
+	static boolean startTrans = false;
+	private int threadID;
+	private static int nextThreadID = 1;
+	
+	private synchronized static int getNextId() {
+		return nextThreadID++;
+	}
+
+
+	
+	public ClientThread(ConnectionInformation infos) throws Exception {
+		threadCon = new DatabaseConnection(infos);
+		threadID = getNextId();
+	}
+	
+	static synchronized void setStartTrans () {
+		startTrans = true;
+	}
+
+	synchronized boolean getStartTrans () {
+		return startTrans;
+	}
+
+	public void run() {
+		try {
+			threadCon.connect();
+			
+			if(threadCon.databaseLink.isValid(0))
+			{
+				System.out.println("[Thread " + threadID +"]Thread erfolgreich zur Datenbank verbunden!");
+			}
+			else
+			{
+				throw new SQLException("Keine Verbindung zur Datenbank möglich");
+			}
+			
+			System.out.println("[Thread " + threadID +"]Auf Startsignal warten ...");
+			
+			while(!getStartTrans()) {
+				yield();
+			}
+			
+			System.out.println("[Thread " + threadID +"]Startsignal erhalten!");
+			
+			
+			ProgramStage program = new ProgramStage(threadCon);
+			
+
+			System.out.println("[Thread " + threadID +"]Führe Funktion attackStage aus!");
+			program.attackStage();
+			
+			System.out.println("[Thread " + threadID +"]Führe Funktion benchStage aus!");
+			program.benchStage();
+			
+			System.out.println("[Thread " + threadID +"]Führe Funktion boomOutStage aus!");
+			program.boomOutStage();
+		}
+		catch (SQLException sqle)
+		{
+			System.out.println("Datenbank Fehler: " + sqle.getMessage());
+			sqle.printStackTrace();
+			
+			Main.abortProgramm();
+		}
+		catch (Exception e)
+		{
+			System.out.println("Ein Fehler ist aufgetreten: " + e.getMessage());
+			e.printStackTrace();
+
+			Main.abortProgramm();
+		}
+			
+	}
+}
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={ProgramStage}, label={lst:pr3}]
+package de.w_hs.dbi.pa9.function;
+
+import java.sql.SQLException;
+
+import de.w_hs.dbi.pa9.Main;
+import de.w_hs.dbi.pa9.database.DatabaseConnection;
+
+/**
+ * 
+ * Diese Klasse enthält alle die drei Schritte des Programmablaufs. Zudem werden hier die Abfrage
+ * Werte per Zufall definiert und die Gewichtung erfolgt im geforderten Verhältnis.
+ *
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ * 
+ *
+ */
+public class ProgramStage 
+{
+	private int TransactionNumber;
+	private int AccountsNumber;
+	private int BranchesNumber;
+	private int TellersNumber;
+	private int deltaNumber;
+	private DatabaseConnection connection;
+	private TXHandler txh;
+	
+	public ProgramStage(DatabaseConnection con) throws SQLException
+	{
+		if(con == null)
+		{
+			throw new NullPointerException("Connection darf nicht NULL sein!");
+		}
+		
+		this.connection = con;
+		this.txh = new TXHandler(con);
+	}
+	
+	/**
+	 * Entscheidet per gewichteten Zufall darüber, welche Abfrage an die Datenbank geschickt wird..
+	 * 
+	 * @return Gibt die Zahl 1, 2 oder 3 zurück. Dadurch wird im folgenden über die Abfrage entschieden.
+	 */
+	public int choose()
+	{
+		int number=(int)(Math.random()*100);
+		if(number <= 35)
+		{
+			return 1;
+		}
+		else if( number > 35 && number <= 85)
+		{
+			return 2;
+		}
+		return 3;
+	}
+	
+	/**
+	 * Entscheidet über die jeweiligen Zahlen, welche mit der Abfrage zur Datenbank geschickt werden.
+	 * @param name Bezeichnung der anzusprechenden Tabelle.
+	 * @param n Größe der Datenbank in TPS.
+	 * @return Zufällige, aber passende Übergabewerte, welche zur Abfrage an die Datenbank 
+	 * verwendet werden.
+	 */
+	private int chooseNumber(String name, int n)
+	{
+		double number=Math.random();
+		switch(name)
+		{
+			case "accounts":
+				number*=10000*n;
+				break;
+			case "branches":
+				number*=n;
+				break;
+			case "tellers":
+				number*=10*n;
+				break;
+			case "delta":
+				number*=10000;
+				break;
+		}
+		return (int)(number+1);
+	}
+	
+	public void thinkTime() throws InterruptedException {
+		long startTime = System.currentTimeMillis();
+		
+		this.generateNumbers();
+		
+		while(System.currentTimeMillis()-startTime < 50) {
+			Thread.sleep(1);
+		}
+	}
+	
+	public void generateNumbers() {
+		this.TransactionNumber = choose();
+		this.AccountsNumber = chooseNumber("accounts", 100);
+		this.TellersNumber = chooseNumber("tellers", 100);
+		this.BranchesNumber = chooseNumber("branches", 100);
+		this.deltaNumber = chooseNumber("delta", 100);
+	}
+	
+	
+	/**
+	 * Entscheidet über die auszuführende Abfrage. 
+	 * Die zufälligen Werte werden von der Funktion generateNumbers berechnet.
+	 * 
+	 * @throws SQLException Fehler, welcher bei der Abfrage an die Datenbank auftreten kann.
+	 */
+	private void doTX() throws SQLException
+	{
+		switch(this.TransactionNumber)
+		{
+			case 1:
+				txh.kontostandTX(this.AccountsNumber);
+				break;
+			case 2:
+				txh.einzahlungTX(
+						this.AccountsNumber,
+						this.TellersNumber,
+						this.BranchesNumber,
+						this.deltaNumber
+				);
+				break;
+			case 3:
+				txh.analyseTX(this.deltaNumber);
+				break;
+		}
+	}
+	
+	/**
+	 * Ausführen des ersten Programmteils.
+	 * 
+	 * @throws SQLException Möglicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
+	 */
+	public void attackStage() throws SQLException, InterruptedException
+	{	
+		long start = System.currentTimeMillis();
+		
+		// generiere Initialnummern
+		this.generateNumbers();
+		
+		while(start + 240000 >= System.currentTimeMillis())
+		{
+			doTX();
+			this.thinkTime();
+		}
+	}
+	
+	/**
+	 * Ausführen des zweiten Programmteils.
+	 * 
+	 * @throws SQLException Möglicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
+	 */
+	public void benchStage() throws SQLException, InterruptedException
+	{
+		int txCounter = 0;
+		long start = System.currentTimeMillis();
+		
+		// generiere Initialnummern
+		this.generateNumbers();
+		
+		while(start + 300000 >= System.currentTimeMillis())
+		{
+			doTX();
+			txCounter++;
+			this.thinkTime();	
+		}
+		
+		Main.setTxCountSum(Main.getTxCountSum() + txCounter);
+		
+		System.out.println("Anzahl der Transaktionen: " + txCounter);
+		System.out.println("Anzahl der Transaktionen pro Sekunde: " + (double)((double)txCounter/(double)300));
+		
+	}
+	
+	/**
+	 * Ausführen des dritten Programmteils.
+	 * 
+	 * @throws SQLException  Möglicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
+	 */
+	public void boomOutStage() throws SQLException, InterruptedException
+	{
+		long start = System.currentTimeMillis();
+		
+		// generiere Initialnummern
+		this.generateNumbers();
+		
+		while(start + 60000 >= System.currentTimeMillis())
+		{
+			doTX();
+			this.thinkTime();
+		}
+	}
+}
+
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={TXHandler}, label={lst:pr4}]
+package de.w_hs.dbi.pa9.function;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.postgresql.util.PSQLException;
+
+import de.w_hs.dbi.pa9.database.DatabaseConnection;
+
+/**
+ * In dieser Klasse sind die Statements hinterlegt, welche an die Datenbank geschickt werden.
+ * 
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ *
+ */
+public class TXHandler 
+{
+	private DatabaseConnection connection;
+	private Statement statement;
+	
+	public TXHandler(DatabaseConnection con) throws SQLException
+	{
+		this.connection=con;
+		statement = connection.databaseLink.createStatement();
+	}
+	
+	/**
+	 * Abfrage eines Kontostandes.
+	 * 
+	 * @param accID Account ID 
+	 * @return Kontostand der gesuchten Account ID
+	 * @throws SQLException Fehler bei der Datenbank Abfrage, mit spezifizierter Fehlermeldung.
+	 */
+	public double kontostandTX(int accID) throws SQLException
+	{
+		Statement statement = connection.databaseLink.createStatement();
+		
+		ResultSet rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid = " + accID);
+		
+		if(rs.next() == false)
+		{
+			throw new SQLException("Kontonummer nicht vorhanden!");
+		}
+		
+		return rs.getDouble(1);
+	}
+	
+	/**
+	 * Ermittlung eiens neuen Kontostandes.
+	 * 
+	 * @return Neuer errechneter Kontostand.
+	 * @throws SQLException Fehler bei der Datenbank Abfrage, mit spezifizierter Fehlermeldung.
+	 */
+	public double einzahlungTX(int accID, int tellerID, int branchID, double delta) throws SQLException
+	{
+		ResultSet rs = null;
+		
+		try {
+			connection.databaseLink.setAutoCommit(false);
+			
+			statement.executeUpdate("UPDATE branches SET balance=balance+"+delta+" WHERE branchid="+branchID);
+			statement.executeUpdate("UPDATE tellers SET balance=balance+"+delta+" WHERE tellerid="+tellerID);
+			statement.executeUpdate("UPDATE accounts SET balance=balance+"+delta+" WHERE accid="+accID);
+			statement.executeUpdate("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt)"
+					+ "VALUES("+accID+", "+tellerID+", "+delta+", "+branchID+", (SELECT balance FROM accounts WHERE accid="+accID+"), ' ')");
+			
+			rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid = " + accID);
+			
+			connection.databaseLink.commit();
+			
+			if(rs.next() == false)
+			{
+				throw new SQLException("Kontonummer nicht vorhanden");
+			}
+			
+		}
+		catch (PSQLException e) {
+			System.out.println(e.getMessage());
+			connection.databaseLink.rollback();
+			
+		}
+		finally {
+
+			connection.databaseLink.setAutoCommit(true);
+		}
+		
+		return rs.getDouble(1);
+	}
+	
+	/**
+	 * Anzahl der Einzahlungen mit dem Betrag delta sollen ermittelt werden.
+	 * @param delta Einzahlungsbetrag
+	 * @return Anzahl der Einzahlungen mit dem Betrag delta wird zurückgegeben.
+	 * @throws SQLException Fehler bei der Datenbank Abfrage, mit spezifizierter Fehlermeldung.
+	 */
+	public int analyseTX(double delta) throws SQLException
+	{
+		Statement statement = connection.databaseLink.createStatement();
+		
+		ResultSet rs = statement.executeQuery("SELECT COUNT(*) FROM history WHERE delta=" + delta);
+		
+		if(rs.next() == false)
+		{
+			throw new SQLException("Kein Eintrag mit dem Wert " + delta + " vorhanden!");
+		}
+		
+		return rs.getInt(1);
+	}
+}
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={DatabaseConnection}, label={lst:pr5}]
+package de.w_hs.dbi.pa9.database;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+/**
+ * Unsere Datebankklasse ermöglicht die Kommunikation
+ * mit der Datenbank. Es ist ein Wrapper für das
+ * Connection-Objekt der JDBC Connection
+ * 
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ */
+public class DatabaseConnection 
+{
+	/**
+	 * Das eigentliche Connection Objekt
+	 */
+	public Connection databaseLink;
+	
+	/**
+	 *  Unser Verbindungs-Model
+	 */
+	private ConnectionInformation ci;
+	
+	/**
+	 * Der Konstruktur der Klasse.  Überprüft ob das Objekt im C
+	 * 
+	 * @param cInfo Das Connection Objekt
+	 * @throws Exception Wird geworfen, wenn das Objekt was übergeben wird null ist.
+	 */
+	public DatabaseConnection(ConnectionInformation cInfo) throws Exception {
+		if(cInfo == null) {
+			throw new Exception("ConnectionInfo Object cannot be null");
+		}
+		
+		ci = cInfo;
+	}
+	public void clearHistory() throws SQLException
+	{
+		Statement statement= databaseLink.createStatement();
+
+		statement.executeUpdate("TRUNCATE TABLE history");
+	}
+	/**
+	 * 
+	 * List die Informatioen aus dem Objekt ci (ConnectionInformation) und versucht eine Verbindung 
+	 * zur Datenbank auf zu bauen.
+	 * 
+	 * @throws SQLException Wird geworfen, wenn der DriverManager keine Verbndung
+	 zur Datenbank aufbauen kann */
+	public void connect() throws SQLException
+	{
+		databaseLink = DriverManager.getConnection(
+				"jdbc:postgresql://" + ci.getHost() +"/" + ci.getDatabase() + "?useCompression=true",
+				ci.getUser(), 
+				ci.getPassword()
+		);
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={ConnectionInformation}, label={lst:pr6}]
+package de.w_hs.dbi.pa9.database;
+
+/**
+ * Dieses Model beinhaltet alle nötigen Informationen 
+ * um sich zu einer Postgre Datenbank zu verbinden
+ * 
+ * @author Mario Kellner
+ * @author Markus Hausmann
+ * @author Jonas Stadtler
+ *
+ */
+public class ConnectionInformation {
+	
+	// Eigenschaften
+	public String host = null;
+	public String database = null;
+	public String user = null;
+	public String password = null;
+	
+	
+	// Getter & Setter
+	public String getHost() {
+		return host;
+	}
+	public void setHost(String host) {
+		this.host = host;
+	}
+	public String getDatabase() {
+		return database;
+	}
+	public void setDatabase(String database) {
+		this.database = database;
+	}
+	public String getUser() {
+		return user;
+	}
+	public void setUser(String user) {
+		this.user = user;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+}
+\end{lstlisting}

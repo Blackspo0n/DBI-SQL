@@ -35,8 +35,6 @@ public class Main
 	 */
 	public static void main(String args[])
 	{
-		System.out.println(System.currentTimeMillis()+240000);
-		
 		ConnectionInformation infos = new ConnectionInformation();
 		infos.setHost("192.168.122.70");
 		infos.setDatabase("benchmark");
