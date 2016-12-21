@@ -72,7 +72,7 @@ Schritten Einschwingphase, Messphase und Ausschwingphase in einer Gwichtung von
 35/50/15 ausgeführt.
 
 Die Verteilung nach diesem Verhältnis übernimmt dabei die Funktion
-\gqq{choose()}.
+\textbf{choose()}.
 
 \begin{lstlisting}[caption={choose-Funktion in ProgramStage.java}]
 	/**
@@ -93,11 +93,10 @@ Die Verteilung nach diesem Verhältnis übernimmt dabei die Funktion
 	}
 \end{lstlisting}
 
-
-Das Aufrufen der jeweiligen Funktion mit zufällig gewählten Parametern übernimmt die Funktion
-doTX(). Wobei die zufälligen Werte durch die Funktion chooseNumber() bestimmt
-werden, diese Funktion achtet dabei darauf, dass keine unzulässigen Werte
-abgefragt werden.
+Das Aufrufen der jeweiligen Funktion mit zufällig gewählten Parametern
+übernimmt die Funktion \textbf{doTX()}. Wobei die zufälligen Werte durch die
+Funktion \textbf{chooseNumber()} bestimmt werden, diese Funktion achtet dabei
+darauf, dass keine unzulässigen Werte abgefragt werden.
 
 
 \begin{lstlisting}[caption={doTX-Funktion in ProgramStage.java}]
@@ -130,9 +129,10 @@ abgefragt werden.
 Die Einschwingphase wird in der Funktion \textbf{attackStage()} implementiert
 und dauert wie in den Vorgaben beschrieben genau vier Minuten.
 
+\clearpage
+
 Die Messphase wird als Funktion \textbf{benchStage()} implementiert und dauert
 genau fünf Minuten. Folgendermaßen wird diese implementiert:
-
 \begin{lstlisting}[caption={benchStage-Funktion in ProgramStage.java}]
 	/**
 	 * Ausführen des zweiten Programmteils.

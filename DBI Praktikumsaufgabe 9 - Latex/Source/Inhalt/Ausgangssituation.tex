@@ -1,43 +1,47 @@
 \section{Ausgangssituation}
-Die Aufgabenstellung sieht vor, dass ein Programm entwickelt wird, mit dem es möglich sein soll 
-Lasten gegen unser gewähltes DBMS zu setzen. 
+Die Aufgabenstellung sieht vor, dass ein Programm entwickelt wird, mit dem es
+möglich sein soll Lasten gegen unser gewähltes DBMS zu setzen. 
 
-Zur Optimierung des geforderten Programms haben wir einige Lösungsansätze verfolgt, welche im 
-Folgenden erläutert werden. Zunächst werden unsere Grundsätzlichen Überlegungen eines 
-Optimierungsansatzes dargestellt. Dieser Ansatz orientiert sich an den vorgegeben Rahmenbedingungen 
-und bildet die grundlegende Überlegung bei der Entwicklung unseres Programms.
+Zur Optimierung des geforderten Programms haben wir einige Lösungsansätze
+verfolgt, welche im Folgenden erläutert werden. Zunächst werden unsere
+grundsätzlichen Überlegungen eines Optimierungsansatzes dargestellt. Dieser
+Ansatz orientiert sich an den vorgegeben Rahmenbedingungen und bildet die
+grundlegende Überlegung bei der Entwicklung unseres Programms.
 
-Aufgrund der Vorgaben ist die Möglichkeit einer Verbesserung an lediglich drei Stellen gegeben. So 
-könnte man das Absenden der Statements bzw. deren Inhalt, die zufällige Auswahl der Daten innerhalb 
-der Statements oder die internen Einstellungen der Datenbank optimieren, um einen höheren Durchsatz 
-zu erzielen.
+Aufgrund der Vorgaben ist die Möglichkeit einer Verbesserung an lediglich drei
+Stellen gegeben. So könnte man das Absenden der Statements bzw. deren Inhalt,
+die zufällige Auswahl der Daten innerhalb der Statements oder die internen
+Einstellungen der Datenbank optimieren, um einen höheren Durchsatz zu erzielen.
 
-Der restliche Teil des Programms ist aufgrund der Vorgabe nicht änderbar oder wird vor dem Ausführen 
-der Messungen durchgeführt. Die Vorgaben verlangsamen das Programm, denn nach jeder der 
-auszuführenden Operationen wird eine Pause von 50ms eingelegt, in welcher das Programm abwartet und 
-keine Transaktionen starten darf.  Zudem muss über alle Werte und Operationen per Zufall entschieden 
-werden. Aufgrund der Vorgaben konvergiert die maximale Abfrage je Sekunde gegen 20. 
+Der restliche Teil des Programms ist aufgrund der Vorgabe nicht änderbar oder
+wird vor dem Ausführen der Messungen durchgeführt. Die Vorgaben verlangsamen
+das Programm, denn nach jeder der auszuführenden Operationen wird eine Pause
+von \textbf{50 Millisekunden} eingelegt, in welcher das Programm abwartet und
+keine Transaktionen starten darf.Zudem muss über alle Werte und Operationen per
+Zufall entschieden werden. Aufgrund der Vorgaben konvergiert die maximale
+Abfrage je Sekunde pro Thread gegen \textbf{20}.
 
-Bei der Anfrageoptimierung ist es wichtig, möglichst wenig Daten abzufragen, um unnötigen 
-Datentransfer zu verhindern. Zudem sollte darauf geachtet werden möglichst wenige Abfragen 
-durchzuführen, dies kann zum Beispiel durch das Verwenden von Subselects erreicht werden. Um die 
-Abfrage noch weiter zu verbessern ist es außerdem wichtig die Datenbanksprache SQL gut zu kennen 
-und möglichst viele Operationen von dieser durchführen zu lassen. Dies spart nicht nur unnötigen 
-Code ein, sondern auch Datentransfer.
+Bei der Anfrageoptimierung ist es wichtig, möglichst wenig Daten abzufragen, um
+unnötigen Datentransfer zu verhindern. Zudem sollte darauf geachtet werden
+möglichst wenige Abfragen durchzuführen, dies kann zum Beispiel durch das
+Verwenden von Subselects erreicht werden. Um die Abfrage noch weiter zu
+verbessern ist es außerdem wichtig die Datenbanksprache SQL gut zu kennen und
+möglichst viele Operationen von dieser durchführen zu lassen. Dies spart nicht
+nur unnötigen Code ein, sondern auch Datentransfer.
 
-Eine weitere Möglichkeit zur Optimierung des Programms ist es, die Daten welche zufällig für die 
-Abfragen ausgewählt werden, während der 50ms langen Pause nach jeder Transaktion bestimmen zu 
-lassen. 
+Eine weitere Möglichkeit zur Optimierung des Programms ist es, die Daten welche
+zufällig für die Abfragen ausgewählt werden, während der 50 Millisekunden
+langen Pause nach jeder Transaktion bestimmen zu lassen. 
 
-Die dritte Möglichkeit ist, die Einstellungen der Datenbank zu Optimieren. Diese Optimierung wirkt 
-sich auf die Ressourcennutzung, sowie die Nachverfolgbarkeit der Datenbankeinträge bzw. Abfragen 
-aus. Dabei sind die technischen Voraussetzungen, welche der verwendete Computer bietet von großer 
-Bedeutung. Besonders wichtig ist dabei die Art der Festplatte, so ist eine SSD-Festplatte in der 
-Lage deutlich schneller Daten zu schreiben oder zu lesen, als eine HDD-Festplatte. Aber nicht nur 
-die Festplatte ist von Bedeutung, denn ein Puffer, welcher beim Schreiben besonders wichtig ist, 
-benötigt Arbeitsspeicher. Des Weiteren, ist ein starker Prozessor von Vorteil, da dieser ein 
-schnelleres Ausführen des Programms ermöglicht.
-
-
+Die dritte Möglichkeit sieht vor die Einstellungen der Datenbank zu optimieren.
+Diese Optimierungen wirken sich auf die Ressourcennutzung, sowie die
+Nachverfolgbarkeit der Datenbankeinträge bzw. Abfragen aus. Dabei sind die
+technischen Voraussetzungen, welche der verwendete Computer bietet von großer
+Bedeutung. Besonders wichtig ist dabei die Art der Festplatte, so ist eine
+\textbf{SSD-Festplatte} in der Lage deutlich schneller Daten zu schreiben oder
+zu lesen als eine \textbf {HDD-Festplatte}. Aber nicht nur die Festplatte ist von
+Bedeutung, denn ein Puffer, welcher beim Schreiben besonders wichtig ist, benötigt
+Arbeitsspeicher. Des Weiteren, ist ein starker Prozessor von Vorteil, da dieser
+ein schnelleres Ausführen des Programms ermöglicht.
 
 \clearpage
