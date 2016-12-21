@@ -18,11 +18,50 @@ Die Erstellung der Abfragen findet in der Klasse \textbf{TXHandler} statt, welch
 ein gleichnamiges Objekt erzeugt. 
 
 Das entstehende Objekt kann die Funktion \gqq{kontostandTX} aufrufen, welche den
-Kontostand abfragt und zurückgibt.Es kann außerdem mit Hilfe der Funktion
-einzahlungTX eine Einzahlung vornehmen, welche den aktuellen Kontostand zurückgibt.
+Kontostand abfragt und zurückgibt. Es ist ebenfalls Möglich mit Hilfe der
+Funktion \textbf{einzahlungsTX} eine Einzahlung vornehmen. 
 
+\lstset{language=Java, backgroundcolor=\color{editorGray},
+  basicstyle={\linespread{0.82}\footnotesize\ttfamily},   
+  frame=b, xleftmargin={0.75cm},literate=
+    {Ö}{{\"O}}1
+  {Ä}{{\"A}}1
+  {Ü}{{\"U}}1
+  {ß}{{\ss}}2
+  {ü}{{\"u}}1
+  {ä}{{\"a}}1
+  {ö}{{\"o}}1,
+    numberstyle=\tiny\noncopynumber,
+      }
+\begin{lstlisting}[caption={einzahlungsTX-Funktion in TXHandler.java}]
+	/**
+	 * Ermittlung eiens neuen Kontostandes.
+	 * @return Neuer errechneter Kontostand.
+	 * @throws SQLException Fehler bei der Datenbank Abfrage, mit spezifizierter Fehlermeldung.
+	 */
+	public double einzahlungTX(int accID, int tellerID, int branchID, double delta) throws SQLException	{
+		ResultSet rs = null;
+		try {
+			connection.databaseLink.setAutoCommit(false);
+			statement.executeUpdate("UPDATE branches SET balance=balance+"+delta+" WHERE branchid="+branchID);
+			statement.executeUpdate("UPDATE tellers SET balance=balance+"+delta+" WHERE tellerid="+tellerID);
+			statement.executeUpdate("UPDATE accounts SET balance=balance+"+delta+" WHERE accid="+accID);
+			statement.executeUpdate("INSERT INTO history (accid, tellerid, delta, branchid, accbalance, cmmnt)"+ "VALUES("+accID+", "+tellerID+", "+delta+", "+branchID+", (SELECT balance FROM accounts WHERE accid="+accID+"), ' ')");
+			rs = statement.executeQuery("SELECT balance FROM accounts WHERE accid = " + accID);
+			connection.databaseLink.commit();
+			if(rs.next() == false) throw new SQLException("Kontonummer nicht vorhanden");
+		}
+		catch (PSQLException e) {
+			System.out.println(e.getMessage());
+			connection.databaseLink.rollback();
+		}
+		finally {
+			connection.databaseLink.setAutoCommit(true);
+		}
+		return rs.getDouble(1);
+	}
+\end{lstlisting}
 
----------------- code hier einfügen
 
 Des Weiteren kann mit der Funktion \textbf{analyseTX} nach der Häufigkeit der
 Einzahlung eines bestimmten Betrags gesucht werden, wobei die Häufigkeit zurückgegeben wird.
@@ -35,7 +74,25 @@ Schritten Einschwingphase, Messphase und Ausschwingphase in einer Gwichtung von
 Die Verteilung nach diesem Verhältnis übernimmt dabei die Funktion
 \gqq{choose()}.
 
---- code verteilungsfunktion
+\begin{lstlisting}[caption={choose-Funktion in ProgramStage.java}]
+	/**
+	 * Entscheidet per gewichteten Zufall darüber, welche Abfrage an die Datenbank geschickt wird..
+	 * 
+	 * @return Gibt die Zahl 1, 2 oder 3 zurück. Dadurch wird im folgenden über die Abfrage entschieden.
+	 */
+	public int choose() {
+		int number=(int)(Math.random()*100);
+		if(number <= 35) {
+			return 1;
+		}
+		else if( number > 35 && number <= 85) {
+			return 2;
+		}
+		
+		return 3;
+	}
+\end{lstlisting}
+
 
 Das Aufrufen der jeweiligen Funktion mit zufällig gewählten Parametern übernimmt die Funktion
 doTX(). Wobei die zufälligen Werte durch die Funktion chooseNumber() bestimmt
@@ -43,13 +100,63 @@ werden, diese Funktion achtet dabei darauf, dass keine unzulässigen Werte
 abgefragt werden.
 
 
--- code doTX
+\begin{lstlisting}[caption={doTX-Funktion in ProgramStage.java}]
+	/**
+	 * Entscheidet über die auszuführende Abfrage.
+	 * 
+	 * @throws SQLException Fehler, welcher bei der Abfrage an die Datenbank auftreten kann.
+	 */
+	private void doTX() throws SQLException
+	{
+		switch(choose())
+		{
+			case 1:
+				txh.kontostandTX(chooseNumber("accounts", 100));
+				break;
+			case 2:
+				txh.einzahlungTX(
+						chooseNumber("accounts", 100),
+						chooseNumber("tellers", 100),
+						chooseNumber("branches", 100),
+						chooseNumber("delta", 100));
+				break;
+			case 3:
+				txh.analyseTX(chooseNumber("delta", 100));
+				break;
+		}
+	}
+\end{lstlisting}
 
 Die Einschwingphase wird in der Funktion \textbf{attackStage()} implementiert
 und dauert wie in den Vorgaben beschrieben genau vier Minuten.
 
 Die Messphase wird als Funktion \textbf{benchStage()} implementiert und dauert
-genau fünf Minuten.
+genau fünf Minuten. Folgendermaßen wird diese implementiert:
+
+\begin{lstlisting}[caption={benchStage-Funktion in ProgramStage.java}]
+	/**
+	 * Ausführen des zweiten Programmteils.
+	 * 
+	 * @throws SQLException Möglicher Fehler bei der DB-Abfrage.
+	 * @throws InterruptedException Möglicher Fehler bei der Wartezeit.
+	 */
+	public void benchStage() throws SQLException, InterruptedException {
+		int txCounter = 0;
+		long start = System.currentTimeMillis();
+		
+		
+		while(start + 300000 >= System.currentTimeMillis()) {
+			doTX();
+			txCounter++;
+			Thread.sleep(50);	
+		}
+		
+		Main.setTxCountSum(Main.getTxCountSum() + txCounter);
+		
+		System.out.println("Anzahl der Transaktionen: " + txCounter);
+		System.out.println("Anzahl der Transaktionen pro Sekunde: " + (double)((double)txCounter/(double)300));
+	}
+\end{lstlisting}
 
 Die Ausschwingphase wird in der Funktion \textbf{boomOutStage()} dargestellt und
 dauert gemäß der Anforderungen eine Minute.
@@ -59,19 +166,36 @@ In jeder Funktion wird die \gqq{thinkTime} von 50 Millisekunden berücksichtigt.
 \subsection{Erstellung der Threads}
 
 Die Threads, welche jeweils einen Lastclient bereitstellt wird in der Klass
-\gqq{ClientThread} implementiert. Diese erbt von der Klasse Thread und
+\textbf{ClientThread} implementiert. Diese erbt von der Klasse Thread und
 implemtiert ein \textbf{run}-Funktion.
 
------ code ausschnitt clientthread
+\begin{lstlisting}[caption={Ausschnitt aus ClientThread}]
+/**
+ *  Zuweisungen an Threads.
+ *  @author Mario Kellner
+ *	@author Markus Hausmann
+ *  @author Jonas Stadtler
+ */
+public class ClientThread extends Thread {
+\end{lstlisting}
 
 Die Instanziierung der Threads finden anschließend in der
 \textbf{main}-Methode des Programms statt. Nach der Erstellung der Threads
 soll mittels eines \textbf{timestamps} auf ein Startsignal gewartet werden.
 
+
 Das Startsignal wird gegeben, wenn der zuvor festgelegte \textbf{timestamp}
 überschritten worden ist:
 
------------ protgrammcode von der schleife
+\begin{lstlisting}[caption={Wartezeit}]
+		    System.out.println("Wartezeit für die Threads beträgt " + (time - System.currentTimeMillis()) + " Millisekunden");
+		    while(time > System.currentTimeMillis()) {
+		    	Thread.sleep(1);
+		    }
+		    
+		    System.out.println("Wartezeit erreicht");
+		    ClientThread.setStartTrans();
+\end{lstlisting}
 
 
 \subsection{Exception-Handling}
@@ -80,7 +204,16 @@ Das Exceptionhandlung findet global in der \textbf{main}-Methode statt. Tritt
 ein Fehler auf, wird dieser mittels dem \textbf{throws}-Statement
 \gqq{hochgebubbelt} bis dieser in unserer \textbf{catch}-Klausel behandelt wird.
 
----- code vom catchblock
+\begin{lstlisting}[caption={Catch-Block}]
+		catch (SQLException sqle){
+			System.out.println("Datenbank Fehler: " + sqle.getMessage());
+			sqle.printStackTrace();
+		}
+% 		catch (Exception e) {
+			System.out.println("Ein Fehler ist aufgetreten: " + e.getMessage());
+			e.printStackTrace();
+		}
+\end{lstlisting}
 
 Da die \textbf{run}-Methode der Klasse \textbf{Thread} kein \textbf{throws}
 unterstützt würde die fehlerbehandlung für die Threads gesondert implementiert.
