@@ -17,8 +17,8 @@ erzeugt, welche die übergebenen Parameter verwendet.
 Die Erstellung der Abfragen findet in der Klasse \textbf{TXHandler} statt, welche
 ein gleichnamiges Objekt erzeugt. 
 
-Das entstehende Objekt kann die Funktion \gqq{kontostandTX} aufrufen, welche den
-Kontostand abfragt und zurückgibt. Es ist ebenfalls Möglich mit Hilfe der
+Das entstehende Objekt kann die Funktion \textbf{kontostandTX} aufrufen, welche
+den Kontostand abfragt und zurückgibt. Es ist ebenfalls Möglich mit Hilfe der
 Funktion \textbf{einzahlungsTX} eine Einzahlung vornehmen. 
 
 \lstset{language=Java, backgroundcolor=\color{editorGray},
@@ -72,7 +72,7 @@ Schritten Einschwingphase, Messphase und Ausschwingphase in einer Gwichtung von
 35/50/15 ausgeführt.
 
 Die Verteilung nach diesem Verhältnis übernimmt dabei die Funktion
-\gqq{choose()}.
+\textbf{choose()}.
 
 \begin{lstlisting}[caption={choose-Funktion in ProgramStage.java}]
 	/**
@@ -95,9 +95,9 @@ Die Verteilung nach diesem Verhältnis übernimmt dabei die Funktion
 
 
 Das Aufrufen der jeweiligen Funktion mit zufällig gewählten Parametern übernimmt die Funktion
-doTX(). Wobei die zufälligen Werte durch die Funktion chooseNumber() bestimmt
-werden, diese Funktion achtet dabei darauf, dass keine unzulässigen Werte
-abgefragt werden.
+\textbf{doTX()}. Wobei die zufälligen Werte durch die Funktion
+\textbf{chooseNumber()} bestimmt werden, diese Funktion achtet dabei darauf,
+dass keine unzulässigen Werte abgefragt werden.
 
 
 \begin{lstlisting}[caption={doTX-Funktion in ProgramStage.java}]
@@ -180,8 +180,8 @@ public class ClientThread extends Thread {
 \end{lstlisting}
 
 Die Instanziierung der Threads finden anschließend in der
-\textbf{main}-Methode des Programms statt. Nach der Erstellung der Threads
-soll mittels eines \textbf{timestamps} auf ein Startsignal gewartet werden.
+\textbf{Main}-Methode des Programms statt. Nach der Erstellung der Threads
+soll mittels eines \textbf{Timestamps} auf ein Startsignal gewartet werden.
 
 
 Das Startsignal wird gegeben, wenn der zuvor festgelegte \textbf{timestamp}
@@ -200,9 +200,9 @@ Das Startsignal wird gegeben, wenn der zuvor festgelegte \textbf{timestamp}
 
 \subsection{Exception-Handling}
 
-Das Exceptionhandlung findet global in der \textbf{main}-Methode statt. Tritt
-ein Fehler auf, wird dieser mittels dem \textbf{throws}-Statement
-\gqq{hochgebubbelt} bis dieser in unserer \textbf{catch}-Klausel behandelt wird.
+Das Exceptionhandlung findet global in der \textbf{Main}-Methode statt. Tritt
+ein Fehler auf, wird dieser mittels dem \textbf{Throws}-Statement
+weitergegeben bis dieser in unserer \textbf{Catch}-Klausel behandelt wird.
 
 \begin{lstlisting}[caption={Catch-Block}]
 		catch (SQLException sqle){
@@ -216,7 +216,7 @@ ein Fehler auf, wird dieser mittels dem \textbf{throws}-Statement
 \end{lstlisting}
 
 Da die \textbf{run}-Methode der Klasse \textbf{Thread} kein \textbf{throws}
-unterstützt würde die fehlerbehandlung für die Threads gesondert implementiert.
+unterstützt würde die Fehlerbehandlung für die Threads gesondert implementiert.
 Zusätzlich wird von den Threads die Funktion \textbf{abortProgramm}
 ausgeführt, wenn ein unbehandelter fehler im Thread auftreten sollte. Dies führt
 dazu, dass dsa Programm automatisch die Ausführung des Programmcodes
